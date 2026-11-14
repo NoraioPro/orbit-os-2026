@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LiveBadge, OsloClock } from '../components/Layout';
 import { OrbitGlobe, type GlobeFocus } from '../components/OrbitGlobe';
@@ -14,6 +14,7 @@ import { signed, type DataStatus, type EvidencePack } from '../kernel';
 import { useStore } from '../state/store';
 import { useAssets } from '../data/assets';
 import { NarrationButton } from '../components/Narration';
+import { IntroVideo, introSeen } from '../components/IntroVideo';
 
 interface Insight { id: string; icon: string; color: string; title: string; line: string; status: DataStatus; note?: string; lat: number; lng: number; pack: EvidencePack }
 
@@ -57,6 +58,7 @@ export default function CommandCenter() {
   const nav = useNavigate();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [focus, setFocus] = useState<GlobeFocus | null>(null);
+  const [showIntro, setShowIntro] = useState(() => !introSeen());
 
   useEffect(() => {
     Promise.all([
@@ -97,6 +99,7 @@ export default function CommandCenter() {
 
   return (
     <div className="relative flex h-full min-h-[690px] flex-col gap-3">
+      <IntroVideo open={showIntro} onClose={() => setShowIntro(false)} narration={assets.intro} />
       {assets.hero && <img src={assets.hero} alt="" aria-hidden className="pointer-events-none absolute inset-0 -z-0 h-full w-full rounded-2xl object-cover opacity-[.12] mix-blend-screen" />}
       <div className="flex items-start justify-between">
         <div>
@@ -104,7 +107,7 @@ export default function CommandCenter() {
           <p className="text-sm text-slate-300">From Space Data to Real-World Decisions · <span className="text-sky-300">One Change Engine, Many Worlds</span></p>
           {db && <p className="mt-0.5 text-[11px] text-slate-400">Events: <span className={db.status === 'live' ? 'text-emerald-300' : 'text-sky-300'}>{db.label}</span> · {db.events.length.toLocaleString('en-US')} records</p>}
         </div>
-        <div className="flex items-center gap-4"><NarrationButton src={assets.intro} label="Intro" /><LiveBadge /><OsloClock /></div>
+        <div className="flex items-center gap-4"><button onClick={() => setShowIntro(true)} className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-[12px] text-slate-200 transition hover:border-sky-300/60 hover:text-white">▶ Intro video</button><NarrationButton src={assets.intro} label="Narration" /><LiveBadge /><OsloClock /></div>
       </div>
 
       <div className="grid min-h-0 flex-1 grid-cols-[250px_minmax(0,1fr)_290px] gap-3 overflow-hidden">
