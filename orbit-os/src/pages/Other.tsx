@@ -52,7 +52,53 @@ export function Missions() {
           <div className="mt-3 text-[11px] uppercase tracking-wider text-slate-500">Step {i + 1} · {s.w}</div>
           <div className="text-lg font-semibold text-white">{s.t}</div><p className="mt-1 text-xs text-slate-400">{s.d}</p>
         </Glass>))}</div>
-      <Glass className="mt-3 p-4 text-sm text-slate-300"><div className="h-title mb-2">Why this pattern wins</div>Every Space Apps challenge in this set is one of six problems in disguise. ORBIT implements those six once, in the kernel, and every module calls the same functions. Earth data validates the methods; the Moon and Mars inherit them.</Glass>
+
+      <Glass className="mt-3 p-4">
+        <div className="flex items-center justify-between"><div className="h-title">One change engine — 7 kernel patterns, reused everywhere</div><button onClick={() => nav('/agents')} className="text-xs text-sky-300 hover:underline">AI Agents →</button></div>
+        <p className="mt-1 text-[11px] text-slate-400">Every module calls the same functions — change, anomaly, fusion, review, planning, transfer, prediction. Write once, run on Earth, the Moon and Mars.</p>
+        <div className="mt-3 grid grid-cols-7 gap-2">
+          {Object.entries(PATTERNS).map(([k, p]) => (
+            <button key={k} onClick={() => nav('/agents')} title={p.description} className="rounded-lg border border-white/10 bg-white/[.03] p-2.5 text-center transition hover:border-sky-300/40 hover:bg-sky-500/5">
+              <div className="text-sm font-semibold text-white">{p.short}</div>
+              <div className="mt-0.5 text-[10px] leading-tight text-slate-400">{p.name}</div>
+            </button>
+          ))}
+        </div>
+      </Glass>
+
+      <Glass className="mt-3 overflow-hidden p-0">
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5">
+          <div className="h-title">14 challenges → one platform</div>
+          <span className="text-[11px] text-slate-500">click a row for the challenge · click a module to jump straight to it</span>
+        </div>
+        <div className="scroll-thin overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="bg-white/5 text-left text-slate-400">
+              <tr><th className="p-2.5">Challenge</th><th className="p-2.5">Answered by</th><th className="p-2.5">Kernel</th><th className="p-2.5">SDGs</th></tr>
+            </thead>
+            <tbody>
+              {CHALLENGES.map((c) => {
+                const mods = MODULES.filter((m) => m.challenges.includes(c.n));
+                const sdgs = [...new Set(mods.flatMap((m) => m.sdgs))];
+                return (
+                  <tr key={c.n} className="cursor-pointer border-t border-white/5 transition hover:bg-sky-500/5" onClick={() => nav(`/solution/${c.n}`)}>
+                    <td className="p-2.5"><span className="mr-1 text-slate-500">#{c.n}</span><span className="font-semibold text-white">{c.name}</span></td>
+                    <td className="p-2.5">
+                      {mods.length ? mods.map((m) => <button key={m.id} onClick={(e) => { e.stopPropagation(); nav(`/module/${m.id}`); }} className="mr-1 rounded-full border border-sky-400/30 bg-sky-500/10 px-2 py-0.5 text-[10px] text-sky-200 transition hover:bg-sky-500/25">{m.name}</button>) : <span className="text-slate-500">prototype only</span>}
+                    </td>
+                    <td className="p-2.5">{mods[0]?.patterns.map((p) => <span key={p} title={PATTERNS[p].name} className="mr-1.5 text-violet-300">{PATTERNS[p].short}</span>)}</td>
+                    <td className="p-2.5">{sdgs.map((n) => <span key={n} title={SDGS[n]?.name} className="mr-1 inline-block rounded px-1.5 py-0.5 text-[9px] font-bold text-white" style={{ background: SDGS[n]?.color ?? '#334155' }}>{n}</span>)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </Glass>
+
+      <Glass className="mt-3 p-3 text-[11px] text-slate-400">
+        <Icon name="ShieldCheck" className="mr-1 inline h-3.5 w-3.5 text-sky-300" /><b className="text-slate-200">Why this wins:</b> every challenge here is one of a handful of problems in disguise. ORBIT implements those once in the kernel, each module calls the same functions, and every figure is labelled live / snapshot / sample — so one engine honestly answers all fourteen.
+      </Glass>
     </div>
   );
 }
