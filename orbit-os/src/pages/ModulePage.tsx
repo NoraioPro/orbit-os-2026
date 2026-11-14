@@ -35,6 +35,7 @@ const EarthJukebox = lazy(() => import('../modules/EarthJukebox').then((m) => ({
 const CropWatch = lazy(() => import('../modules/CropWatch').then((m) => ({ default: m.CropWatch })));
 const FireCalendar = lazy(() => import('../modules/FireCalendar').then((m) => ({ default: m.FireCalendar })));
 const SarChampion = lazy(() => import('../modules/SarChampion').then((m) => ({ default: m.SarChampion })));
+const SarFaultLab = lazy(() => import('../modules/SarFaultLab').then((m) => ({ default: m.SarFaultLab })));
 const SkyChangeViewer = lazy(() => import('../modules/SkyChangeViewer').then((m) => ({ default: m.SkyChangeViewer })));
 const SpaceExplorerPro = lazy(() => import('../modules/SpaceExplorerPro').then((m) => ({ default: m.SpaceExplorerPro })));
 
@@ -53,7 +54,7 @@ const EarthSuite: ComponentType = () => (
   </div>
 );
 const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterWidget /><FireCalendar /></div>;
-const SarSuite: ComponentType = () => <div className="space-y-3"><SarGlobe /><SarChampion /></div>;
+const SarSuite: ComponentType = () => <div className="space-y-3"><SarFaultLab /><SarGlobe /><SarChampion /></div>;
 const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanWidget /><SolarFish /></div>;
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
 const HumanSuite: ComponentType = () => <div className="space-y-3"><AstronautTwin /><HumanLab /><FlameLab /></div>;
