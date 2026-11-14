@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { MODULES } from '../data/modules';
 import { NAV_GROUPS, matchNav, type NavGroupId } from '../data/nav';
@@ -42,7 +42,14 @@ function loadGroups(): Record<string, boolean> {
 function Spine({ rail, onToggleRail, onNavigate }: { rail: boolean; onToggleRail?: () => void; onNavigate?: () => void }) {
   const loc = useLocation();
   const [open, setOpen] = useState<Record<string, boolean>>(loadGroups);
+  const navRef = useRef<HTMLElement>(null);
   const current = matchNav(loc.pathname);
+
+  // keep the active row (including a 14-deep challenge subtree) in view
+  useEffect(() => {
+    const active = navRef.current?.querySelector('[aria-current="page"]');
+    active?.scrollIntoView({ block: 'nearest' });
+  }, [loc.pathname, open]);
 
   useEffect(() => {
     try {
@@ -57,7 +64,7 @@ function Spine({ rail, onToggleRail, onNavigate }: { rail: boolean; onToggleRail
   const toggle = (id: NavGroupId) => setOpen((s) => ({ ...s, [id]: !isOpen(id) }));
 
   return (
-    <nav aria-label="ORBIT navigation" className="flex min-h-0 flex-1 flex-col">
+    <nav ref={navRef} aria-label="ORBIT navigation" className="flex min-h-0 flex-1 flex-col">
       <div className="scroll-thin min-h-0 flex-1 overflow-y-auto pr-0.5">
         {NAV_GROUPS.map((g) => {
           const expanded = isOpen(g.id);
@@ -83,28 +90,78 @@ function Spine({ rail, onToggleRail, onNavigate }: { rail: boolean; onToggleRail
               <div className="grid transition-[grid-template-rows] duration-300 ease-out" style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}>
                 <div className="min-h-0 overflow-hidden">
                   <div className="space-y-[2px] pb-0.5">
-                    {g.items.map((item) => (
-                      <NavLink
-                        key={item.id}
-                        to={item.to}
-                        end
-                        onClick={onNavigate}
-                        title={rail ? `${item.label}${item.badge ? ` · ${item.badge}` : ''}` : item.hint}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2.5 rounded-lg px-2.5 py-[4px] text-[12.5px] transition ${rail ? 'justify-center' : ''} ${
-                            isActive
-                              ? 'border border-sky-400/40 bg-gradient-to-r from-sky-500/30 to-indigo-500/10 text-white shadow-glow'
-                              : 'border border-transparent text-slate-200 hover:bg-white/5'
-                          }`
-                        }
-                      >
-                        <Icon name={item.icon} className={`h-4 w-4 shrink-0 ${item.color ?? 'text-sky-300'}`} />
-                        {!rail && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
-                        {!rail && item.badge && (
-                          <span className="shrink-0 rounded border border-white/10 bg-white/5 px-1 py-[1px] text-[9px] font-semibold tracking-wide text-slate-400">{item.badge}</span>
-                        )}
-                      </NavLink>
-                    ))}
+                    {g.items.map((item) => {
+                      const kids = item.children ?? [];
+                      const kidActive = kids.some((k) => k.to === loc.pathname.replace(/\/+$/, '') || loc.pathname.startsWith(`${k.to}/`));
+                      const kidsOpen = kidActive || open[item.id] === true;
+                      return (
+                        <div key={item.id}>
+                          <div className="flex items-center gap-1">
+                            <NavLink
+                              to={item.to}
+                              end
+                              onClick={onNavigate}
+                              title={rail ? `${item.label}${item.badge ? ` · ${item.badge}` : ''}` : item.hint}
+                              className={({ isActive }) =>
+                                `flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2.5 py-[4px] text-[12.5px] transition ${rail ? 'justify-center' : ''} ${
+                                  isActive
+                                    ? 'border border-sky-400/40 bg-gradient-to-r from-sky-500/30 to-indigo-500/10 text-white shadow-glow'
+                                    : 'border border-transparent text-slate-200 hover:bg-white/5'
+                                }`
+                              }
+                            >
+                              <Icon name={item.icon} className={`h-4 w-4 shrink-0 ${item.color ?? 'text-sky-300'}`} />
+                              {!rail && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
+                              {!rail && kids.length > 0 && (
+                                <span className="shrink-0 rounded border border-white/10 bg-white/5 px-1 py-[1px] text-[9px] font-semibold text-slate-400">{kids.length}</span>
+                              )}
+                              {!rail && item.badge && !kids.length && (
+                                <span className="shrink-0 rounded border border-white/10 bg-white/5 px-1 py-[1px] text-[9px] font-semibold tracking-wide text-slate-400">{item.badge}</span>
+                              )}
+                            </NavLink>
+                            {!rail && kids.length > 0 && (
+                              <button
+                                onClick={() => setOpen((s) => ({ ...s, [item.id]: !kidsOpen }))}
+                                aria-expanded={kidsOpen}
+                                aria-label={`${kidsOpen ? 'Collapse' : 'Expand'} ${item.label}`}
+                                className="rounded-md p-1 text-slate-500 transition hover:bg-white/5 hover:text-white"
+                              >
+                                <Icon name="ChevronDown" className={`h-3.5 w-3.5 transition-transform ${kidsOpen ? '' : '-rotate-90'}`} />
+                              </button>
+                            )}
+                          </div>
+
+                          {kids.length > 0 && !rail && (
+                            <div className="grid transition-[grid-template-rows] duration-300 ease-out" style={{ gridTemplateRows: kidsOpen ? '1fr' : '0fr' }}>
+                              <div className="min-h-0 overflow-hidden">
+                                <div className="scroll-thin ml-3 mt-0.5 max-h-[42vh] space-y-[2px] overflow-y-auto border-l border-white/10 pl-2 pr-1">
+                                  {kids.map((kid) => (
+                                    <NavLink
+                                      key={kid.id}
+                                      to={kid.to}
+                                      end
+                                      onClick={onNavigate}
+                                      title={kid.hint}
+                                      className={({ isActive }) =>
+                                        `flex items-center gap-2 rounded-lg px-2 py-[3px] text-[12px] transition ${
+                                          isActive
+                                            ? 'border border-sky-400/30 bg-sky-500/15 text-white'
+                                            : 'border border-transparent text-slate-300 hover:bg-white/5 hover:text-white'
+                                        }`
+                                      }
+                                    >
+                                      <Icon name={kid.icon} className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                                      <span className="min-w-0 flex-1 truncate">{kid.label}</span>
+                                      {kid.badge && <span className="shrink-0 text-[9px] font-semibold text-slate-500">{kid.badge}</span>}
+                                    </NavLink>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

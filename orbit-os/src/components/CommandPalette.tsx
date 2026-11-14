@@ -142,7 +142,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                 {item.hint && <span className="block truncate text-[11px] text-slate-400">{item.hint}</span>}
               </span>
               {item.badge && <span className="shrink-0 rounded border border-white/10 bg-white/5 px-1.5 py-[1px] text-[10px] font-semibold text-slate-300">{item.badge}</span>}
-              <span className="shrink-0 text-[10px] uppercase tracking-wide text-slate-500">{GROUP_LABEL[item.group] ?? ''}</span>
+              <span className="shrink-0 text-[10px] uppercase tracking-wide text-slate-500">{item.id.startsWith('solution.') ? 'Solutions' : GROUP_LABEL[item.group] ?? ''}</span>
             </button>
           ))}
           {askFallback && (

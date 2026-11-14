@@ -1,4 +1,5 @@
-import { MODULES } from './modules';
+import { CHALLENGES, MODULES } from './modules';
+import { CHALLENGE_META } from './challenges';
 
 /**
  * ORBIT's single navigation registry.
@@ -28,6 +29,8 @@ export interface NavItem {
   keywords?: string[];
   /** accent class for the icon */
   color?: string;
+  /** second-level destinations rendered under this row (e.g. the 14 challenge prototypes) */
+  children?: NavItem[];
 }
 
 export interface NavGroup {
@@ -84,6 +87,28 @@ const moduleItems: NavItem[] = MODULE_ORDER
     color: MODULE_COLORS[m.id],
   }));
 
+/** per-challenge rail icons (lucide names that already exist in components/ui.tsx) */
+const SOLUTION_ICONS: Record<number, string> = {
+  1: 'Box', 2: 'ChartColumn', 3: 'Gamepad2', 4: 'HeartPulse', 5: 'Radio', 6: 'Sprout', 7: 'Flame',
+  8: 'Clock', 9: 'Target', 10: 'Mars', 11: 'Moon', 12: 'Sparkles', 13: 'Rocket', 14: 'Music',
+};
+
+/** the 14 challenge prototypes, as second-level rows under Program › Solutions */
+export const SOLUTION_ITEMS: NavItem[] = CHALLENGES.map((c) => {
+  const meta = CHALLENGE_META[c.n];
+  return {
+    id: `solution.${c.n}`,
+    label: c.name,
+    to: `/solution/${c.n}`,
+    icon: SOLUTION_ICONS[c.n] ?? 'Puzzle',
+    kind: 'page' as const,
+    group: 'program' as const,
+    badge: `C${c.n}`,
+    hint: meta?.desc,
+    keywords: ['challenge', 'solution', 'prototype', `challenge ${c.n}`, ...(meta?.subjects ?? []), ...(meta?.difficulty ? [meta.difficulty] : [])],
+  };
+});
+
 export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'command',
@@ -118,7 +143,7 @@ export const NAV_GROUPS: NavGroup[] = [
     hint: 'missions & reports',
     items: [
       { id: 'page.missions', label: 'Missions', to: '/missions', icon: 'Rocket', kind: 'page', group: 'program', hint: 'Mission designs and the 14 challenge solutions', keywords: ['challenge', 'space apps'] },
-      { id: 'page.solutions', label: 'Solutions', to: '/solutions', icon: 'Puzzle', kind: 'page', group: 'program', hint: 'The 14 published challenge solutions', keywords: ['challenge', 'entries'] },
+      { id: 'page.solutions', label: 'Solutions', to: '/solutions', icon: 'Puzzle', kind: 'page', group: 'program', hint: 'The 14 published challenge solutions', keywords: ['challenge', 'entries'], children: SOLUTION_ITEMS },
       { id: 'page.sdgs', label: 'SDGs', to: '/sdgs', icon: 'Target', kind: 'page', group: 'program', hint: 'Modules mapped to UN goals', keywords: ['un', 'goals', 'impact'] },
       { id: 'page.reports', label: 'Reports', to: '/reports', icon: 'FileText', kind: 'page', group: 'program', hint: 'Generated evidence reports', keywords: ['pdf', 'export', 'evidence'] },
     ],
@@ -134,8 +159,8 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-/** flattened — the palette iterates this, the rail iterates NAV_GROUPS */
-export const NAV_INDEX: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
+/** flattened (children included) — the palette iterates this, the rail iterates NAV_GROUPS */
+export const NAV_INDEX: NavItem[] = NAV_GROUPS.flatMap((g) => g.items.flatMap((i) => (i.children ? [i, ...i.children] : [i])));
 
 /** resolve the current location to a nav item (module routes included) */
 export function matchNav(pathname: string): { group?: NavGroup; item?: NavItem } {
@@ -153,7 +178,6 @@ export function matchNav(pathname: string): { group?: NavGroup; item?: NavItem }
 /** extras that are reachable but hidden from the spine (alias routes, deep pages) */
 export const NAV_EXTRAS: NavItem[] = [
   { id: 'page.arctic', label: 'Arctic Watch', to: '/arctic', icon: 'Snowflake', kind: 'page', group: 'worlds', hint: 'ORBIT OS · Arctic Watch (embedded sibling app)', keywords: ['ice', 'svalbard', 'arctic'] },
-  { id: 'page.solution', label: 'Solution detail', to: '/solution/1', icon: 'Puzzle', kind: 'page', group: 'program', hint: 'Individual challenge solution write-up', keywords: ['solution', 'challenge'] },
 ];
 
 /** punctuation/space-insensitive substring match, scored by where it hits */
