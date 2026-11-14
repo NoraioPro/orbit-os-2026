@@ -1,25 +1,16 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAssets } from '../data/assets';
 import { MODULES } from '../data/modules';
 import { useStore } from '../state/store';
 import { EvidenceDrawer } from './EvidenceDrawer';
 import { DataFooter } from './DataFooter';
+import { Logo3D } from './Logo3D';
 import { Icon } from './ui';
 
 export function Logo() {
-  const a = useAssets();
   return (
     <div className="flex items-center gap-3">
-      {a.logo ? <img src={a.logo} alt="ORBIT OS logo" className="h-11 w-11 rounded-full object-contain drop-shadow-[0_0_12px_rgba(139,92,246,.6)]" /> : <svg viewBox="0 0 64 64" className="h-11 w-11 drop-shadow-[0_0_12px_rgba(139,92,246,.6)]">
-        <defs>
-          <radialGradient id="lg1" cx=".35" cy=".35"><stop offset="0" stopColor="#7dd3fc" /><stop offset=".6" stopColor="#4f46e5" /><stop offset="1" stopColor="#1e1b4b" /></radialGradient>
-          <linearGradient id="lg2" x1="0" x2="1"><stop offset="0" stopColor="#f97316" /><stop offset=".5" stopColor="#ec4899" /><stop offset="1" stopColor="#8b5cf6" /></linearGradient>
-        </defs>
-        <circle cx="32" cy="32" r="15" fill="url(#lg1)" />
-        <ellipse cx="32" cy="32" rx="29" ry="11" fill="none" stroke="url(#lg2)" strokeWidth="4" transform="rotate(-28 32 32)" />
-        <circle cx="55" cy="20" r="3" fill="#fde68a" />
-      </svg>}
+      <Logo3D size={44} />
       <div className="leading-tight">
         <div className="text-[26px] font-extrabold tracking-wide text-white">ORBIT OS</div>
         <div className="text-[12px] text-slate-300">Space Intelligence Platform</div>
