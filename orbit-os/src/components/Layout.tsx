@@ -4,6 +4,7 @@ import { useAssets } from '../data/assets';
 import { MODULES } from '../data/modules';
 import { useStore } from '../state/store';
 import { EvidenceDrawer } from './EvidenceDrawer';
+import { DataFooter } from './DataFooter';
 import { Icon } from './ui';
 
 export function Logo() {
@@ -121,6 +122,7 @@ export function Layout() {
         <Sidebar />
         <main className="glass relative min-w-0 flex-1 overflow-hidden"><div key={loc.pathname} className="page-in scroll-thin h-full overflow-y-auto p-5"><Outlet /></div></main>
       </div>
+      <DataFooter />
       <EvidenceDrawer />
     </div>
   );

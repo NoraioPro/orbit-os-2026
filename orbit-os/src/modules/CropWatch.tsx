@@ -154,9 +154,15 @@ export function CropWatch() {
     setLoading(true);
     setFatal(null);
     Promise.all(
-      CROP_REGIONS.map(async (r) => {
+      CROP_REGIONS.map(async (r, i) => {
         try {
-          const res = await fetch(archiveUrl(r));
+          // Stagger to dodge Open-Meteo burst rate-limiting (HTTP 429)
+          await new Promise((res) => setTimeout(res, i * 200));
+          let res = await fetch(archiveUrl(r));
+          if (res.status === 429) {
+            await new Promise((res2) => setTimeout(res2, 2500));
+            res = await fetch(archiveUrl(r));
+          }
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const j = (await res.json()) as { daily?: DailyArchive };
           if (!j.daily) throw new Error('no daily block in response');
