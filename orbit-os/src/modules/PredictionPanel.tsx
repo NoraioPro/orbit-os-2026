@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Glass, Icon, StatusBadge } from '../components/ui';
+import { NarrationButton } from '../components/Narration';
 import { LineChart } from '../components/LineChart';
 import { forecastSeries, poissonForecast, type Forecast, type SeriesPoint } from '../kernel';
 
@@ -50,7 +51,7 @@ export function PredictionPanel() {
   return (
     <Glass className="p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2"><Icon name="ChartColumn" className="h-4 w-4 text-sky-300" /><span className="h-title">6-year daily history → prediction</span><StatusBadge status="live" note={h.retrieved_at.slice(0, 16).replace('T', ' ')} /></div>
+        <div className="flex items-center gap-2"><Icon name="ChartColumn" className="h-4 w-4 text-sky-300" /><span className="h-title">6-year daily history → prediction</span><StatusBadge status="live" note={h.retrieved_at.slice(0, 16).replace('T', ' ')} /><NarrationButton src="/assets/audio/prediction.mp3" label="Listen" /></div>
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
           <select className="input !w-auto !py-1 text-xs" value={siteIdx} onChange={(e) => setSiteIdx(+e.target.value)}>{h.sites.map((s, i) => <option key={i} value={i}>{s.site}</option>)}</select>
           <select className="input !w-auto !py-1 text-xs" value={varIdx} onChange={(e) => setVarIdx(+e.target.value)}>{VARS.map((x, i) => <option key={x.id} value={i}>{x.label}</option>)}</select>

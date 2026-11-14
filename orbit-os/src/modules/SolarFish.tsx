@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
+import { NarrationButton } from '../components/Narration';
 
 /* ------------------------------------------------------------------ *
  * SolarFish — marine habitat intelligence (extracted from the
@@ -122,7 +123,7 @@ export function SolarFish() {
   return (
     <Glass className="p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2"><Icon name="Waves" className="h-4 w-4 text-cyan-300" /><span className="h-title">SolarFish · habitat forecaster</span><StatusBadge status="snapshot" note="species profiles · literature-informed" /></div>
+        <div className="flex items-center gap-2"><Icon name="Waves" className="h-4 w-4 text-cyan-300" /><span className="h-title">SolarFish · habitat forecaster</span><StatusBadge status="snapshot" note="species profiles · literature-informed" /><NarrationButton src="/assets/audio/solarfish.mp3" label="Listen" /></div>
         <span className="text-[11px] text-slate-500">challenge #2 · Be an Earth System Trend Detective</span>
       </div>
       <p className="mt-1 text-[11px] text-slate-400">Satellites cannot see fish underwater — SolarFish estimates <b className="text-slate-200">where the environment is suitable</b> for a species, with the uncertainty stated. Decision support, not a catch prediction.</p>

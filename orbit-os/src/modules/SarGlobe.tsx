@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Globe, { type GlobeMethods } from 'react-globe.gl';
 import { MeshPhongMaterial, Color } from 'three';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
+import { NarrationButton } from '../components/Narration';
 import { backscatterChange, simulateSarPair } from '../kernel';
 
 /* ------------------------------------------------------------------ *
@@ -84,7 +85,7 @@ export function SarGlobe() {
   return (
     <Glass className="p-0 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
-        <div className="flex items-center gap-2"><Icon name="Radio" className="h-5 w-5 text-teal-300" /><span className="h-title">SAR Earth Atlas</span><StatusBadge status="live" note="ASF acquisitions · live" /></div>
+        <div className="flex items-center gap-2"><Icon name="Radio" className="h-5 w-5 text-teal-300" /><span className="h-title">SAR Earth Atlas</span><StatusBadge status="live" note="ASF acquisitions · live" /><NarrationButton src="/assets/audio/sar-atlas.mp3" label="Listen" /></div>
         <span className="text-[11px] text-slate-500">8 study areas · ranked by detected radar change · click any marker</span>
       </div>
 

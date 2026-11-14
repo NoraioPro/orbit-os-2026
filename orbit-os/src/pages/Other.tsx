@@ -53,6 +53,25 @@ export function Missions() {
           <div className="text-lg font-semibold text-white">{s.t}</div><p className="mt-1 text-xs text-slate-400">{s.d}</p>
         </Glass>))}</div>
 
+      <Glass className="mt-3 p-3">
+        <div className="h-title">The decision workflow — four layers, colour-coded</div>
+        <p className="mt-1 text-[11px] text-slate-400">Every module sits on one path: from seeing the problem, to measuring change, to forecasting, to deciding.</p>
+        <div className="mt-2 grid grid-cols-4 gap-2">
+          {[
+            { k: 'SEE', c: '#22d3ee', d: 'Where is it?', ex: 'Global Atlas, Situation Room' },
+            { k: 'CHANGE', c: '#3b82f6', d: 'How fast is it moving?', ex: 'Trend Detective, SAR' },
+            { k: 'PREDICT', c: '#f59e0b', d: "What's coming?", ex: 'Prediction Panel, SolarFish' },
+            { k: 'DECIDE', c: '#10b981', d: 'What should I do?', ex: 'CropWatch, GNSS Guardian' },
+          ].map((s) => (
+            <div key={s.k} className="rounded-lg border p-3" style={{ borderColor: `${s.c}55`, background: `${s.c}14` }}>
+              <div className="text-sm font-bold tracking-wide" style={{ color: s.c }}>{s.k}</div>
+              <div className="mt-0.5 text-[11px] text-slate-200">{s.d}</div>
+              <div className="mt-1 text-[9px] text-slate-400">{s.ex}</div>
+            </div>
+          ))}
+        </div>
+      </Glass>
+
       <Glass className="mt-3 p-4">
         <div className="flex items-center justify-between"><div className="h-title">One change engine — 7 kernel patterns, reused everywhere</div><button onClick={() => nav('/agents')} className="text-xs text-sky-300 hover:underline">AI Agents →</button></div>
         <p className="mt-1 text-[11px] text-slate-400">Every module calls the same functions — change, anomaly, fusion, review, planning, transfer, prediction. Write once, run on Earth, the Moon and Mars.</p>

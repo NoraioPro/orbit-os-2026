@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Globe, { type GlobeMethods } from 'react-globe.gl';
 import { MeshPhongMaterial, Color } from 'three';
 import { Glass, Icon, StatusBadge } from '../components/ui';
+import { NarrationButton } from '../components/Narration';
 import { gpPosition, orbitClass, ORBIT_CLASSES } from '../kernel/orbit';
 import { loadEvents, TYPE_META, type EventsDB } from '../data/events';
 import { loadFirms, type FirmsGrid } from '../data/harvest';
@@ -112,6 +113,7 @@ export function GlobalAtlas() {
           <Icon name="Earth" className="h-5 w-5 text-sky-300" />
           <span className="h-title">Global Atlas · where is everything</span>
           <StatusBadge status="live" note={`${pts.length.toLocaleString('en-US')} points plotted`} />
+          <NarrationButton src="/assets/audio/global-atlas.mp3" label="Listen" />
         </div>
         <div className="flex items-center gap-1.5 text-[11px]">
           <span className="text-slate-500">Sim speed</span>

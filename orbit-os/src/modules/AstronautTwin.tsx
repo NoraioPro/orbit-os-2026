@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
+import { NarrationButton } from '../components/Narration';
 
 /* ------------------------------------------------------------------ *
  * Astronaut Digital Twin — a 3D astronaut (three.js primitives, no
@@ -140,7 +141,7 @@ export function AstronautTwin() {
   return (
     <Glass className="p-0 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
-        <div className="flex items-center gap-2"><Icon name="HeartPulse" className="h-5 w-5 text-rose-300" /><span className="h-title">Astronaut Digital Twin</span><StatusBadge status="sample" note="simulated physiology · not medical data" /></div>
+        <div className="flex items-center gap-2"><Icon name="HeartPulse" className="h-5 w-5 text-rose-300" /><span className="h-title">Astronaut Digital Twin</span><StatusBadge status="sample" note="simulated physiology · not medical data" /><NarrationButton src="/assets/audio/astronaut-twin.mp3" label="Listen" /></div>
         <div className="flex gap-2"><Chip className="border-sky-400/30 text-sky-200">3D twin</Chip><Chip className="border-amber-400/30 text-amber-200">EVA suit</Chip></div>
       </div>
 
