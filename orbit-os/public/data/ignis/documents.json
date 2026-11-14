@@ -1,0 +1,115 @@
+[
+  {
+    "ids": [
+      "luci"
+    ],
+    "title": "Lunar Combustion Investigation: Flammability Results",
+    "url": "https://ntrs.nasa.gov/citations/20250010653",
+    "locator": "LUCI: SIBAL fabric and SIBAL Flame Spread Fit Comparison",
+    "finding": "NASA reports a flame-base spread rate of 0.92 mm/s for the downward-burning SIBAL cotton-fiberglass specimen in simulated lunar gravity. The 1-g comparison reports 1.5 mm/s from a linear fit.",
+    "limits": "Simulated lunar acceleration in a rotating chamber is a specific test environment. SIBAL differs from plain cotton. The indexed rows do not contain numeric pressure, imposed airflow, starting oxygen or uncertainty.",
+    "terms": "lunar moon partial gravity earth cotton fabric flammability comparison SIBAL spread habitat"
+  },
+  {
+    "ids": [
+      "saffire-i",
+      "saffire-ii"
+    ],
+    "title": "Results of Large-Scale Spacecraft Flammability Tests",
+    "url": "https://ntrs.nasa.gov/citations/20170008805",
+    "locator": "Slides 9, 17, 20–21",
+    "finding": "The wide SIBAL cotton-fiberglass sample had mean flame spread rates of 1.8 mm/s with concurrent flow and 1.3 mm/s with opposed flow. The narrower Saffire-II specimen spread at 2.1 mm/s at the same nominal flow speed.",
+    "limits": "Direction, width and starting oxygen differ. These observations do not isolate any one factor.",
+    "terms": "solid material flammability forced airflow cotton lunar oxygen flame spread"
+  },
+  {
+    "ids": [
+      "flex"
+    ],
+    "title": "Experimental Observations of Methanol Droplet Combustion and Extinction",
+    "url": "https://ntrs.nasa.gov/citations/20120016855",
+    "locator": "Abstract",
+    "finding": "The report describes methanol droplet extinction in quiescent microgravity in oxygen, carbon dioxide and nitrogen mixtures at two total pressures.",
+    "limits": "Droplet findings have limited applicability to solid fuels and ventilated habitats.",
+    "terms": "suppression co2 carbon dioxide dilution extinction pressure liquid inert"
+  },
+  {
+    "ids": [
+      "same-r"
+    ],
+    "title": "Smoke Aerosol Measurement Experiment – Reflight",
+    "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-101",
+    "locator": "Investigation overview, SAME-R",
+    "finding": "NASA identifies SAME-R as an ISS spacecraft fire safety investigation in combustion science.",
+    "limits": "The reflight catalog entry supplies investigation context. Detector performance is outside this evidence card.",
+    "terms": "smoke aerosol detection particles sensor"
+  },
+  {
+    "ids": [
+      "bass",
+      "daft",
+      "flex"
+    ],
+    "title": "NASA Glenn Combustion Science",
+    "url": "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/",
+    "locator": "Archived combustion experiments",
+    "finding": "NASA describes BASS as examining burning and extinction of solids, DAFT as checking the operation of a modified particle counter, and FLEX as studying inert-gas suppression of droplet flames.",
+    "limits": "Program summaries describe objectives and apparatus at the investigation level.",
+    "terms": "bass solid extinction daft instrument detection flex flammability"
+  },
+  {
+    "ids": [
+      "saffire-iii"
+    ],
+    "title": "Saffire-I–III Results",
+    "url": "https://ntrs.nasa.gov/citations/20180004258",
+    "locator": "Spread rate summary for cotton/fiberglass fabric",
+    "finding": "NASA compares concurrent and opposed spread and reports flow context and fabric width for the Saffire-I case.",
+    "limits": "Specimen scale, combustion geometry and direction matter when comparing results.",
+    "terms": "saffire iii flow airflow spread comparison solid cotton"
+  },
+  {
+    "ids": [
+      "bass-ii"
+    ],
+    "title": "Burning and Suppression of Solids II",
+    "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-25",
+    "locator": "PSI-25 · Investigation objectives",
+    "finding": "BASS-II studied ignition, spread and extinction of solid fuels under low-velocity forced flow in microgravity.",
+    "limits": "The objectives establish the scope of the investigation. This evidence card does not contain an indexed BASS-II measurement.",
+    "terms": "bass-ii solid material flammability forced airflow ventilation ignition extinction polymer"
+  },
+  {
+    "ids": [
+      "spice"
+    ],
+    "url": "https://doi.org/10.60555/9kbh-e962",
+    "title": "SPICE · Smoke Point In Co-flow Experiment",
+    "terms": "spice gas gaseous coflow soot smoke burner",
+    "finding": "NASA describes tests of how burner diameter and coflow affect luminous flame length and laminar smoke point.",
+    "locator": "NASA PSI investigation overview",
+    "limits": "Collection metadata describes the experimental scope. Consult the primary files for run-specific outcomes and uncertainty."
+  },
+  {
+    "ids": [
+      "flex"
+    ],
+    "url": "https://doi.org/10.60555/mbq8-0451",
+    "title": "FLEX · NASA PSI collection",
+    "terms": "flex liquid droplet extinction suppressant suppression helium carbon dioxide mixtures",
+    "finding": "NASA describes liquid-droplet experiments studying extinction limits and gaseous suppressants in microgravity.",
+    "locator": "NASA PSI investigation overview",
+    "limits": "Collection metadata describes the experimental scope. Consult the primary files for run-specific outcomes and uncertainty."
+  },
+  {
+    "ids": [
+      "saffire-i"
+    ],
+    "url": "https://doi.org/10.60555/0t15-1z43",
+    "title": "Saffire-I · NASA PSI collection",
+    "terms": "saffire-i solid fuel scale ventilation sensor material screening",
+    "finding": "NASA describes a large SIBAL specimen in a forced-flow duct aboard an uncrewed Cygnus after departure from the ISS.",
+    "locator": "NASA PSI investigation overview",
+    "limits": "Collection metadata describes the experimental scope. Consult the primary files for run-specific outcomes and uncertainty."
+  }
+]

@@ -19,6 +19,19 @@ const DURATION: Record<string, number> = {
 };
 const FLASH = 1.5 * 86400000;
 
+// Live weather sites for the twin (MET Norway Yr, locationforecast/2.0, keyless).
+const TWIN_SITES = [
+  { lat: 59.91, lon: 10.75, label: 'Oslo' },
+  { lat: 78.22, lon: 15.65, label: 'Svalbard' },
+  { lat: 60.0, lon: -30.0, label: 'N. Atlantic' },
+  { lat: 13.5, lon: 2.1, label: 'Sahel' },
+  { lat: 37.77, lon: -122.42, label: 'California' },
+];
+const WEATHER_EMOJI: Record<string, string> = { clearsky_day: '☀️', clearsky_night: '🌙', fair_day: '🌤️', fair_night: '🌙', partlycloudy_day: '⛅', partlycloudy_night: '☁️', cloudy: '☁️', lightrain: '🌦️', rain: '🌧️', heavyrain: '🌧️', rainshowers_day: '🌦️', rainshowers_night: '🌧️', lightsnow: '🌨️', snow: '❄️', heavysnow: '❄️', lightsleet: '🌨️', sleet: '🌨️', fog: '🌫️' };
+const wEmoji = (c: string) => WEATHER_EMOJI[c] ?? '·';
+const tempColor = (t: number) => (t <= -10 ? '#67e8f9' : t <= 0 ? '#38bdf8' : t <= 10 ? '#22d3ee' : t <= 20 ? '#34d399' : t <= 30 ? '#fbbf24' : '#f87171');
+interface TwinWeather { lat: number; lon: number; label: string; temp: number; wind: number; rh: number; code: string; updated: string }
+
 const endOf = (e: OrbitEvent) => e.t + (DURATION[e.type] ?? 3 * 86400000);
 const activeAt = (e: OrbitEvent, T: number) => (DURATION[e.type] === 0 ? e.t <= T && T <= e.t + FLASH : e.t <= T && T <= e.t + (DURATION[e.type] ?? 3 * 86400000));
 
@@ -30,11 +43,27 @@ export default function WorldTwin() {
   const [selected, setSelected] = useState<OrbitEvent | null>(null);
   const [types, setTypes] = useState<string[]>(Object.keys(TYPE_META));
   const [minMag, setMinMag] = useState(5);
+  const [weather, setWeather] = useState<TwinWeather[]>([]);
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
 
   useEffect(() => { loadEvents(settings.dataSource).then(setDb).catch(() => {}); }, [settings.dataSource]);
+  useEffect(() => {
+    let alive = true;
+    Promise.all(TWIN_SITES.map(async (s) => {
+      try {
+        const r = await fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${s.lat}&lon=${s.lon}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const j = await r.json();
+        const cur = j.properties.timeseries[0];
+        const inst = cur.data.instant.details;
+        const code = cur.data.next_1_hours?.summary?.symbol_code ?? cur.data.next_6_hours?.summary?.symbol_code ?? '';
+        return { lat: s.lat, lon: s.lon, label: s.label, temp: inst.air_temperature, wind: inst.wind_speed, rh: inst.relative_humidity, code, updated: j.properties.meta.updated_at };
+      } catch { return null; }
+    })).then((ws) => { if (alive) setWeather(ws.filter((x): x is TwinWeather => !!x)); });
+    return () => { alive = false; };
+  }, []);
   useEffect(() => {
     const el = wrap.current; if (!el) return;
     const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight }));
@@ -56,6 +85,7 @@ export default function WorldTwin() {
   }, [playing, db, minT, maxT]);
 
   const active = useMemo(() => (db ? db.events.filter((e) => activeAt(e, T) && types.includes(e.type) && (e.type !== 'earthquake' || (e.mag ?? 0) >= minMag)) : []), [db, T, types, minMag]);
+  const points = useMemo(() => [...active.map((e) => ({ ...e, kind: 'event' as const })), ...weather.map((w) => ({ ...w, kind: 'weather' as const }))], [active, weather]);
   const histogram = useMemo(() => {
     if (!db) return [];
     const filtered = db.events.filter((e) => types.includes(e.type) && (e.type !== 'earthquake' || (e.mag ?? 0) >= minMag));
@@ -108,15 +138,15 @@ export default function WorldTwin() {
                 showAtmosphere
                 atmosphereColor="#4aa8ff"
                 atmosphereAltitude={0.22}
-                pointsData={active}
+                pointsData={points}
                 pointLat="lat"
                 pointLng="lon"
-                pointColor={(d: any) => colorOf(d)}
-                pointAltitude={0.02}
-                pointRadius={(d: any) => (d.type === 'earthquake' ? 0.18 : 0.26)}
+                pointColor={(d: any) => (d.kind === 'weather' ? tempColor(d.temp) : colorOf(d))}
+                pointAltitude={(d: any) => (d.kind === 'weather' ? 0.04 : 0.02)}
+                pointRadius={(d: any) => (d.kind === 'weather' ? 0.32 : d.type === 'earthquake' ? 0.18 : 0.26)}
                 pointsMerge={false}
-                pointLabel={(d: any) => `<div style="background:#0b1229ee;border:1px solid #38bdf855;padding:6px 8px;border-radius:8px;font:12px Inter,sans-serif;color:#e2e8f0"><b>${TYPE_META[d.type]?.label ?? d.type}</b><br/>${d.title.slice(0, 60)}<br/><span style="color:#94a3b8">${isoMin(d.t)}</span></div>`}
-                onPointClick={(d: any) => setSelected(d)}
+                pointLabel={(d: any) => d.kind === 'weather' ? `<div style="background:#0b1229ee;border:1px solid #22d3ee55;padding:6px 8px;border-radius:8px;font:12px Inter,sans-serif;color:#e2e8f0"><b>${d.label}</b> · ${d.temp.toFixed(1)}°C ${wEmoji(d.code)}<br/><span style="color:#94a3b8">wind ${d.wind.toFixed(1)} m/s · ${d.rh.toFixed(0)}% RH · live Yr</span></div>` : `<div style="background:#0b1229ee;border:1px solid #38bdf855;padding:6px 8px;border-radius:8px;font:12px Inter,sans-serif;color:#e2e8f0"><b>${TYPE_META[d.type]?.label ?? d.type}</b><br/>${d.title.slice(0, 60)}<br/><span style="color:#94a3b8">${isoMin(d.t)}</span></div>`}
+                onPointClick={(d: any) => d.kind === 'event' && setSelected(d)}
               />
             )}
           </div>
@@ -124,6 +154,19 @@ export default function WorldTwin() {
         </Glass>
 
         <div className="flex flex-col gap-3">
+          <Glass className="p-3">
+            <div className="flex items-center justify-between"><div className="h-title">Live weather now</div>{weather[0] && <StatusBadge status="live" note={weather[0].updated.slice(0, 16).replace('T', ' ')} />}</div>
+            <ul className="mt-2 space-y-1.5 text-[11px]">
+              {weather.map((w) => (
+                <li key={w.label} className="flex items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[.03] px-2 py-1.5">
+                  <span className="flex items-center gap-1.5"><span className="text-sm">{wEmoji(w.code)}</span><span className="text-slate-200">{w.label}</span></span>
+                  <span className="tabular-nums"><b className="text-white">{w.temp.toFixed(0)}°C</b> <span className="text-slate-500">· {w.wind.toFixed(0)} m/s</span></span>
+                </li>
+              ))}
+              {!weather.length && <li className="p-2 text-slate-500">Loading live Yr weather…</li>}
+            </ul>
+            <p className="mt-1.5 text-[10px] text-slate-500">MET Norway Yr (locationforecast/2.0, keyless, CC BY 4.0) — live now-cast, weather markers on the globe are colour-coded by temperature.</p>
+          </Glass>
           <Glass className="p-3">
             <div className="h-title">Now · {dateLabel(T)}</div>
             <div className="mt-1 text-3xl font-bold text-white">{active.length.toLocaleString('en-US')}</div>

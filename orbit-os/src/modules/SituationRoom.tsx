@@ -5,6 +5,7 @@ import { Glass, Icon, StatusBadge } from '../components/ui';
 import { gpPosition, orbitClass, ORBIT_CLASSES } from '../kernel/orbit';
 import { loadEvents, TYPE_META, type EventsDB } from '../data/events';
 import { loadFirms, loadSpace, type FirmsGrid, type SpaceHarvest } from '../data/harvest';
+import { GlobalAtlas } from './GlobalAtlas';
 
 const CELESTRAK = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json';
 
@@ -42,9 +43,13 @@ export function SituationRoom() {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [rows, setRows] = useState<GpRow[] | null>(null);
+  const [simSpeed, setSimSpeed] = useState(60);
+  const baseRef = useRef(Date.now());
 
   useEffect(() => {
-    fetch(CELESTRAK)
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    fetch(CELESTRAK, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((catalog: GpRow[]) => { setRows(catalog); setSatErr(null); })
       .catch((e) => {
@@ -52,7 +57,8 @@ export function SituationRoom() {
           .then((r) => (r.ok ? r.json() : Promise.reject(new Error('no fallback'))))
           .then((j: { sample?: any[] }) => { setRows((j.sample ?? []).map((s): GpRow => ({ OBJECT_NAME: s.name, NORAD_CAT_ID: s.norad, EPOCH: s.epoch, MEAN_MOTION: s.mean_motion, ECCENTRICITY: s.eccentricity, INCLINATION: s.inclination, RA_OF_ASC_NODE: s.raan, ARG_OF_PERICENTER: s.arg_perigee, MEAN_ANOMALY: s.mean_anomaly }))); setSatErr(`live catalog blocked (${String(e).replace(/^Error: /, '')}); using the ${(j.sample ?? []).length}-satellite harvest`); })
           .catch(() => setSatErr(String(e)));
-      });
+      })
+      .finally(() => clearTimeout(timer));
     loadEvents('harvest').then(setDb).catch(() => {});
     loadFirms().then(setFirms).catch(() => {});
     loadSpace().then(setSpace).catch(() => {});
@@ -61,21 +67,27 @@ export function SituationRoom() {
   useEffect(() => {
     if (!rows) return;
     const propagate = () => {
-      const at = Date.now();
+      const virtualNow = baseRef.current + (Date.now() - baseRef.current) * simSpeed;
       const out: Sat[] = rows.map((c) => {
-        const p = gpPosition({ meanMotionRevDay: c.MEAN_MOTION, eccentricity: c.ECCENTRICITY, inclinationDeg: c.INCLINATION, raanDeg: c.RA_OF_ASC_NODE, argPerigeeDeg: c.ARG_OF_PERICENTER, meanAnomalyDeg: c.MEAN_ANOMALY, epochMs: epochMs(c.EPOCH) }, at);
+        const p = gpPosition({ meanMotionRevDay: c.MEAN_MOTION, eccentricity: c.ECCENTRICITY, inclinationDeg: c.INCLINATION, raanDeg: c.RA_OF_ASC_NODE, argPerigeeDeg: c.ARG_OF_PERICENTER, meanAnomalyDeg: c.MEAN_ANOMALY, epochMs: epochMs(c.EPOCH) }, virtualNow);
         return { name: c.OBJECT_NAME, norad: c.NORAD_CAT_ID, lat: p.lat, lng: p.lon, altKm: p.altKm, cls: orbitClass(c.OBJECT_NAME, p.altKm, c.ECCENTRICITY, c.INCLINATION) };
       });
       setSats(out);
-      setPosTime(new Date(at).toISOString().slice(11, 19) + ' UTC');
+      setPosTime(new Date(virtualNow).toISOString().slice(11, 19) + ' UTC');
     };
     propagate();
-    const id = setInterval(propagate, 60000);
+    const id = setInterval(propagate, 1000);
     return () => clearInterval(id);
-  }, [rows]);
+  }, [rows, simSpeed]);
 
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
   useEffect(() => { const el = wrap.current; if (!el) return; const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight })); ro.observe(el); return () => ro.disconnect(); }, []);
+  useEffect(() => {
+    const g = globeRef.current; if (!g || !size.w) return;
+    g.pointOfView({ lat: 15, lng: 0, altitude: 3.2 }, 0);
+    const c = g.controls() as any;
+    c.autoRotate = true; c.autoRotateSpeed = 0.25; c.enableZoom = true;
+  }, [size.w > 0]);
 
   const material = useMemo(() => new MeshPhongMaterial({ color: new Color('#ffffff'), emissive: new Color('#0b2a6b'), emissiveIntensity: 0.6, shininess: 12 }), []);
   const shown = useMemo(() => (sats ? (filter === 'all' ? sats : sats.filter((s) => s.cls === filter)) : []), [sats, filter]);
@@ -123,7 +135,7 @@ export function SituationRoom() {
                 pointLat="lat"
                 pointLng="lng"
                 pointColor={(d: any) => ORBIT_CLASSES[d.cls]?.color ?? '#94a3b8'}
-                pointAltitude={0.015}
+                pointAltitude={(d: any) => Math.max(0.06, d.altKm / 6371)}
                 pointRadius={(d: any) => (d.cls === 'geo' ? 0.22 : 0.14)}
                 pointsMerge={false}
                 pointLabel={(d: any) => `<div style="background:#0b1229ee;border:1px solid #38bdf855;padding:5px 8px;border-radius:8px;font:12px Inter,sans-serif;color:#e2e8f0"><b>${d.name}</b><br/>NORAD ${d.norad} · ${ORBIT_CLASSES[d.cls]?.label ?? d.cls}<br/><span style="color:#94a3b8">${d.altKm.toFixed(0)} km · ${d.lat.toFixed(1)}°, ${d.lng.toFixed(1)}°</span></div>`}
@@ -137,7 +149,14 @@ export function SituationRoom() {
               </button>
             ))}
           </div>
-          <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 text-[10px]">
+          <div className="absolute left-3 top-14 flex flex-wrap items-center gap-1">
+            <span className="px-0.5 text-[9px] uppercase tracking-wide text-slate-500">orbit</span>
+            {([1, 60, 360] as const).map((s) => (
+              <button key={s} onClick={() => { baseRef.current = Date.now(); setSimSpeed(s); }} className={`rounded-full border px-2 py-0.5 text-[10px] ${simSpeed === s ? 'border-sky-300/50 bg-sky-500/20 text-white' : 'border-white/10 bg-slate-950/60 text-slate-400 hover:text-slate-200'}`}>{s}×</button>
+            ))}
+          </div>
+          <div className="absolute bottom-3 left-3 right-3 text-[9px] text-slate-500">altitude is real (LEO ≈ 400–2,000 km hugs Earth, GEO ≈ 35,786 km sits ~5.6 Earth-radii out) · drag/zoom to explore</div>
+          <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-2 text-[10px]">
             {Object.entries(ORBIT_CLASSES).map(([k, v]) => <span key={k} className="flex items-center gap-1 rounded bg-slate-950/70 px-1.5 py-0.5 text-slate-300"><span className="h-2 w-2 rounded-full" style={{ background: v.color }} />{v.label}</span>)}
           </div>
         </Glass>
@@ -175,6 +194,8 @@ export function SituationRoom() {
       <Glass className="p-3 text-[11px] text-slate-400">
         <div className="flex items-start gap-2"><Icon name="ShieldCheck" className="mt-0.5 h-4 w-4 text-sky-300" /><span><b className="text-slate-200">Honesty:</b> satellite positions are approximate Keplerian propagation of CelesTrak TLEs (no J2/drag/SGP4). Events and fires are real USGS / NASA EONET / FIRMS harvests; space weather is NOAA SWPC. This is a situational-awareness view, <b>not</b> a warning or defense-grading system.</span></div>
       </Glass>
+
+      <GlobalAtlas />
     </div>
   );
 }

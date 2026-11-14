@@ -1,0 +1,3 @@
+id,investigation,material,gravity,direction,width_cm,length_cm,oxygen_pct,airflow_cm_s,spread_mm_s,slide
+LUCI-SIBAL-partial-g,luci,SIBAL cotton-fiberglass fabric,Lunar,Downward,5,30,,,0.92,LUCI - SIBAL fabric
+LUCI-SIBAL-1g,luci,SIBAL cotton-fiberglass fabric,Earth,Unindexed,,,,,1.5,SIBAL Flame Spread Fit Comparison

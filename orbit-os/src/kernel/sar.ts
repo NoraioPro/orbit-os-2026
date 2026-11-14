@@ -142,12 +142,12 @@ export function relateEvents(lat: number, lon: number, radiusKm: number, events:
 export interface SarPair { before: SarRaster; after: SarRaster; label: string; groundTruth: string }
 
 /** Seeded synthetic before/after pair with an injected, known change region (SAMPLE). */
-export function simulateSarPair(scenario: string, opts: { seed?: number; size?: number; extent?: [number, number, number, number] } = {}): SarPair {
+export function simulateSarPair(scenario: string, opts: { seed?: number; size?: number; extent?: [number, number, number, number]; radius?: number } = {}): SarPair {
   const seed = opts.seed ?? 1, size = opts.size ?? 64;
   const extent = opts.extent ?? ([10.0, 59.0, 11.0, 60.0] as [number, number, number, number]);
   const r = rng(seed);
   const n = size * size;
-  const cx = size / 2, cy = size / 2, radius = size / 5;
+  const cx = size / 2, cy = size / 2, radius = opts.radius ?? size / 5;
   const base = new Array<number>(n), changed = new Array<number>(n);
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
     const i = y * size + x;

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { LineChart } from '../components/LineChart';
 import { Chip, ConfidencePill, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
+import { NarrationButton } from '../components/Narration';
 import { DATASETS } from '../data/datasets';
 import { moduleById } from '../data/modules';
 import { POWER_VARS } from '../data/power';
@@ -34,7 +35,7 @@ export default function Analysis() {
   const p = shown?.plan ?? plan;
   return (
     <div>
-      <PageHeader icon="ChartColumn" title="Analysis · Quick Investigation" subtitle="Question → structured plan → kernel computation → evidence pack → human review. Works offline with a deterministic planner; an LLM is optional." />
+      <PageHeader icon="ChartColumn" title="Analysis · Quick Investigation" subtitle="Question → structured plan → kernel computation → evidence pack → human review. Works offline with a deterministic planner; an LLM is optional." right={<NarrationButton src="/assets/audio/analysis.mp3" label="Listen" />} />
       <Glass className="p-4">
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (text.trim()) { ran.current = null; nav(`/analysis?q=${encodeURIComponent(text.trim())}`); } }}>
           <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask ORBIT… e.g. Show vegetation change in Norway last 5 years" />

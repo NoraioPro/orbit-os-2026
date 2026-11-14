@@ -65,6 +65,11 @@ export const TOURS: Record<string, TourStep[]> = {
     s('[data-tour="main"]', 'Health trace + combustion', 'A sample physiological trace with z-score anomaly detection, and an explainer on how fire behaves without buoyancy.'),
     s('[data-tour="sources"]', 'No medical claims', 'The kernel never diagnoses — anomalies are queued for a flight surgeon\u2019s review. Sample data, stated plainly.'),
   ],
+  ignis: [
+    s('[data-tour="hero"]', 'IGNIS · Flame in Freefall', 'Real microgravity combustion data — published Saffire-I/II and LUCI flame-spread measurements, 19 NASA PSI investigation profiles and 5 curated collections.'),
+    s('[data-tour="main"]', 'The real data', 'Flame spreads slower without buoyancy-driven airflow: 0.92\u20132.1 mm/s in microgravity vs 1.5 mm/s at 1-g. Every figure traces to an NTRS citation.'),
+    s('[data-tour="sources"]', 'Kept separate by design', 'Microgravity combustion is not merged with Earth wildfire data — different physics, different signatures. Row-level provenance for every figure.'),
+  ],
   defense: [
     s('[data-tour="hero"]', 'Earth Situation Room', 'A real-time picture of Earth for situational awareness — the live satellite population, active crises, and every free sensor feeding it.'),
     s('[data-tour="main"]', 'The satellite swarm', 'Every active satellite orbiting Earth, propagated in real time from CelesTrak TLEs. Filter by LEO, MEO, GEO or Starlink, and hover any point for its orbit.'),

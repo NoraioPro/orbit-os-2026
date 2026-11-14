@@ -3,6 +3,7 @@ import path from "node:path";
 import { collectCelestrak } from "./sources/celestrak.ts";
 import { collectAsf } from "./sources/asf.ts";
 import { collectCopernicus } from "./sources/copernicus.ts";
+import { collectDaily } from "./sources/daily.ts";
 import { collectDonki } from "./sources/donki.ts";
 import { collectEonet } from "./sources/eonet.ts";
 import { collectEpic } from "./sources/epic.ts";
@@ -40,6 +41,7 @@ const COLLECTORS: { id: string; run: Collector }[] = [
   { id: "openmeteo", run: collectOpenMeteo },
   { id: "copernicus", run: collectCopernicus },
   { id: "asf", run: collectAsf },
+  { id: "daily", run: collectDaily },
 ];
 
 function formatResult(result: SourceResult): string {

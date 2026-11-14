@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
+import { SarCanvas, ampPalette, changePalette, phasePalette } from '../components/SarCanvas';
 import {
   backscatterChange, classifyChange, phaseToDisplacement, relateEvents,
   simulateSarPair, SAR_MISSIONS, type SarRaster,
@@ -87,20 +88,7 @@ const fmtTime = (t: string | null): string => (t ? `${t.slice(0, 10)} ${t.slice(
 const thumbFor = (g: AsfGranule): string | null =>
   g.thumbnailUrl ?? (g.browse ?? []).find((b) => /thumb/i.test(b)) ?? (g.browse ?? [])[0] ?? null;
 
-// ── colour maps (SAMPLE rasters only) ───────────────────────────────────────
-const cmapBefore = (v: number) => (v < -20 ? '#1e3a8a' : v < -16 ? '#334155' : '#475569');
-const cmapChange = (v: number) => (v >= 6 ? '#a855f7' : v >= 3 ? '#f97316' : v <= -6 ? '#1d4ed8' : v <= -3 ? '#38bdf8' : '#111827');
-const cmapDisp = (v: number) => (v > 0.02 ? '#ef4444' : v < -0.02 ? '#3b82f6' : '#0f172a');
-
-function RasterGrid({ r, cmap }: { r: SarRaster; cmap: (v: number) => string }) {
-  return (
-    <div className="grid gap-[1px]" style={{ gridTemplateColumns: `repeat(${r.width}, 1fr)` }}>
-      {r.values.map((v, i) => (
-        <div key={i} className="aspect-square rounded-[1px]" style={{ background: cmap(v) }} title={`${v.toFixed(2)} ${r.unit}`} />
-      ))}
-    </div>
-  );
-}
+// ── SAMPLE rasters rendered through the smooth canvas renderer (SarCanvas). ──
 
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
@@ -129,16 +117,20 @@ export function SarChampion() {
   );
   const change = useMemo(() => backscatterChange(pair.before, pair.after, { thresholdDb: thr }), [pair, thr]);
   const classes = useMemo(() => classifyChange(change.diff), [change]);
-  const disp = useMemo(() => {
+  const phase = useMemo(() => {
     const w = 44, h = 44;
     const vals = new Array<number>(w * h);
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       const d = Math.sqrt((x - w / 2) ** 2 + (y - h / 2) ** 2) / (w / 2);
       vals[y * w + x] = 2 * Math.PI * Math.exp(-(d * d) * 3);
     }
+    return { width: w, height: h, extent: pair.after.extent, values: vals, quantity: 'phase-rad' as const, unit: 'rad', label: 'Synthetic wrapped phase' };
+  }, [pair]);
+  const dispMax = useMemo(() => {
     const lambda = band === 'L' ? 0.238 : 0.0555; // NISAR L-band ≈24 cm, Sentinel-1 C-band ≈5.5 cm
-    return phaseToDisplacement({ width: w, height: h, extent: pair.after.extent, values: vals, quantity: 'phase-rad', unit: 'rad', label: 'Synthetic wrapped phase' }, lambda);
-  }, [pair, band]);
+    const disp = phaseToDisplacement(phase, lambda);
+    return { maxCm: Math.max(...disp.values.map((v) => Math.abs(v))) * 100, lambda };
+  }, [phase, band]);
   const related = useMemo(
     () => (db ? relateEvents(aoi.lat, aoi.lon, 500, db.events.map((e) => ({ type: e.type, title: e.title, lat: e.lat, lon: e.lon, t: e.t }))) : []),
     [db, aoi],
@@ -283,11 +275,11 @@ export function SarChampion() {
         <div className="mt-3 grid grid-cols-2 gap-4">
           <div>
             <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Before · σ0 (dB)</div>
-            <RasterGrid r={pair.before} cmap={cmapBefore} />
+            <SarCanvas r={pair.before} palette={ampPalette} />
           </div>
           <div>
             <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">After · σ0 (dB)</div>
-            <RasterGrid r={pair.after} cmap={cmapBefore} />
+            <SarCanvas r={pair.after} palette={ampPalette} />
           </div>
         </div>
         <label className="mt-3 flex items-center gap-2 text-xs text-slate-300">
@@ -297,7 +289,7 @@ export function SarChampion() {
         <div className="mt-2 grid grid-cols-[minmax(0,1fr)_260px] gap-4">
           <div>
             <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Change · after − before (dB)</div>
-            <RasterGrid r={change.diff} cmap={cmapChange} />
+            <SarCanvas r={change.diff} palette={changePalette} />
           </div>
           <div className="space-y-2 text-xs">
             <Stat label="Changed cells" value={String(change.changedCells)} sub={`(${(change.changedPct * 100).toFixed(1)}%)`} />
@@ -321,8 +313,8 @@ export function SarChampion() {
             <StatusBadge status="sample" />
           </div>
           <p className="mt-1 text-[11px] text-slate-400">
-            Synthetic wrapped phase → line-of-sight displacement (λ = {band === 'L' ? '0.238 m · L-band' : '0.0555 m · C-band'}).
-            LOS only — a single component of 3-D motion.
+            Synthetic wrapped phase → line-of-sight displacement (λ = {dispMax.lambda.toFixed(3)} m, {band === 'L' ? 'L-band' : 'C-band'}).
+            Each colour cycle is one 2π phase wrap; max LOS displacement ≈ <b className="text-white">{dispMax.maxCm.toFixed(1)} cm</b>. LOS only — a single component of 3-D motion.
           </p>
           <div className="mt-2 flex gap-1">
             {(['L', 'C'] as const).map((b) => (
@@ -332,11 +324,10 @@ export function SarChampion() {
             ))}
           </div>
           <div className="mx-auto mt-3 max-w-[300px]">
-            <RasterGrid r={disp} cmap={cmapDisp} />
+            <SarCanvas r={phase} palette={phasePalette} />
           </div>
           <p className="mt-2 text-[10px] text-slate-500">
-            Blue = motion toward the satellite (e.g. uplift or subsidence), red = away. Atmospheric delays, orbit error and
-            phase ambiguity are not modelled here — this is a SAMPLE raster, not a real interferogram.
+            Each colour cycle is one 2π phase wrap — concentric rings mean a smooth displacement field. Atmospheric delays, orbit error and phase ambiguity are not modelled here — this is a SAMPLE raster, not a real interferogram.
           </p>
         </Glass>
 

@@ -44,10 +44,21 @@ function pickLink(links: { href: string; rel: string }[]): string | undefined {
   return links[0]?.href;
 }
 
+/** Fetch with a hard timeout — a hung request aborts instead of leaving the UI stuck on "Fetching…". */
+async function fetchWithTimeout(url: string, ms = 9000): Promise<Response> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { signal: ctrl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 async function loadSkyImages(): Promise<SkyImage[]> {
   const out: SkyImage[] = [];
   try {
-    const r = await fetch('https://images-api.nasa.gov/search?q=infrared%20sky&media_type=image');
+    const r = await fetchWithTimeout('https://images-api.nasa.gov/search?q=infrared%20sky&media_type=image');
     const j = await r.json();
     for (const item of j.collection?.items ?? []) {
       const d = item.data?.[0];
@@ -67,7 +78,7 @@ async function loadSkyImages(): Promise<SkyImage[]> {
     /* images-api failed — try APOD, then static fallback */
   }
   try {
-    const r = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
+    const r = await fetchWithTimeout('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
     const j = await r.json();
     if (j?.media_type === 'image' && j?.url) {
       out.push({

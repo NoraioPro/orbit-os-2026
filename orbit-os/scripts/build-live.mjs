@@ -101,3 +101,14 @@ write('events.json', { meta: { snapshot_utc: collected, label, records: rows.len
 
 // 6. Manifest passthrough (provenance) with the display label
 write('manifest.json', { ...manifest, output_dir: undefined, display_label: label });
+
+// 7. 6-year daily history for the prediction engine (read directly; optional source)
+{
+  const p = path.join(dir, 'daily-history.json');
+  if (fs.existsSync(p)) {
+    const f = JSON.parse(fs.readFileSync(p, 'utf8'));
+    const weather = (f.records ?? []).filter((r) => r.type === 'daily-weather').map((r) => ({ site: r.values.site, lat: r.lat, lon: r.lon, time: r.values.time, temp_max: r.values.temperature_2m_max, temp_min: r.values.temperature_2m_min, precip: r.values.precipitation_sum, soil: r.values.soil_moisture_0_to_7cm_mean }));
+    const quakes = (f.records ?? []).find((r) => r.type === 'daily-earthquakes');
+    write('daily-history.json', { label, retrieved_at: f.retrieved_at, time_range: f.time_range, sites: weather, earthquakes: quakes ? { time: quakes.values.time, count: quakes.values.count } : null, notes: f.notes ?? [] });
+  }
+}

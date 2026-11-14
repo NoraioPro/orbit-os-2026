@@ -20,7 +20,7 @@ function collect(o: unknown, trail: string[] = [], out: { path: string; trail: s
 const ALIASES: Record<string, string[]> = {
   earth: ['earth', 'earth-intelligence', 'earth_intelligence', 'earthpulse'], disaster: ['disaster'], agri: ['agri', 'agriculture'], ocean: ['ocean'],
   infrastructure: ['infrastructure', 'infra'], gnss: ['gnss'], autonomy: ['autonomy'], explorer: ['explorer', 'space-explorer', 'space_explorer'],
-  academy: ['academy', 'mission-academy', 'mission_academy'], human: ['human', 'human-space', 'human_space'], sar: ['sar'], defense: ['defense', 'situation', 'crisis'],
+  academy: ['academy', 'mission-academy', 'mission_academy'], human: ['human', 'human-space', 'human_space'], ignis: ['ignis', 'flame-in-freefall', 'flame_in_freefall', 'flame-freefall'], sar: ['sar'], defense: ['defense', 'situation', 'crisis'],
 };
 
 export function normalise(j: unknown): Assets {

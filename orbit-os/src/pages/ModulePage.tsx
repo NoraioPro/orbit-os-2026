@@ -22,9 +22,14 @@ import { TOURS } from '../data/tours';
 import { useStore } from '../state/store';
 
 const HumanLab = lazy(() => import('../modules/HumanLab').then((m) => ({ default: m.HumanLab })));
+const FlameLab = lazy(() => import('../modules/FlameLab').then((m) => ({ default: m.FlameLab })));
+const SolarFish = lazy(() => import('../modules/SolarFish').then((m) => ({ default: m.SolarFish })));
+const AstronautTwin = lazy(() => import('../modules/AstronautTwin').then((m) => ({ default: m.AstronautTwin })));
 const MartianRoutes = lazy(() => import('../modules/MartianRoutes').then((m) => ({ default: m.MartianRoutes })));
 const MissionAcademyPro = lazy(() => import('../modules/MissionAcademyPro').then((m) => ({ default: m.MissionAcademyPro })));
 const SituationRoom = lazy(() => import('../modules/SituationRoom').then((m) => ({ default: m.SituationRoom })));
+const SarGlobe = lazy(() => import('../modules/SarGlobe').then((m) => ({ default: m.SarGlobe })));
+const PredictionPanel = lazy(() => import('../modules/PredictionPanel').then((m) => ({ default: m.PredictionPanel })));
 const EarthTrendDetective = lazy(() => import('../modules/EarthTrendDetective').then((m) => ({ default: m.EarthTrendDetective })));
 const EarthJukebox = lazy(() => import('../modules/EarthJukebox').then((m) => ({ default: m.EarthJukebox })));
 const CropWatch = lazy(() => import('../modules/CropWatch').then((m) => ({ default: m.CropWatch })));
@@ -43,16 +48,19 @@ const EarthSuite: ComponentType = () => (
       </div>
     </div>
     <EarthTrendDetective />
+    <PredictionPanel />
     <EarthJukebox />
   </div>
 );
 const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterWidget /><FireCalendar /></div>;
-const SarSuite: ComponentType = () => <div className="space-y-3"><SarObservatory /><SarChampion /></div>;
+const SarSuite: ComponentType = () => <div className="space-y-3"><SarGlobe /><SarChampion /></div>;
+const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanWidget /><SolarFish /></div>;
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
+const HumanSuite: ComponentType = () => <div className="space-y-3"><AstronautTwin /><HumanLab /><FlameLab /></div>;
 
 const WIDGET: Record<string, ComponentType> = {
-  earth: EarthSuite, disaster: DisasterSuite, agri: CropWatch, ocean: OceanWidget, infrastructure: InfraWidget, gnss: GnssGuardian,
-  sar: SarSuite, autonomy: MartianRoutes, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanLab, defense: SituationRoom,
+  earth: EarthSuite, disaster: DisasterSuite, agri: CropWatch, ocean: OceanSuite, infrastructure: InfraWidget, gnss: GnssGuardian,
+  sar: SarSuite, autonomy: MartianRoutes, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanSuite, ignis: FlameLab, defense: SituationRoom,
 };
 export default function ModulePage() {
   const { id = '' } = useParams();
