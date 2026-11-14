@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 const OrbitGlobe = lazy(() => import('../components/OrbitGlobe').then((m) => ({ default: m.OrbitGlobe })));
 import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
 import { NarrationButton } from '../components/Narration';
+import { DataConnections } from '../components/DataConnections';
 import { DATASETS } from '../data/datasets';
 import { eventEvidence, isoMin, TYPE_META } from '../data/events';
 import { AGENTS, CHALLENGES, MODULES, SDGS } from '../data/modules';
@@ -255,6 +256,9 @@ export function SettingsPage() {
         <label className="flex items-center justify-between gap-4"><span><b className="text-white">Use LLM planner/narrator when configured</b><div className="text-xs text-slate-400">{llm.configured ? `Configured on the dev server: ${llm.model}` : 'Not configured. Set ORBIT_LLM_API_KEY in .env (see .env.example). The deterministic planner is used.'}</div></span><input type="checkbox" checked={settings.useLlm} onChange={(e) => setSettings({ ...settings, useLlm: e.target.checked })} /></label>
         <label className="flex items-center justify-between gap-4"><span><b className="text-white">Event data source</b><div className="text-xs text-slate-400">Collector harvest = live, 14k events across every type (floods, storms, volcanoes, fires, ice, quakes). Shards = 17k quake/fire-heavy snapshot (11:39 UTC, few floods/storms).</div></span><select className="input !w-auto" value={settings.dataSource} onChange={(e) => setSettings({ ...settings, dataSource: e.target.value as 'harvest' | 'shards' })}><option value="harvest">Collector harvest</option><option value="shards">86 data shards</option></select></label>
         <button className="btn-ghost" onClick={() => { ['orbit.history.v1', 'orbit.reports.v1', 'orbit.review.v1'].forEach((k) => localStorage.removeItem(k)); location.reload(); }}><Icon name="X" />Clear local history, reports and reviews</button>
+      </Glass>
+      <Glass className="mt-3 p-4">
+        <DataConnections />
       </Glass>
     </div>
   );
