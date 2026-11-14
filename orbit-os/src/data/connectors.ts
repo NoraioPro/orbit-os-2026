@@ -21,7 +21,7 @@ export interface Connector {
  */
 export const CONNECTORS: Connector[] = [
   { id: 'earthdata', name: 'NASA Earthdata', provider: 'NASA ESDIS', priority: 'P0', purpose: 'Authenticate NASA downloads', status: 'needs-credentials', auth: 'free Earthdata login (URS)', url: 'https://urs.earthdata.nasa.gov/' },
-  { id: 'asf', name: 'ASF Search API', provider: 'NASA ASF DAAC', priority: 'P0', purpose: 'Find NISAR and SAR scenes', status: 'needs-credentials', auth: 'Earthdata login (metadata search is keyless)', url: 'https://asf.alaska.edu/' },
+  { id: 'asf', name: 'ASF Search API', provider: 'NASA ASF DAAC', priority: 'P0', purpose: 'Find NISAR and SAR scenes', status: 'connected', auth: '', url: 'https://asf.alaska.edu/', dateRange: 'keyless · live NISAR L1 RSLC scenes' },
   { id: 'nisar', name: 'NISAR earthaccess', provider: 'NASA-ISRO', priority: 'P0', purpose: 'Retrieve real radar products', status: 'needs-credentials', auth: 'Earthdata login', url: 'https://nisar.jpl.nasa.gov/data/' },
   { id: 'copernicus-stac', name: 'Copernicus STAC', provider: 'ESA / CDSE', priority: 'P0', purpose: 'Discover Sentinel-1 acquisitions', status: 'needs-credentials', auth: 'CDSE client id + secret', url: 'https://dataspace.copernicus.eu/' },
   { id: 'sentinel-hub', name: 'Sentinel Hub Process', provider: 'Sinergise / Planet', priority: 'P0', purpose: 'Generate Sentinel radar imagery', status: 'needs-credentials', auth: 'Sentinel Hub token', url: 'https://www.sentinel-hub.com/' },

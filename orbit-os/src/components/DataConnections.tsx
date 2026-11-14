@@ -1,13 +1,48 @@
+import { useEffect, useState } from 'react';
 import { CONNECTORS } from '../data/connectors';
 
+type ServerStatus = Record<string, { configured: boolean; keyless?: boolean; note: string }>;
+
+/** Maps a UI connector id to the server proxy's status key. */
+const SERVER_KEY: Record<string, string> = {
+  earthdata: 'earthdata',
+  asf: 'asf',
+  nisar: 'earthdata',
+  'copernicus-stac': 'cdse',
+  'sentinel-hub': 'sentinelHub',
+  hyp3: 'earthdata',
+  opentopography: 'opentopography',
+};
+
 /**
- * Settings panel: every data source with its real status (connected-live vs
- * needs-credentials), date range for live sources, and an honest "needs X"
- * for everything not yet connected. No fabricated numbers.
+ * Settings panel: every data source with its REAL status. It fetches
+ * /api/connector/status — credentials live server-side only, so the browser
+ * sees "configured / not configured", never a secret.
  */
 export function DataConnections() {
-  const connected = CONNECTORS.filter((c) => c.status === 'connected');
-  const needsCreds = CONNECTORS.filter((c) => c.status === 'needs-credentials');
+  const [server, setServer] = useState<ServerStatus | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/connector/status')
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((d: ServerStatus) => { if (alive) setServer(d); })
+      .catch(() => { if (alive) setServer({}); });
+    return () => { alive = false; };
+  }, []);
+
+  const connectors = CONNECTORS.map((c) => {
+    const key = SERVER_KEY[c.id];
+    const s = key && server ? server[key] : null;
+    if (!s) return c;
+    if (s.configured) {
+      return { ...c, status: 'connected' as const, dateRange: s.keyless ? 'keyless · live' : 'authenticated · live' };
+    }
+    return { ...c, status: 'needs-credentials' as const, auth: s.note };
+  });
+
+  const connected = connectors.filter((c) => c.status === 'connected');
+  const needsCreds = connectors.filter((c) => c.status === 'needs-credentials');
 
   return (
     <div className="space-y-3">
@@ -15,10 +50,11 @@ export function DataConnections() {
         <span className="font-bold text-white">Data connections</span>
         <span className="text-emerald-300">{connected.length} connected · live</span>
         <span className="text-amber-300">{needsCreds.length} need credentials</span>
+        {server ? null : <span className="text-xs text-slate-500">checking server…</span>}
       </div>
 
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-        {CONNECTORS.map((c) => (
+        {connectors.map((c) => (
           <div
             key={c.id}
             className={`rounded-lg border p-3 ${
@@ -67,6 +103,11 @@ export function DataConnections() {
           </div>
         ))}
       </div>
+
+      <p className="text-[10px] text-slate-500">
+        🔒 Credentials live only in the dev server&apos;s <code className="rounded bg-white/5 px-1">.env</code> (server-side). The browser calls{' '}
+        <code className="rounded bg-white/5 px-1">/api/connector/*</code> and never sees a secret.
+      </p>
     </div>
   );
 }

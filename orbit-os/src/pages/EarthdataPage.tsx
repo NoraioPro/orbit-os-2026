@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Glass, Icon, StatusBadge } from '../components/ui';
 import { Provenance } from '../components/Provenance';
 import { WorkflowStrip } from '../components/WorkflowStrip';
+import { RealNisar } from '../components/RealNisar';
 
 const API_STATUS = [
   { name: 'ASF Search API', status: 'keyless', note: 'scene metadata' },
@@ -109,6 +110,8 @@ export default function EarthdataPage() {
           ⚠ Illustrative target — values shown are the demo template, not a live NISAR scene.
         </div>
       </Glass>
+
+      <RealNisar />
 
       <Provenance
         sources={[
