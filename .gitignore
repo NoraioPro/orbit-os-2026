@@ -18,4 +18,4 @@ dist/
 *.log
 
 # raw asset pack (synced into orbit-os/public/assets)
-assets/
+/assets/
