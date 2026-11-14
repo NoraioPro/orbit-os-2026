@@ -1,0 +1,24 @@
+// Kernel self-test: bundles src/kernel with esbuild (a Vite dependency) and checks the six patterns.
+import { build } from 'esbuild';
+import assert from 'node:assert/strict';
+const out = await build({ entryPoints: ['src/kernel/index.ts'], bundle: true, format: 'esm', write: false, platform: 'node' });
+const k = await import('data:text/javascript;base64,' + Buffer.from(out.outputFiles[0].text).toString('base64'));
+const line = Array.from({ length: 20 }, (_, i) => ({ x: 2000 + i, y: 0.3 * i + (i % 3) * 0.1 }));
+const t = k.trend(line, 5);
+assert.ok(Math.abs(t.theilSen - 0.3) < 0.05, 'change: Theil-Sen slope'); assert.ok(t.significant, 'change: Mann-Kendall significant');
+const flat = Array.from({ length: 20 }, (_, i) => ({ x: i, y: i % 2 }));
+assert.ok(!k.trend(flat).significant, 'change: no trend on flat series');
+const now = Date.UTC(2026, 10, 14), D = 86400000;
+const ev = [...Array.from({ length: 12 }, () => ({ type: 'q', lat: 10.5, lon: 20.5, t: now - 2 * D })), { type: 'q', lat: 10.5, lon: 20.5, t: now - 9 * D }];
+const f = k.cellFlags(ev, now);
+assert.equal(f.length, 1, 'anomaly: DG-04 flag'); assert.equal(f[0].current, 12); assert.equal(f[0].previous, 1);
+assert.equal(k.cellFlags(ev.slice(0, 4), now).length, 0, 'anomaly: needs +5');
+const a = k.allocate([{ id: 'a', name: 'a', cost: 5, value: 10 }, { id: 'b', name: 'b', cost: 4, value: 7 }, { id: 'c', name: 'c', cost: 3, value: 6 }], 7);
+assert.equal(a.value, 13, 'planning: knapsack optimum');
+const r = k.routePlan([[1, 1, 1], [Infinity, Infinity, 1], [1, 1, 1]], [0, 0], [2, 0]);
+assert.ok(r.path.length > 0 && Number.isFinite(r.energy), 'planning: route found around wall');
+const fu = k.fuse([{ name: 'a', signal: 0.9, quality: 1, status: 'live' }, { name: 'b', signal: 0.8, quality: 1, status: 'live' }]);
+assert.equal(fu.agreement, 1, 'fusion: agreement');
+const cold = k.analogScore({ tempC: -20, precipMmDay: 0.1, solarMJ: 10 }, k.WORLDS[0]).score, wet = k.analogScore({ tempC: 27, precipMmDay: 6, solarMJ: 15 }, k.WORLDS[0]).score;
+assert.ok(cold > wet, 'transfer: cold desert beats tropics as Mars analog');
+console.log('kernel self-test: all 6 patterns OK');

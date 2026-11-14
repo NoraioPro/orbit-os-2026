@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Retired Hardware Story</title>
+<meta name="description" content="A scroll-based illustrated story about NASA hardware left on the Moon and Mars, with reading levels, a timeline, why-it-mattered notes and quiz cards.">
+<style>
+:root{
+  --bg:#f5f7fc;--ink:#14192c;--muted:#4b5274;--card:#ffffff;--line:#d5dbeb;
+  --accent:#2a64d8;--accent-ink:#ffffff;--gold:#c98a12;--note-bg:#fff4d6;--note-ink:#4f3c00;
+  --star:#7d86a8;--ok:#1d7a46;--bad:#a2312c;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a0d19;--ink:#e7ebf7;--muted:#a3accc;--card:#141a2e;--line:#2a3352;
+    --accent:#7aa7ff;--accent-ink:#0a0d19;--gold:#f0b85a;--note-bg:#2a2410;--note-ink:#f3e0a6;
+    --star:#56607f;--ok:#7fe0a6;--bad:#ff9b94;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a0d19;--ink:#e7ebf7;--muted:#a3accc;--card:#141a2e;--line:#2a3352;
+  --accent:#7aa7ff;--accent-ink:#0a0d19;--gold:#f0b85a;--note-bg:#2a2410;--note-ink:#f3e0a6;
+  --star:#56607f;--ok:#7fe0a6;--bad:#ff9b94;color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;max-width:100%;overflow-x:hidden}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+h1{font-size:1.9rem;line-height:1.2;margin:.2rem 0 .4rem}
+h2{font-size:1.4rem;margin:.2rem 0 .5rem}
+h3{font-size:1.05rem;margin:.9rem 0 .3rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+p{margin:.5rem 0}
+button{font:inherit;color:inherit;cursor:pointer}
+.progress{position:fixed;top:0;left:0;height:4px;width:0;background:var(--gold);z-index:5}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#0b1130,#1b2a5c 70%,#2b3566);color:#f2f4ff;padding:28px 0 22px;border-bottom:1px solid var(--line)}
+.hero .wrap{position:relative;z-index:1}
+.hero .kicker{color:#ffd98a;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase}
+.hero p{color:#d9e0fb}
+.stars{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.note{background:var(--note-bg);color:var(--note-ink);border:1px solid var(--gold);border-radius:10px;padding:10px 12px;margin:14px 0;font-size:.92rem}
+.note strong{font-weight:700}
+
+/* controls */
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:14px 0 6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:8px 14px;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.ghost{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:.92rem}
+.seg button:focus-visible,.ghost:focus-visible,.timeline button:focus-visible,.quiz button:focus-visible,.jump:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* timeline */
+.timeline{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;padding:0;list-style:none}
+.timeline button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font-size:.85rem;color:var(--muted)}
+.timeline button.active{border-color:var(--accent);color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent)}
+.timeline .yr{font-weight:700;color:var(--ink);margin-right:4px}
+
+/* story */
+.item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin:22px 0;scroll-margin-top:12px}
+.item .head{display:flex;gap:12px;align-items:flex-start}
+.item svg{flex:0 0 72px;width:72px;height:60px;color:var(--accent);background:var(--bg);border-radius:12px;padding:6px}
+.meta{color:var(--muted);font-size:.9rem;margin:0}
+.story{font-size:1.02rem;margin:.6rem 0}
+.box{border-left:4px solid var(--accent);padding:6px 12px;margin:10px 0;background:var(--bg);border-radius:0 10px 10px 0}
+.box h3{margin-top:0}
+.quiz{border:1px dashed var(--gold);border-radius:12px;padding:12px;margin-top:12px}
+.quiz .q{font-weight:700;margin:0 0 8px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts button{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px;font-size:.95rem}
+.opts button:disabled{cursor:default}
+.opts button.right{border-color:var(--ok);color:var(--ok);font-weight:700}
+.opts button.wrong{border-color:var(--bad);color:var(--bad)}
+.expl{margin:8px 0 0;font-size:.95rem;color:var(--muted);min-height:1.2em}
+
+/* reveal (only when JS is running) */
+html.js .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+html.js .reveal.in{opacity:1;transform:none}
+
+.end{border-top:1px solid var(--line);margin:28px 0 36px;padding-top:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.panel ul{padding-left:1.1rem;margin:.4rem 0}
+.panel li{margin:.3rem 0}
+footer{color:var(--muted);font-size:.85rem;padding:0 0 28px}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="hero">
+  <svg class="stars" id="stars" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div class="kicker">NASA Space Apps 2026 &middot; Challenge 1 prototype</div>
+    <h1>Abandoned but not Forgotten</h1>
+    <p>Hardware NASA left on the Moon and Mars, and in deep space, and the science it made possible. Scroll through the story, pick a reading level, and test yourself with the quiz cards.</p>
+    <div class="bar" role="group" aria-label="Reading level">
+      <div class="seg">
+        <button type="button" id="lvYoung" aria-pressed="true" data-level="young">Younger readers</button>
+        <button type="button" id="lvOlder" aria-pressed="false" data-level="older">Older readers</button>
+      </div>
+      <button type="button" class="ghost" id="themeBtn">Theme: auto</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="note" role="note">
+    <strong>Check before publishing.</strong> The facts in this prototype were written from general knowledge and have not been verified against live NASA sources. Check every fact, date and mission detail against NASA's own pages before publishing. Illustrations are simple drawings, not photographs.
+  </div>
+
+  <nav aria-label="Timeline">
+    <ol class="timeline" id="timeline"></ol>
+  </nav>
+
+  <section aria-label="Story">
+    <div id="story"></div>
+  </section>
+
+  <section class="panel end reveal" id="next">
+    <h2>Next steps to use real data and content</h2>
+    <ul>
+      <li>Verify every fact and date against NASA mission pages (for example, the NASA Science and NASA Moon and Mars mission sites) before publishing.</li>
+      <li>Replace the drawings with NASA-released photographs, checking image-use rules on each NASA media page.</li>
+      <li>Have a teacher or subject expert review the reading levels with real students.</li>
+      <li>Add more hardware items, such as other lunar and Martian equipment, and cite a source for each claim.</li>
+    </ul>
+    <p class="meta">This is a prototype. No live data is loaded and no external requests are made.</p>
+  </section>
+</main>
+
+<footer class="wrap">Prototype for educational storytelling. Illustrative content only.</footer>
+
+<script>
+(function () {
+  "use strict";
+  document.documentElement.classList.add("js");
+
+  // ---- Story data (illustrative; verify against NASA sources) ----
+  var ITEMS = [
+    {
+      id: "surveyor3", year: "1967", place: "Moon", icon: "lander",
+      title: "Surveyor 3",
+      story: {
+        young: "In 1967, a robot lander named Surveyor 3 touched down on the Moon. It was not a person, but it showed that a spacecraft could land gently on the Moon's dusty surface. Two years later, astronauts on Apollo 12 walked over to visit it.",
+        older: "Surveyor 3 was an uncrewed lander that touched down in 1967 in the Ocean of Storms. Its soft landing gave engineers data about the lunar surface before crewed missions. In 1969 the Apollo 12 crew visited it and brought back parts, including its television camera, for study on Earth."
+      },
+      why: {
+        young: "Surveyor proved that a soft landing on the Moon was possible, which made the Apollo landings easier to plan.",
+        older: "Surveyor's landing and surface data helped Apollo engineers understand soil and landing conditions before the first crewed landings."
+      },
+      did: {
+        young: "Parts of Surveyor 3 came back to Earth, so scientists could see what years on the Moon had done to them.",
+        older: "Studying returned parts showed how materials respond to vacuum, dust and large temperature swings over time."
+      },
+      quiz: { q: "Which astronauts visited Surveyor 3 on the Moon?", opts: ["Apollo 12 astronauts", "Soviet cosmonauts", "Nobody ever visited it"], a: 0,
+        expl: "The Apollo 12 crew visited Surveyor 3 in 1969." }
+    },
+    {
+      id: "descent", year: "1969", place: "Moon, Tranquility Base", icon: "lander",
+      title: "Apollo 11 lunar module descent stage",
+      story: {
+        young: "When the Apollo 11 astronauts left the Moon, they flew off in the top half of their lander. The bottom half, called the descent stage, stayed behind. It is still sitting on the Moon today.",
+        older: "The Lunar Module had two stages. The descent stage carried the lander down and then served as a launch platform for the ascent stage. Apollo 11 left the descent stage on the surface at Tranquility Base when it returned to lunar orbit."
+      },
+      why: {
+        young: "Each part of the lander had a job. Engineers planned every stage so the astronauts could land safely and come home.",
+        older: "Staging means the heavy descent stage is left behind, so less mass has to be lifted back into orbit. This idea is still used in lunar lander design."
+      },
+      did: {
+        young: "The descent stage has stayed in place since 1969, which makes it a kind of time capsule.",
+        older: "NASA's Lunar Reconnaissance Orbiter has photographed the Apollo landing sites from orbit, including the hardware left behind."
+      },
+      quiz: { q: "Which part of the Apollo 11 lander lifted off from the Moon?", opts: ["The ascent stage", "The descent stage", "The whole lander"], a: 0,
+        expl: "The ascent stage carried the astronauts back to lunar orbit. The descent stage stayed on the surface." }
+    },
+    {
+      id: "retro", year: "1969 to 1971", place: "Moon", icon: "mirror",
+      title: "Laser mirror arrays (retroreflectors)",
+      story: {
+        young: "Astronauts placed mirror panels on the Moon. Shine a laser at them from Earth, and the light bounces straight back. Timing that trip helps scientists measure the distance to the Moon very precisely.",
+        older: "Apollo 11, 14 and 15 left retroreflector arrays on the lunar surface. Observatories on Earth fire short laser pulses at them and time the returns. This lunar laser ranging work is still going on."
+      },
+      why: {
+        young: "Scientists use these mirrors to learn how the Moon moves, and they help test ideas about gravity.",
+        older: "Lunar laser ranging gives precise measurements of the Earth-Moon distance and helps test theories of gravity."
+      },
+      did: {
+        young: "The mirrors need no power. They simply reflect light back toward where it came from.",
+        older: "Retroreflectors are passive: they need no power and return light toward its source."
+      },
+      quiz: { q: "What does a retroreflector do?", opts: ["Plays radio music", "Sends light straight back to its source", "Makes electricity"], a: 1,
+        expl: "That is why a laser aimed at the Moon can return to Earth as a measurable echo." }
+    },
+    {
+      id: "lrv", year: "1971 to 1972", place: "Moon", icon: "rover",
+      title: "Lunar Roving Vehicles",
+      story: {
+        young: "Astronauts drove electric buggies on the Moon! Three rovers were used on Apollo 15, 16 and 17. When each mission ended, its rover stayed on the Moon, parked where the crew left it.",
+        older: "The Lunar Roving Vehicle was a folding, battery-powered buggy stowed on the Lunar Module. Apollo 15, 16 and 17 each used one, and each was left on the surface when the crew departed."
+      },
+      why: {
+        young: "Rovers let astronauts travel much farther than walking, so they could study more rocks and more places.",
+        older: "Mobility let crews reach geological sites well away from the lander, which increased the science returned on each mission."
+      },
+      did: {
+        young: "Orbiting cameras have photographed tracks left by the rovers.",
+        older: "Orbital images have shown the tracks left by the rovers, a lasting record of where crews drove."
+      },
+      quiz: { q: "How many Apollo missions carried a lunar rover?", opts: ["One", "Three", "Six"], a: 1,
+        expl: "Apollo 15, 16 and 17 each carried a Lunar Roving Vehicle." }
+    },
+    {
+      id: "voyager", year: "1977", place: "Deep space", icon: "probe",
+      title: "Voyager 1 and Voyager 2",
+      story: {
+        young: "Voyager 1 and 2 were launched in 1977. They flew past the giant planets and sent back pictures. Voyager 1 went into interstellar space in 2012, and both spacecraft are still working.",
+        older: "Voyagers 1 and 2 launched in 1977 on a tour of the outer planets. Their flybys transformed our understanding of Jupiter, Saturn, Uranus and Neptune. Voyager 1 crossed into interstellar space in 2012, and Voyager 2 followed in 2018."
+      },
+      why: {
+        young: "The Voyagers found active volcanoes on Io, a moon of Jupiter, which surprised many scientists.",
+        older: "Discoveries such as active volcanoes on Io changed how scientists think about moons and planets."
+      },
+      did: {
+        young: "Each Voyager carries a golden record with sounds and pictures from Earth, meant as a message for anyone who might find it.",
+        older: "Each spacecraft carries a golden record of sounds, greetings and images from Earth."
+      },
+      quiz: { q: "What does each Voyager carry?", opts: ["A golden record of Earth sounds and images", "A solar sail", "A hot-air balloon"], a: 0,
+        expl: "The Golden Record is a message from Earth on each spacecraft." }
+    },
+    {
+      id: "spirit", year: "2004 to 2010 and 2018", place: "Mars", icon: "rover",
+      title: "Spirit and Opportunity",
+      story: {
+        young: "Two twin rovers landed on Mars in 2004. They explored for years, far longer than their first planned missions. Spirit stopped responding after it got stuck in soft soil. Opportunity went quiet in 2018 when a huge dust storm blocked its sunlight.",
+        older: "Spirit and Opportunity were solar-powered rovers built for a short primary mission. Spirit became stuck in soft soil and its last contact came in 2010. Opportunity's last contact came in 2018, after a global dust storm cut off its solar power."
+      },
+      why: {
+        young: "They found rocks and minerals that formed in water, which showed scientists that ancient Mars may have had water on its surface.",
+        older: "Evidence from rocks and minerals formed in water changed how scientists think about the ancient Martian environment."
+      },
+      did: {
+        young: "Dust can block sunlight. Engineers learned a lot from the rovers about how dust builds up on solar panels.",
+        older: "Their long lives taught engineers about dust, solar power and how to plan long robotic missions."
+      },
+      quiz: { q: "What ended Opportunity's mission?", opts: ["A meteor", "A global dust storm that blocked sunlight", "Running out of fuel"], a: 1,
+        expl: "Opportunity was solar-powered, so a long dust storm that blocked sunlight was fatal to its energy supply." }
+    },
+    {
+      id: "ingenuity", year: "2021 to 2024", place: "Mars", icon: "heli",
+      title: "Ingenuity, the Mars helicopter",
+      story: {
+        young: "In 2021, a small helicopter named Ingenuity made the first powered flight on another planet. It was built to fly only a few times, but it kept flying for a long time. Its flights ended in 2024 after damage to its rotor blades. It is still on Mars.",
+        older: "Ingenuity's first flight in April 2021 was the first powered, controlled flight on another planet. It began as a technology demonstration. After rotor damage ended its flights in 2024, the helicopter stayed on the surface."
+      },
+      why: {
+        young: "It showed that flying on Mars is possible, even though the air there is very thin. Future explorers may use flying scouts.",
+        older: "Mars has a thin atmosphere, which makes lift hard to generate. Ingenuity showed that rotorcraft can work there, informing future aerial exploration."
+      },
+      did: {
+        young: "Its rotors had to spin much faster than rotors on Earth to get enough lift in the thin air.",
+        older: "Rotors had to spin much faster than on Earth to produce enough lift in Mars' thin atmosphere."
+      },
+      quiz: { q: "What was special about Ingenuity?", opts: ["First powered flight on another planet", "First robot to drill on Mars", "First rover to reach Jupiter"], a: 0,
+        expl: "Ingenuity made the first powered, controlled flight on another planet." }
+    }
+  ];
+
+  // ---- Icons (simple line drawings) ----
+  var ICONS = {
+    lander: '<svg viewBox="0 0 72 60" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M22 36 L30 20 H42 L50 36"/><path d="M30 20 V14 M42 20 V14"/><path d="M18 36 L14 46 M54 36 L58 46"/><path d="M8 52 H64"/><circle cx="36" cy="10" r="3"/></svg>',
+    mirror: '<svg viewBox="0 0 72 60" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="22" y="22" width="28" height="22"/><path d="M26 22 V14 M46 22 V14"/><path d="M26 33 H46 M36 22 V44"/><path d="M4 8 L22 26"/><path d="M8 52 H64"/></svg>',
+    rover: '<svg viewBox="0 0 72 60" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="18" y="26" width="34" height="10" rx="2"/><path d="M30 26 L34 14 H44"/><circle cx="24" cy="42" r="6"/><circle cx="46" cy="42" r="6"/><path d="M8 52 H64"/></svg>',
+    probe: '<svg viewBox="0 0 72 60" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="34" cy="30" r="8"/><path d="M34 22 V12 M24 30 H12 M44 30 H56"/><path d="M30 30 L20 40 M38 30 L48 40"/><path d="M52 8 L58 14"/></svg>',
+    heli: '<svg viewBox="0 0 72 60" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M14 16 H58"/><path d="M36 16 V22"/><rect x="28" y="22" width="18" height="12" rx="3"/><path d="M46 28 H60"/><path d="M8 52 H64"/><path d="M34 34 V46 M38 34 V46"/></svg>'
+  };
+
+  var state = { level: "young" };
+  var $ = function (id) { return document.getElementById(id); };
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  // ---- Starfield (deterministic) ----
+  (function stars() {
+    var svg = $("stars"), seed = 7;
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var out = "";
+    for (var i = 0; i < 90; i++) {
+      out += '<circle cx="' + (rnd() * 400).toFixed(1) + '" cy="' + (rnd() * 260).toFixed(1) + '" r="' + (0.4 + rnd() * 1.2).toFixed(2) + '" fill="#fff" opacity="' + (0.35 + rnd() * 0.6).toFixed(2) + '"/>';
+    }
+    out += '<circle cx="330" cy="70" r="26" fill="#c9cfdc" opacity=".85"/><circle cx="322" cy="62" r="5" fill="#aab1c2" opacity=".6"/><circle cx="342" cy="80" r="7" fill="#aab1c2" opacity=".5"/>';
+    svg.innerHTML = out;
+  })();
+
+  // ---- Timeline ----
+  function buildTimeline() {
+    var ol = $("timeline");
+    ITEMS.forEach(function (it, i) {
+      var li = el("li");
+      var b = el("button", "");
+      b.type = "button";
+      b.setAttribute("data-target", it.id);
+      b.setAttribute("data-idx", String(i));
+      var y = el("span", "yr", it.year);
+      b.appendChild(y);
+      b.appendChild(document.createTextNode(" " + it.title.split(":")[0].split(",")[0]));
+      b.addEventListener("click", function () {
+        var t = $(it.id);
+        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      li.appendChild(b);
+      ol.appendChild(li);
+    });
+  }
+
+  // ---- Story sections ----
+  function buildStory() {
+    var root = $("story");
+    ITEMS.forEach(function (it, i) {
+      var sec = el("article", "item reveal");
+      sec.id = it.id;
+      var head = el("div", "head");
+      var icon = el("div");
+      icon.innerHTML = ICONS[it.icon];
+      var ht = el("div");
+      ht.appendChild(el("p", "meta", (i + 1) + " of " + ITEMS.length + " · " + it.year + " · " + it.place));
+      var h = el("h2", "", it.title);
+      ht.appendChild(h);
+      head.appendChild(icon.firstChild);
+      head.appendChild(ht);
+      sec.appendChild(head);
+
+      var story = el("p", "story");
+      story.setAttribute("data-k", "story");
+      sec.appendChild(story);
+
+      var why = el("div", "box");
+      why.appendChild(el("h3", "", "Why it mattered"));
+      var whyP = el("p");
+      whyP.setAttribute("data-k", "why");
+      why.appendChild(whyP);
+      sec.appendChild(why);
+
+      var did = el("div", "box");
+      did.appendChild(el("h3", "", "Did you know?"));
+      var didP = el("p");
+      didP.setAttribute("data-k", "did");
+      did.appendChild(didP);
+      sec.appendChild(did);
+
+      sec.appendChild(buildQuiz(it));
+      root.appendChild(sec);
+    });
+  }
+
+  function buildQuiz(it) {
+    var box = el("div", "quiz");
+    box.appendChild(el("p", "q", "Quiz: " + it.quiz.q));
+    var opts = el("div", "opts");
+    var expl = el("p", "expl", "Pick an answer to check it.");
+    var buttons = it.quiz.opts.map(function (text, j) {
+      var b = el("button", "", text);
+      b.type = "button";
+      b.addEventListener("click", function () {
+        buttons.forEach(function (x, k) {
+          x.disabled = true;
+          if (k === it.quiz.a) x.classList.add("right");
+        });
+        if (j !== it.quiz.a) {
+          b.classList.add("wrong");
+          expl.textContent = "Not quite. " + it.quiz.expl;
+        } else {
+          expl.textContent = "Correct! " + it.quiz.expl;
+        }
+      });
+      opts.appendChild(b);
+      return b;
+    });
+    box.appendChild(opts);
+    box.appendChild(expl);
+    return box;
+  }
+
+  // ---- Reading level ----
+  function applyLevel() {
+    var lv = state.level;
+    document.querySelectorAll("[data-k]").forEach(function (node) {
+      var sec = node.closest(".item");
+      var idx = -1;
+      for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].id === sec.id) { idx = i; break; }
+      if (idx < 0) return;
+      var it = ITEMS[idx], k = node.getAttribute("data-k");
+      node.textContent = k === "story" ? it.story[lv] : (k === "why" ? it.why[lv] : it.did[lv]);
+    });
+    $("lvYoung").setAttribute("aria-pressed", lv === "young" ? "true" : "false");
+    $("lvOlder").setAttribute("aria-pressed", lv === "older" ? "true" : "false");
+  }
+
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.level = b.getAttribute("data-level");
+      applyLevel();
+    });
+  });
+
+  // ---- Theme toggle: auto -> light -> dark ----
+  var themes = ["auto", "light", "dark"], ti = 0;
+  $("themeBtn").addEventListener("click", function () {
+    ti = (ti + 1) % themes.length;
+    var t = themes[ti];
+    if (t === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", t);
+    $("themeBtn").textContent = "Theme: " + t;
+  });
+
+  // ---- Progress bar ----
+  var prog = $("progress");
+  window.addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+
+  // ---- Reveal + timeline highlight ----
+  function setActive(id) {
+    document.querySelectorAll(".timeline button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-target") === id);
+    });
+  }
+  var sections = ITEMS.map(function (it) { return $(it.id); });
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add("in");
+          setActive(en.target.id);
+        }
+      });
+    }, { threshold: 0.2 });
+    sections.forEach(function (s) { io.observe(s); });
+    var endObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) en.target.classList.add("in"); });
+    }, { threshold: 0.1 });
+    endObs.observe($("next"));
+  } else {
+    document.querySelectorAll(".reveal").forEach(function (n) { n.classList.add("in"); });
+  }
+
+  buildTimeline();
+  buildStory();
+  applyLevel();
+  setActive(ITEMS[0].id);
+})();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/XSj59HAsViRqRq25H9Y8Wz" target="_blank" rel="noopener">Mars outpost trainer</a></li>
+<li><a href="https://claude.ai/artifact/WhZcavCNKvSQBJj4nuL6qQ" target="_blank" rel="noopener">Martian route map</a></li>
+</ul>
+</nav>
+</body>
+</html>

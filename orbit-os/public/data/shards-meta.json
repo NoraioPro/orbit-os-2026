@@ -1,0 +1,1 @@
+{"snapshot_utc":"2026-11-14T11:39:39.586Z","records":17186,"shards":86,"by_type":{"earthquake":9943,"wildfires":7174,"severeStorms":2,"seaLakeIce":35,"volcanoes":32},"sources":["USGS ComCat (all_month, all magnitudes)","NASA EONET v3 (open events)"],"notes":"Times are UTC. Wildfire rows are individual satellite detections. No forecast model is included."}

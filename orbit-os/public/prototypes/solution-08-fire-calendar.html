@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Fire Calendar Harmonizer</title>
+<style>
+/* Layout: controls, then the merge summary, a burning-activity calendar with anomaly periods, and next steps. */
+:root {
+  --bg: #f5f4ef; --surface: #ffffff; --surface-2: #faf9f6; --fg: #1d1d1b; --muted: #5f6168;
+  --line: #e2e0d9; --accent: #c2410c; --accent-soft: #fbe9dc; --chip: #ecebe6;
+  --modis: #2b6cb0; --viirs: #7a3fb0; --flag: #b42318; --ok: #2f7d5b;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15120f; --surface: #1f1b17; --surface-2: #19160f; --fg: #f1ece4; --muted: #aaa196;
+    --line: #3a332b; --accent: #f29a5c; --accent-soft: #3a2a1c; --chip: #2d2720;
+    --modis: #7fb2ea; --viirs: #c49cf0; --flag: #ff8a80; --ok: #6cc39a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15120f; --surface: #1f1b17; --surface-2: #19160f; --fg: #f1ece4; --muted: #aaa196;
+  --line: #3a332b; --accent: #f29a5c; --accent-soft: #3a2a1c; --chip: #2d2720;
+  --modis: #7fb2ea; --viirs: #c49cf0; --flag: #ff8a80; --ok: #6cc39a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+h1, h2 { font-family: "Space Grotesk", Inter, system-ui, sans-serif; line-height: 1.2; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.6rem, 5vw, 2.2rem); letter-spacing: -0.02em; }
+h2 { font-size: 1.05rem; }
+select { font: inherit; color: inherit; }
+select:focus-visible, .pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 16px; min-width: 0; }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent); font-weight: 700; }
+.lede { margin: 0; color: var(--muted); max-width: 66ch; }
+.badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--chip); }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px; display: grid; gap: 12px; min-width: 0; align-content: start;
+}
+.card-head { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: baseline; }
+.muted { color: var(--muted); font-size: 13px; margin: 0; }
+.controls { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+select { width: 100%; min-width: 0; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); }
+.panels { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .panels { grid-template-columns: 1fr 1fr; } }
+.kpis { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.kpi { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.kpi .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.kpi .v { font-family: "Space Grotesk", Inter, sans-serif; font-size: 1.2rem; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 12px; color: var(--muted); align-items: center; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+.ramp { display: inline-block; width: 110px; height: 10px; border-radius: 5px; vertical-align: -1px;
+  background: linear-gradient(90deg, hsl(28 85% 92%), hsl(28 85% 38%)); }
+canvas { display: block; width: 100%; max-width: 100%; }
+.cal-wrap { overflow-x: auto; min-width: 0; }
+.readout { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0; min-height: 3.2em; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+tr.pick { cursor: pointer; }
+tr.pick:hover td, tr.pick:focus-visible td { background: var(--accent-soft); outline: none; }
+.flagtxt { color: var(--flag); font-weight: 600; }
+.steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; }
+.steps li::marker { color: var(--accent); }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="card" style="gap:8px">
+    <span class="eyebrow">Challenge 8 · MODIS and VIIRS hot spots</span>
+    <h1>Fire Calendar Harmonizer</h1>
+    <p class="lede">Two fire-detection records, one scale. Pick an area and the tool merges MODIS and VIIRS hot spots with a calibration factor, draws the burning calendar and flags weeks that run above the baseline.</p>
+    <div><span class="badge">Synthetic sample data, not satellite detections</span></div>
+  </header>
+
+  <section class="card" aria-label="Controls">
+    <div class="controls">
+      <div class="field"><label for="area">Area of interest</label><select id="area"></select></div>
+      <div class="field"><label for="years">Calendar years</label>
+        <select id="years">
+          <option value="all">2003 to 2024 (both sensors shown)</option>
+          <option value="recent">2012 to 2024 (overlap era)</option>
+        </select></div>
+      <div class="field"><label for="policy">Merge policy</label>
+        <select id="policy">
+          <option value="harm">Harmonized (VIIRS divided by k)</option>
+          <option value="raw">Unharmonized (VIIRS as is)</option>
+        </select></div>
+      <div class="field"><label for="calwin">Calibration window</label>
+        <select id="calwin">
+          <option value="full">Full overlap, 2012 to 2024</option>
+          <option value="fire">Fire season only (day 150 to 300)</option>
+        </select></div>
+      <div class="field"><label for="base">Baseline years</label>
+        <select id="base">
+          <option value="early">2003 to 2011 (MODIS only)</option>
+          <option value="wide">2003 to 2019 (all)</option>
+        </select></div>
+      <div class="field"><label for="thr">Unusual when z is at least</label>
+        <select id="thr">
+          <option value="1.5">1.5</option>
+          <option value="2" selected>2.0</option>
+          <option value="2.5">2.5</option>
+        </select></div>
+    </div>
+    <p class="muted" id="summary"></p>
+  </section>
+
+  <section class="card" aria-label="Harmonization">
+    <div class="card-head"><h2>How the two records are merged</h2><span class="muted" id="areaNote"></span></div>
+    <div class="kpis" id="kpis"></div>
+    <canvas id="annual" role="img" aria-label="Annual merged totals with raw sensor totals"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--accent)"></span>Merged annual total</span>
+      <span><span class="sw" style="background:var(--modis)"></span>Raw MODIS total (dot)</span>
+      <span><span class="sw" style="background:var(--viirs)"></span>Raw VIIRS total (triangle)</span>
+      <span>Dashed line: baseline mean</span>
+    </div>
+    <p class="muted" id="method"></p>
+  </section>
+
+  <section class="card" aria-label="Burning calendar">
+    <div class="card-head"><h2>Burning-activity calendar</h2><span class="muted">Rows are years, columns are weeks of the year</span></div>
+    <div class="cal-wrap"><canvas id="cal" role="img" aria-label="Year by week heatmap of merged fire detections"></canvas></div>
+    <div class="legend">
+      <span><span class="ramp" aria-hidden="true"></span> Fewer to more detections</span>
+      <span><span class="sw" style="background:transparent;border:2px solid var(--flag)"></span>Flagged: z at or above threshold</span>
+    </div>
+    <p class="readout" id="readout">Tap or click a week to see its counts and baseline comparison.</p>
+  </section>
+
+  <section class="card" aria-label="Unusual periods">
+    <div class="card-head"><h2>Unusual periods</h2><span class="muted" id="flagNote"></span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Period</th><th>Peak z</th><th>Detections</th><th>Expected</th></tr></thead>
+        <tbody id="periods"></tbody>
+      </table>
+    </div>
+    <p class="muted">Top 10 by peak z. Click a row to open its first week in the calendar.</p>
+  </section>
+
+  <section class="card" aria-label="Next steps">
+    <h2>Next steps to use real data</h2>
+    <ol class="steps">
+      <li><b>MODIS detections:</b> the MODIS Active Fire product (MCD14 series) from Terra and Aqua, 1 km pixels.</li>
+      <li><b>VIIRS detections:</b> the VIIRS 375 m Active Fire product from Suomi NPP and NOAA-20.</li>
+      <li><b>Access:</b> NASA FIRMS (Fire Information for Resource Management System) for hot-spot downloads, and Earthdata Search for the full archive.</li>
+      <li><b>Matching:</b> pair detections within about 1 km and the same overpass day instead of matching whole-day totals.</li>
+      <li><b>Calibration:</b> estimate the factor per region and per season, and report the uncertainty of k.</li>
+      <li><b>Filters:</b> apply detection confidence and fire radiative power thresholds before counting, and use day and night detections separately.</li>
+    </ol>
+    <p class="note">Product names are given for orientation. Check each product's documentation for versions and coverage dates.</p>
+  </section>
+</div>
+
+<script>
+// ---- Synthetic sample data (seeded, deterministic) ----
+const Y0 = 2003, NY = 22, D = 365, OV = 9; // OV = index of 2012, first VIIRS year
+const AREAS = [
+  { name: "Area 1: Savanna belt", c: 280, w: 60, b: 18, kT: 1.25, spikes: [2015, 2019, 2023] },
+  { name: "Area 2: Boreal forest", c: 190, w: 35, b: 10, kT: 1.35, spikes: [2012, 2016, 2021] },
+  { name: "Area 3: Cropland burns", c: 110, w: 25, b: 25, kT: 1.30, spikes: [2007, 2014, 2024] },
+  { name: "Area 4: Dry grassland", c: 200, w: 50, b: 8, kT: 1.40, spikes: [2010, 2018] },
+  { name: "Area 5: Peat region", c: 230, w: 45, b: 6, kT: 1.20, spikes: [2015, 2019, 2024] },
+  { name: "Area 6: Mediterranean scrub", c: 215, w: 30, b: 14, kT: 1.45, spikes: [2017, 2022] }
+];
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const MOD = [], VIR = [];
+AREAS.forEach((A, a) => {
+  const mo = [], vi = [];
+  for (let yi = 0; yi < NY; yi++) {
+    const rnd = mulberry32(7919 * (a + 1) + 131 * yi + 5);
+    const g = () => { let u = 0; while (u === 0) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); };
+    const spike = A.spikes.includes(Y0 + yi) ? 2.5 : 1;
+    const m = Math.exp(0.3 * g()) * spike;
+    const md = new Uint16Array(D), vr = yi >= OV ? new Uint16Array(D) : null;
+    for (let d = 0; d < D; d++) {
+      const lam = m * A.b * (Math.exp(-((d - A.c) ** 2) / (2 * A.w * A.w)) + 0.03);
+      md[d] = Math.max(0, Math.round(lam + Math.sqrt(lam) * g()));
+      if (vr) vr[d] = Math.max(0, Math.round(A.kT * lam * (1 + 0.05 * g()) + Math.sqrt(A.kT * lam) * 0.5 * g()));
+    }
+    mo.push(md); vi.push(vr);
+  }
+  MOD.push(mo); VIR.push(vi);
+});
+
+// ---- Statistics ----
+function pearson(x, y) {
+  const n = x.length; if (!n) return 0;
+  const mx = x.reduce((s, v) => s + v, 0) / n, my = y.reduce((s, v) => s + v, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) { const dx = x[i] - mx, dy = y[i] - my; sxy += dx * dy; sxx += dx * dx; syy += dy * dy; }
+  return sxx && syy ? sxy / Math.sqrt(sxx * syy) : 0;
+}
+// Cross-calibration: k = sum(VIIRS) / sum(MODIS) over matched overlap-window days.
+function calibrate(a, win) {
+  let sm = 0, sv = 0, both = 0, either = 0;
+  const xs = [], ys = [];
+  for (let yi = OV; yi < NY; yi++) for (let d = 0; d < D; d++) {
+    if (win === "fire" && (d < 150 || d > 300)) continue;
+    const m = MOD[a][yi][d], v = VIR[a][yi][d];
+    sm += m; sv += v;
+    if (m > 0 && v > 0) both++;
+    if (m > 0 || v > 0) either++;
+    xs.push(m); ys.push(v);
+  }
+  const k = sm > 0 ? sv / sm : 1;
+  const scaled = ys.map(v => v / k);
+  return { k, sm, sv, days: xs.length, agree: either ? both / either : 0, r: pearson(xs, scaled) };
+}
+// Merged daily value on the MODIS scale.
+function mergedArea(a, policy, k) {
+  const out = [];
+  for (let yi = 0; yi < NY; yi++) {
+    const row = new Float64Array(D);
+    for (let d = 0; d < D; d++) {
+      if (yi >= OV) row[d] = policy === "harm" ? VIR[a][yi][d] / k : VIR[a][yi][d];
+      else row[d] = MOD[a][yi][d];
+    }
+    out.push(row);
+  }
+  return out;
+}
+const WEEKS = 53;
+function weekly(merged) {
+  return merged.map(row => {
+    const w = new Float64Array(WEEKS);
+    for (let d = 0; d < D; d++) w[Math.min(WEEKS - 1, Math.floor(d / 7))] += row[d];
+    return w;
+  });
+}
+function monthDay(doy) {
+  const m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const dt = new Date(2001, 0, 1 + Math.min(D - 1, doy));
+  return `${dt.getDate()} ${m[dt.getMonth()]}`;
+}
+
+// ---- State and elements ----
+const st = { a: 0, years: "all", policy: "harm", calwin: "full", base: "early", thr: 2, sel: null };
+const $ = id => document.getElementById(id);
+const sel = { area: $("area"), years: $("years"), policy: $("policy"), calwin: $("calwin"), base: $("base"), thr: $("thr") };
+AREAS.forEach((A, i) => sel.area.add(new Option(A.name, i)));
+const cal = $("cal"), annual = $("annual");
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+let cellGeom = null;
+function drawCalendar(yiList, W, Z, flags, maxW) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = cal.clientWidth, padL = 44, padT = 18;
+  const cw = Math.max(4, (w - padL) / WEEKS), ch = Math.min(18, Math.max(10, 300 / yiList.length));
+  const h = padT + yiList.length * ch + 4;
+  cal.style.height = h + "px";
+  cal.width = w * dpr; cal.height = h * dpr;
+  const ctx = cal.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  const muted = cssVar("--muted"), fg = cssVar("--fg"), accent = cssVar("--accent"), chip = cssVar("--chip");
+  ctx.font = "11px Inter, system-ui, sans-serif";
+  ctx.fillStyle = muted;
+  const mLetters = "JFMAMJJASOND";
+  for (let m = 0; m < 12; m++) {
+    const wk = Math.floor(new Date(2001, m, 1).getTime() / 86400000 - new Date(2001, 0, 1).getTime() / 86400000) / 7;
+    ctx.fillText(mLetters[m], padL + Math.floor(wk) * cw, 12);
+  }
+  yiList.forEach((yi, r) => {
+    const y = padT + r * ch;
+    if ((Y0 + yi) % 2 === 0 || yiList.length < 12) { ctx.fillStyle = muted; ctx.fillText(String(Y0 + yi), 4, y + ch - 4); }
+    for (let c = 0; c < WEEKS; c++) {
+      const v = W[r][c], x = padL + c * cw;
+      const t = maxW ? Math.sqrt(v / maxW) : 0;
+      ctx.fillStyle = v <= 0 ? chip : `hsl(28 85% ${92 - 54 * t}%)`;
+      ctx.fillRect(x, y, Math.max(1, cw - 1), Math.max(1, ch - 1));
+      if (flags[r][c]) { ctx.strokeStyle = fg; ctx.lineWidth = 1.5; ctx.strokeRect(x + 0.5, y + 0.5, cw - 2, ch - 2); }
+    }
+  });
+  if (st.sel) {
+    const r = yiList.indexOf(st.sel.yi);
+    if (r >= 0) { ctx.strokeStyle = accent; ctx.lineWidth = 2.5; ctx.strokeRect(padL + st.sel.w * cw + 0.5, padT + r * ch + 0.5, cw - 2, ch - 2); }
+  }
+  cellGeom = { padL, padT, cw, ch, yiList, rows: yiList.length };
+}
+
+function drawAnnual(totals, raw, baseMean, displayYi) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = annual.clientWidth, h = 200, pad = { l: 46, r: 8, t: 10, b: 26 };
+  annual.style.height = h + "px";
+  annual.width = w * dpr; annual.height = h * dpr;
+  const ctx = annual.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  const muted = cssVar("--muted"), line = cssVar("--line"), accent = cssVar("--accent");
+  const modisC = cssVar("--modis"), viirsC = cssVar("--viirs"), fg = cssVar("--fg");
+  const all = displayYi.map(yi => Math.max(totals[yi], raw.mod[yi] || 0, raw.vir[yi] || 0, baseMean));
+  const top = Math.max(...all) * 1.1 || 1;
+  const bw = (w - pad.l - pad.r) / displayYi.length;
+  const Yp = v => pad.t + (1 - v / top) * (h - pad.t - pad.b);
+  ctx.font = "11px Inter, system-ui, sans-serif";
+  ctx.strokeStyle = line; ctx.fillStyle = muted;
+  for (let k = 0; k <= 3; k++) {
+    const v = top * k / 3, y = Yp(v);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+    ctx.fillText(Math.round(v).toLocaleString("en-US"), 4, y + 4);
+  }
+  displayYi.forEach((yi, i) => {
+    const x = pad.l + i * bw + bw * 0.15, bwid = bw * 0.7;
+    ctx.fillStyle = accent; ctx.globalAlpha = 0.85;
+    ctx.fillRect(x, Yp(totals[yi]), bwid, h - pad.b - Yp(totals[yi]));
+    ctx.globalAlpha = 1;
+    const cx = x + bwid / 2;
+    if (raw.mod[yi] != null) { ctx.fillStyle = modisC; ctx.beginPath(); ctx.arc(cx, Yp(raw.mod[yi]), 3.5, 0, 7); ctx.fill(); }
+    if (raw.vir[yi] != null) { ctx.fillStyle = viirsC; const py = Yp(raw.vir[yi]); ctx.beginPath(); ctx.moveTo(cx, py - 4.5); ctx.lineTo(cx + 4, py + 3); ctx.lineTo(cx - 4, py + 3); ctx.closePath(); ctx.fill(); }
+    if ((Y0 + yi) % 3 === 0 || displayYi.length < 12) { ctx.fillStyle = muted; ctx.fillText(String(Y0 + yi), x - 2, h - 8); }
+  });
+  ctx.setLineDash([5, 4]); ctx.strokeStyle = fg; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(pad.l, Yp(baseMean)); ctx.lineTo(w - pad.r, Yp(baseMean)); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function sumRange(arr, from, to) { let s = 0; for (let i = from; i <= to; i++) s += arr[i]; return s; }
+
+function sync() {
+  sel.area.value = st.a; sel.years.value = st.years; sel.policy.value = st.policy;
+  sel.calwin.value = st.calwin; sel.base.value = st.base; sel.thr.value = String(st.thr);
+  const A = AREAS[st.a];
+  const cz = calibrate(st.a, st.calwin);
+  const k = cz.k;
+  const merged = mergedArea(st.a, st.policy, k);
+  const W = weekly(merged);
+  const totals = merged.map(row => row.reduce((s, v) => s + v, 0));
+  const rawTotals = { mod: MOD[st.a].map(r => r.reduce((s, v) => s + v, 0)), vir: VIR[st.a].map(r => r ? r.reduce((s, v) => s + v, 0) : null) };
+
+  // Baseline per week
+  const baseYi = []; for (let yi = 0; yi < NY; yi++) if (st.base === "early" ? yi < OV : yi < 17) baseYi.push(yi);
+  const mean = new Float64Array(WEEKS), sd = new Float64Array(WEEKS);
+  for (let c = 0; c < WEEKS; c++) {
+    let s = 0; baseYi.forEach(yi => s += W[yi][c]); const mu = s / baseYi.length;
+    let v = 0; baseYi.forEach(yi => v += (W[yi][c] - mu) ** 2);
+    mean[c] = mu; sd[c] = Math.max(1, Math.sqrt(v / Math.max(1, baseYi.length - 1)));
+  }
+  const displayYi = []; for (let yi = st.years === "recent" ? OV : 0; yi < NY; yi++) displayYi.push(yi);
+  const Z = displayYi.map(yi => Array.from({ length: WEEKS }, (_, c) => (W[yi][c] - mean[c]) / sd[c]));
+  const flags = Z.map(row => row.map(z => z >= st.thr));
+  let maxW = 0; displayYi.forEach(yi => { for (let c = 0; c < WEEKS; c++) maxW = Math.max(maxW, W[yi][c]); });
+
+  // Periods: runs of flagged weeks inside one year
+  const periods = [];
+  displayYi.forEach((yi, r) => {
+    let c = 0;
+    while (c < WEEKS) {
+      if (!flags[r][c]) { c++; continue; }
+      const s = c; let peak = -Infinity, tot = 0, exp = 0;
+      while (c < WEEKS && flags[r][c]) { peak = Math.max(peak, Z[r][c]); tot += W[yi][c]; exp += mean[c]; c++; }
+      periods.push({ yi, s, e: c - 1, peak, tot, exp });
+    }
+  });
+  periods.sort((p, q) => q.peak - p.peak);
+
+  // Summary and KPIs
+  const areaNote = A.name;
+  $("areaNote").textContent = `Calibration k = ${k.toFixed(2)} from ${cz.days} days`;
+  $("summary").textContent = `${periods.length} unusual period${periods.length === 1 ? "" : "s"} in ${displayYi.length} years at z of ${st.thr.toFixed(1)} or more. Baseline ${st.base === "early" ? "2003 to 2011" : "2003 to 2019"}.`;
+  const stepBefore = sumRange(totals, OV - 3, OV - 1) / 3, stepAfter = sumRange(totals, OV, OV + 2) / 3;
+  const step = stepBefore ? (stepAfter / stepBefore - 1) * 100 : 0;
+  $("kpis").replaceChildren(...[
+    ["Calibration factor k", k.toFixed(2)],
+    ["Overlap days used", cz.days.toLocaleString("en-US")],
+    ["Both sensors agree", (cz.agree * 100).toFixed(0) + "%"],
+    ["Daily correlation r", cz.r.toFixed(2)],
+    ["Step at 2012", (step >= 0 ? "+" : "") + step.toFixed(0) + "%"]
+  ].map(([k2, v]) => { const d = document.createElement("div"); d.className = "kpi"; d.innerHTML = `<div class="k"></div><div class="v"></div>`; d.querySelector(".k").textContent = k2; d.querySelector(".v").textContent = v; return d; }));
+  const polic = st.policy === "harm"
+    ? `Harmonized: from 2012 VIIRS counts are divided by k = ${k.toFixed(2)} so they match the MODIS scale. k is the ratio of total VIIRS to total MODIS detections over the matched overlap days (${st.calwin === "full" ? "2012 to 2024" : "days 150 to 300 only"}). The step at 2012 should be near zero.`
+    : `Unharmonized: VIIRS counts are used as they are from 2012. VIIRS detects small fires that MODIS misses, so the series steps up at 2012 even when burning is unchanged. The step above shows the bias that harmonization removes.`;
+  $("method").textContent = polic + ` Daily correlation r compares MODIS with VIIRS divided by k on the same days.`;
+  drawAnnual(totals, rawTotals, sumRange(totals, baseYi[0], baseYi[baseYi.length - 1]) / baseYi.length, displayYi);
+
+  // Calendar
+  drawCalendar(displayYi, displayYi.map(yi => W[yi]), Z, flags, maxW);
+  if (st.sel && !displayYi.includes(st.sel.yi)) st.sel = null;
+  showSelection(W, mean, sd, Z, displayYi, flags);
+
+  // Periods table
+  const rows = periods.slice(0, 10).map(p => {
+    const tr = document.createElement("tr"); tr.className = "pick"; tr.tabIndex = 0;
+    const cells = [`${Y0 + p.yi}: ${monthDay(p.s * 7)} to ${monthDay(Math.min(D - 1, p.e * 7 + 6))}`, `+${p.peak.toFixed(1)}`, p.tot.toLocaleString("en-US"), Math.round(p.exp).toLocaleString("en-US")];
+    cells.forEach((t, i) => { const td = document.createElement("td"); td.textContent = t; if (i === 1) td.className = "flagtxt"; tr.appendChild(td); });
+    const pick = () => { st.sel = { yi: p.yi, w: p.s }; sync(); };
+    tr.addEventListener("click", pick);
+    tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    return tr;
+  });
+  if (!rows.length) {
+    const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 4;
+    td.textContent = `No week reaches z of ${st.thr.toFixed(1)}. Lower the threshold to see the weakest unusual periods.`;
+    tr.appendChild(td); rows.push(tr);
+  }
+  $("periods").replaceChildren(...rows);
+  $("flagNote").textContent = `${flags.reduce((s, r) => s + r.filter(Boolean).length, 0)} flagged weeks`;
+}
+
+function showSelection(W, mean, sd, Z, displayYi, flags) {
+  const ro = $("readout");
+  if (!st.sel) {
+    ro.textContent = "Tap or click a week to see its counts and baseline comparison.";
+    return;
+  }
+  const { yi, w } = st.sel, r = displayYi.indexOf(yi);
+  const v = W[yi][w], z = Z[r][w];
+  ro.textContent = `${Y0 + yi}, ${monthDay(w * 7)} to ${monthDay(Math.min(D - 1, w * 7 + 6))}: ${Math.round(v).toLocaleString("en-US")} detections on the merged scale. Baseline mean ${Math.round(mean[w])}, sd ${sd[w].toFixed(0)}, z ${z >= 0 ? "+" : ""}${z.toFixed(1)}. ${flags[r][w] ? "Flagged as unusual." : "Within the usual range."}`;
+}
+
+cal.addEventListener("click", e => {
+  if (!cellGeom) return;
+  const rect = cal.getBoundingClientRect();
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  const c = Math.floor((x - cellGeom.padL) / cellGeom.cw), r = Math.floor((y - cellGeom.padT) / cellGeom.ch);
+  if (c < 0 || c >= WEEKS || r < 0 || r >= cellGeom.rows) return;
+  st.sel = { yi: cellGeom.yiList[r], w: c };
+  sync();
+});
+
+// ---- Wiring ----
+sel.area.addEventListener("change", e => { st.a = Number(e.target.value); st.sel = null; sync(); });
+sel.years.addEventListener("change", e => { st.years = e.target.value; st.sel = null; sync(); });
+sel.policy.addEventListener("change", e => { st.policy = e.target.value; sync(); });
+sel.calwin.addEventListener("change", e => { st.calwin = e.target.value; sync(); });
+sel.base.addEventListener("change", e => { st.base = e.target.value; sync(); });
+sel.thr.addEventListener("change", e => { st.thr = Number(e.target.value); sync(); });
+let rz;
+window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(sync, 120); });
+sync();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/2rPJsWqmQjY4EAMN3xVneN" target="_blank" rel="noopener">Earth trend detective</a></li>
+<li><a href="https://claude.ai/artifact/6Adb3crQ7dynFU9ieKfBn4" target="_blank" rel="noopener">Farm rotation planner</a></li>
+<li><a href="https://claude.ai/artifact/SdCL2Z7zoRGqZkXP3at59R" target="_blank" rel="noopener">Microgravity fire dashboard</a></li>
+</ul>
+</nav>
+</body>
+</html>

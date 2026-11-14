@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission Design Game</title>
+<style>
+:root {
+  --bg: #f4f3ee; --surface: #ffffff; --surface-2: #f8f7f3; --fg: #1b2230; --muted: #5b6474; --line: #dcdfe6;
+  --accent: #b5471f; --accent-fg: #ffffff; --accent-soft: #f7e4da; --chip: #eceef3; --bad: #b3262e; --good: #2f7d5b;
+  --shadow: 0 1px 2px rgba(20,30,45,.06), 0 6px 18px rgba(20,30,45,.06);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d131e; --surface: #151d2c; --surface-2: #121a28; --fg: #e8ecf3; --muted: #97a3b8; --line: #263247;
+    --accent: #f08a5d; --accent-fg: #15100c; --accent-soft: #3a2a22; --chip: #213049; --bad: #ff7a7f; --good: #6cc39a;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d131e; --surface: #151d2c; --surface-2: #121a28; --fg: #e8ecf3; --muted: #97a3b8; --line: #263247;
+  --accent: #f08a5d; --accent-fg: #15100c; --accent-soft: #3a2a22; --chip: #213049; --bad: #ff7a7f; --good: #6cc39a;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding: 0 16px 48px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; min-width: 0; }
+h1, h2 { font-family: "Space Grotesk", Inter, system-ui, sans-serif; margin: 0; line-height: 1.2; }
+h1 { font-size: clamp(1.6rem, 6vw, 2.3rem); margin: 4px 0; }
+h2 { font-size: 1rem; margin-bottom: 10px; }
+.eyebrow { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin: 22px 0 0; }
+.lead { color: var(--muted); margin: 6px 0 0; max-width: 64ch; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 14px; min-width: 0; box-shadow: var(--shadow); }
+.layout { display: grid; gap: 0; }
+.status { order: -1; }
+.design { min-width: 0; }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
+  .status { order: 0; position: sticky; top: 12px; }
+  .status .card:first-child { margin-top: 14px; }
+}
+.hint { font-size: 12px; color: var(--muted); font-weight: 400; }
+.opts { display: grid; gap: 8px; }
+.two-col { grid-template-columns: 1fr; }
+@media (min-width: 520px) { .two-col { grid-template-columns: 1fr 1fr; } }
+.opt-item {
+  display: flex; gap: 10px; align-items: flex-start; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--surface-2); min-width: 0;
+}
+.opt-item.on { border-color: var(--accent); background: var(--accent-soft); }
+.opt-item input { margin-top: 4px; accent-color: var(--accent); flex: 0 0 auto; }
+.oi-text { display: grid; gap: 2px; min-width: 0; }
+.oi-text b { font-size: 14px; }
+.oi-text small { font-size: 12px; color: var(--muted); }
+.oi-text small.warn { color: var(--accent); font-weight: 600; }
+.btn {
+  font: inherit; font-size: 14px; color: var(--fg); background: var(--surface-2);
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px; cursor: pointer;
+}
+.btn:hover:not(:disabled) { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.wide { width: 100%; margin-top: 12px; padding: 12px; font-size: 15px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.ctrl { display: grid; gap: 6px; margin-top: 12px; font-size: 14px; }
+.ctrl .lbl { display: flex; justify-content: space-between; color: var(--muted); }
+.ctrl output { color: var(--fg); font-weight: 700; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+input[type=number] {
+  font: inherit; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px 10px; width: 110px;
+}
+.seedrow { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.seedrow label { display: grid; gap: 4px; }
+canvas { display: block; width: 100%; height: 180px; border-radius: 10px; }
+#yrs { height: 130px; margin-top: 10px; }
+.meter { margin-bottom: 10px; }
+.mt { display: flex; justify-content: space-between; font-size: 13px; gap: 8px; }
+.mt span { color: var(--muted); }
+.track { height: 10px; background: var(--chip); border-radius: 6px; overflow: hidden; margin-top: 4px; }
+.track span { display: block; height: 100%; transition: width .25s ease; }
+@media (prefers-reduced-motion: reduce) { .track span { transition: none; } }
+.why { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; }
+.why li.block { color: var(--bad); font-weight: 600; }
+.ok { color: var(--good); font-weight: 600; margin: 8px 0 0; font-size: 14px; }
+.grade { font-family: "Space Grotesk", Inter, sans-serif; font-size: 2.6rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.score { font-size: 1.05rem; font-weight: 700; margin: 6px 0 0; }
+.driver { margin: 10px 0 0; font-size: 14px; }
+.stale { margin: 10px 0 0; font-size: 13px; color: var(--accent); font-weight: 600; }
+.row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.hidden { display: none !important; }
+.sub { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="eyebrow">Challenge 13 · Space Mission Design Game</p>
+  <h1>Design and fly a mission</h1>
+  <p class="lead">Pick an objective, orbit, launch vehicle, power system and instruments within budget and mass. Then fly it. Each choice shifts the score, and the report shows which trade-offs did the most damage.</p>
+
+  <div class="layout">
+    <div class="design">
+      <section class="card">
+        <h2>1. Objective</h2>
+        <div class="opts" id="objs"></div>
+      </section>
+      <section class="card">
+        <h2>2. Orbit</h2>
+        <div class="opts" id="orbits"></div>
+      </section>
+      <section class="card">
+        <h2>3. Launch vehicle</h2>
+        <div class="opts" id="vehicles"></div>
+      </section>
+      <section class="card">
+        <h2>4. Power system</h2>
+        <div class="opts" id="powers"></div>
+      </section>
+      <section class="card">
+        <h2>5. Instruments <span class="hint">choose any number</span></h2>
+        <div class="opts two-col" id="insts"></div>
+      </section>
+      <section class="card">
+        <h2>6. Budget, duration and presets</h2>
+        <div class="ctrl">
+          <div class="lbl"><span>Budget</span><output id="bOut"></output></div>
+          <input type="range" id="budget" min="150" max="500" step="10">
+        </div>
+        <div class="ctrl">
+          <div class="lbl"><span>Mission length</span><output id="yOut"></output></div>
+          <input type="range" id="years" min="1" max="5" step="1">
+        </div>
+        <div class="presets">
+          <button class="btn" id="pStarter">Load starter design</button>
+          <button class="btn" id="pIce">Load ice hunter design</button>
+          <button class="btn" id="pClear">Clear instruments</button>
+        </div>
+        <p class="sub">Operations cost per year depends on the orbit and is charged on top of the build cost.</p>
+      </section>
+    </div>
+
+    <aside class="status">
+      <section class="card">
+        <h2>Design check</h2>
+        <canvas id="orbit" role="img" aria-label="Diagram of the chosen orbit around its body"></canvas>
+        <div id="meters" style="margin-top:12px"></div>
+        <ul class="why" id="checks"></ul>
+        <button class="btn primary wide" id="launch">Launch mission</button>
+        <div class="seedrow">
+          <label>Mission seed
+            <input type="number" id="seed" min="1" max="99999" value="42">
+          </label>
+          <button class="btn" id="newSeed">New seed</button>
+        </div>
+        <p class="sub">The seed fixes the launch roll and the year-by-year events, so the same design and seed always fly the same way.</p>
+      </section>
+
+      <section class="card hidden" id="result" aria-live="polite">
+        <h2>Flight report</h2>
+        <div class="grade" id="resGrade"></div>
+        <p class="score" id="resScore"></p>
+        <p class="driver" id="resDriver"></p>
+        <p class="stale hidden" id="resStale">Design changed since this flight. Launch again to update the score.</p>
+        <ul class="why" id="resWhy"></ul>
+        <h2 style="margin-top:14px">Science by year</h2>
+        <canvas id="yrs" role="img" aria-label="Bar chart of science points by year, red dots mark events"></canvas>
+        <ul class="why" id="resYears"></ul>
+        <div class="row-btns">
+          <button class="btn" id="reSame">Re-fly, same seed</button>
+          <button class="btn" id="reNew">Re-fly, new seed</button>
+          <button class="btn" id="edit">Edit design</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Scoring rules</h2>
+        <ul class="why">
+          <li>Science per instrument = science value × duty cycle. Instruments that match the objective count 1.5×.</li>
+          <li>Objective factor: 0.4 plus 0.6 × share of needed instrument types aboard.</li>
+          <li>Orbit fit: matched orbit ×1.2, mismatched ×0.8. Data link: Earth orbits 0.9–1.0, Moon orbit 0.7, Mars orbit 0.5.</li>
+          <li>Power: duty = supply ÷ demand (capped at 1). Solar output at Mars is 43% of Earth's.</li>
+          <li>Events each year: solar storm (chance by orbit radiation), instrument anomaly (15%), link gap (more likely on weak links).</li>
+          <li>Score = science × 3 plus a bonus for unspent budget. Launch can fail, depending on vehicle reliability.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<script>
+const BUS = { mass: 300, power: 120, cost: 60 };
+const SCALE = 3;
+const ORBITS = {
+  leo: { name: 'Low Earth orbit', body: 'earth', capF: 1, ops: 6, comms: 1, rad: 0.15, desc: '400 km. Fast passes, short links.' },
+  sso: { name: 'Sun-synchronous polar', body: 'earth', capF: 0.95, ops: 8, comms: 0.95, rad: 0.2, desc: 'Same local time each pass. Good for imaging.' },
+  geo: { name: 'Geostationary', body: 'earth', capF: 0.55, ops: 14, comms: 0.9, rad: 0.3, desc: '36,000 km. Always over one region.' },
+  llo: { name: 'Low lunar orbit', body: 'moon', capF: 0.5, ops: 12, comms: 0.7, rad: 0.45, desc: 'Close to the Moon. Limited Earth view.' },
+  mars: { name: 'Mars orbit', body: 'mars', capF: 0.35, ops: 16, comms: 0.5, rad: 0.5, desc: 'Long light-time delays. Weak link.' }
+};
+const VEH = {
+  small: { name: 'Small lift', cap: 500, cost: 60, rel: 0.92, orbits: ['leo', 'sso'] },
+  medium: { name: 'Medium lift', cap: 2000, cost: 140, rel: 0.96, orbits: ['leo', 'sso', 'geo', 'llo'] },
+  heavy: { name: 'Heavy lift', cap: 6000, cost: 280, rel: 0.98, orbits: ['leo', 'sso', 'geo', 'llo', 'mars'] }
+};
+const POWER = {
+  solar_s: { name: 'Small solar array', mass: 25, supply: 150, cost: 8, solar: true },
+  solar_l: { name: 'Large solar array', mass: 60, supply: 320, cost: 18, solar: true },
+  rtg: { name: 'Radioisotope generator', mass: 45, supply: 120, cost: 45, solar: false }
+};
+const INST = {
+  camera: { name: 'Imaging camera', cat: 'imaging', mass: 40, power: 60, cost: 12, sci: 20 },
+  spectro: { name: 'Spectrometer', cat: 'composition', mass: 25, power: 50, cost: 18, sci: 25 },
+  radar: { name: 'Radar sounder', cat: 'subsurface', mass: 90, power: 150, cost: 35, sci: 35 },
+  rad: { name: 'Radiation monitor', cat: 'radiation', mass: 8, power: 10, cost: 4, sci: 10 },
+  seis: { name: 'Seismometer', cat: 'interior', mass: 15, power: 20, cost: 9, sci: 18 },
+  thermal: { name: 'Thermal camera', cat: 'thermal', mass: 30, power: 40, cost: 10, sci: 17 },
+  mag: { name: 'Magnetometer', cat: 'fields', mass: 6, power: 8, cost: 3, sci: 8 },
+  alt: { name: 'Laser altimeter', cat: 'topography', mass: 20, power: 35, cost: 14, sci: 22 }
+};
+const OBJ = {
+  surface: { name: 'Map a planet surface', needs: ['imaging', 'topography'], good: ['sso', 'llo', 'mars'], desc: 'Pictures and height data.' },
+  ice: { name: 'Find subsurface ice at a pole', needs: ['subsurface', 'thermal'], good: ['llo', 'mars'], desc: 'Radar and heat signatures.' },
+  climate: { name: "Monitor Earth's climate", needs: ['thermal', 'imaging'], good: ['sso', 'geo'], desc: 'Repeat views of Earth.' },
+  weather: { name: 'Measure space weather', needs: ['radiation', 'fields'], good: ['geo', 'leo'], desc: 'Radiation and magnetic field.' },
+  interior: { name: "Probe a moon's interior", needs: ['interior', 'fields'], good: ['llo', 'mars'], desc: 'Quakes and magnetic clues.' }
+};
+const PRE = {
+  starter: { objective: 'surface', orbit: 'sso', vehicle: 'medium', power: 'solar_l', inst: ['camera', 'alt'], budget: 300, years: 3 },
+  ice: { objective: 'ice', orbit: 'llo', vehicle: 'medium', power: 'solar_l', inst: ['radar', 'spectro', 'thermal', 'rad'], budget: 350, years: 3 }
+};
+
+const $ = id => document.getElementById(id);
+const clampN = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function css(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+let D = { objective: 'surface', orbit: 'sso', vehicle: 'medium', power: 'solar_l', inst: new Set(['camera', 'alt']), budget: 300, years: 3, seed: 42 };
+let R = null;
+const REFS = {};
+
+function designKey(d) {
+  return JSON.stringify([d.objective, d.orbit, d.vehicle, d.power, [...d.inst].sort(), d.budget, d.years, d.seed]);
+}
+
+function evalDesign(d) {
+  const o = ORBITS[d.orbit], v = VEH[d.vehicle], p = POWER[d.power];
+  const ins = [...d.inst].map(k => ({ key: k, ...INST[k] }));
+  const mass = BUS.mass + p.mass + ins.reduce((a, i) => a + i.mass, 0);
+  const cap = Math.round(v.cap * o.capF);
+  const sunF = d.orbit === 'mars' ? 0.43 : 1;
+  const supply = p.solar ? p.supply * sunF : p.supply;
+  const demand = BUS.power + ins.reduce((a, i) => a + i.power, 0);
+  const duty = Math.min(1, supply / demand);
+  const build = v.cost + BUS.cost + p.cost + ins.reduce((a, i) => a + i.cost, 0);
+  const ops = o.ops * d.years;
+  const total = build + ops;
+  const reasons = [];
+  if (!v.orbits.includes(d.orbit)) reasons.push(`${v.name} cannot reach ${o.name}. Pick another vehicle or orbit.`);
+  if (ins.length === 0) reasons.push('Add at least one instrument.');
+  if (mass > cap) reasons.push(`Mass ${mass} kg is over the ${cap} kg limit for this orbit.`);
+  if (total > d.budget) reasons.push(`Total cost $${total}M is over the $${d.budget}M budget.`);
+  return { o, v, p, ins, mass, cap, supply, demand, duty, total, ops, build, sunF, leftover: d.budget - total, reasons, ok: reasons.length === 0 };
+}
+
+function fly(d) {
+  const e = evalDesign(d), needs = OBJ[d.objective].needs, rng = mulberry32(d.seed);
+  const n = e.ins.length;
+  const w = i => needs.includes(i.cat) ? 1.5 : 1;
+  const sciAll = e.ins.reduce((a, i) => a + i.sci * w(i), 0);
+  const launchRoll = rng();
+  const launched = launchRoll < e.v.rel;
+  const yearsData = [];
+  let S = 0, S0 = 0;
+  for (let y = 1; y <= d.years; y++) {
+    const active = e.ins.map(() => true), evs = [];
+    const r1 = rng(), i1 = Math.floor(rng() * n);
+    if (r1 < e.o.rad) { active[i1] = false; evs.push(`solar storm: ${e.ins[i1].name} offline`); }
+    const r2 = rng(), i2 = Math.floor(rng() * n);
+    if (r2 < 0.15) { active[i2] = false; evs.push(`anomaly: ${e.ins[i2].name} offline`); }
+    const r3 = rng();
+    const cy = r3 < (1 - e.o.comms) * 0.6 ? 0.8 : 1;
+    if (cy < 1) evs.push('link gap: 20% of data lost');
+    const by = e.ins.reduce((a, i, idx) => a + (active[idx] ? i.sci * w(i) : 0), 0);
+    S += by * cy; S0 += sciAll;
+    yearsData.push({ y, evs, by, cy });
+  }
+  const covered = needs.filter(nd => e.ins.some(i => i.cat === nd)).length;
+  const objF = 0.4 + 0.6 * covered / needs.length;
+  const orbF = OBJ[d.objective].good.includes(d.orbit) ? 1.2 : 0.8;
+  const link = e.o.comms;
+  const duty = e.duty;
+  const F = duty * objF * orbF * link;
+  const leftover = Math.max(0, e.leftover);
+  const bonus = Math.round(leftover / d.budget * 100);
+  const score = launched ? Math.round(S * F * SCALE + bonus) : 0;
+  yearsData.forEach(yr => { yr.pts = yr.by * yr.cy * F * SCALE; });
+  const impacts = {
+    power: -Math.round(S * (1 - duty) * objF * orbF * link * SCALE),
+    objective: -Math.round(S * duty * (1 - objF) * orbF * link * SCALE),
+    orbit: Math.round(S * duty * objF * link * (orbF - 1) * SCALE),
+    link: Math.round(S * duty * objF * orbF * (link - 1) * SCALE),
+    events: -Math.round((S0 - S) * F * SCALE)
+  };
+  const grade = !launched ? 'F' : score >= 700 ? 'S' : score >= 500 ? 'A' : score >= 350 ? 'B' : score >= 200 ? 'C' : 'D';
+  return {
+    key: designKey(d), launched, rel: e.v.rel, score, grade, impacts, bonus, leftover, total: e.total, budget: d.budget,
+    covered, need: needs.length, objF, orbF, link, duty, demand: e.demand, supply: e.supply, mass: e.mass, cap: e.cap,
+    vehName: e.v.name, orbName: e.o.name, vehShare: Math.round(e.v.cost / e.total * 100), yearsData,
+    evAll: yearsData.flatMap(y => y.evs.map(t => `year ${y.y}: ${t}`))
+  };
+}
+
+function driverOf(r) {
+  const pairs = [['power', 'power shortfall'], ['objective', 'missing objective instruments'], ['orbit', 'orbit fit'], ['link', 'data link'], ['events', 'random events']];
+  let best = null;
+  pairs.forEach(([k, label]) => { const v = r.impacts[k]; if (v < 0 && (!best || v < best.v)) best = { v, label }; });
+  return best ? `Biggest drag: ${best.label} (${best.v} points).` : 'No major drag on this flight.';
+}
+
+function explainFlight(r) {
+  const L = [];
+  if (!r.launched) {
+    L.push(`Launch anomaly: the ${r.vehName} lost the spacecraft on ascent. This vehicle succeeds about ${Math.round(r.rel * 100)}% of the time. Try a more reliable vehicle, or a new seed for another launch roll.`);
+    return L;
+  }
+  L.push(`Objective: ${r.covered} of ${r.need} needed instrument types aboard. ${r.covered < r.need ? `Missing types cut science by ${Math.round((1 - r.objF) * 100)}%.` : 'Full coverage, no penalty.'}`);
+  L.push(r.duty < 1
+    ? `Power shortfall: demand ${r.demand} W against ${Math.round(r.supply)} W supply, so instruments ran at ${Math.round(r.duty * 100)}% duty. Cost about ${-r.impacts.power} points.`
+    : `Power is enough: ${r.demand} W demand against ${Math.round(r.supply)} W supply.`);
+  L.push(r.orbF > 1
+    ? `${r.orbName} suits this objective: science +20%.`
+    : `${r.orbName} does not suit this objective: science −20%, about ${-r.impacts.orbit} points.`);
+  L.push(r.link < 1
+    ? `The data link from ${r.orbName} keeps ${Math.round(r.link * 100)}% of science, about ${-r.impacts.link} points lost.`
+    : `The data link from ${r.orbName} is strong: no penalty.`);
+  L.push(r.evAll.length
+    ? `Random events cost about ${-r.impacts.events} points: ${r.evAll.join('; ')}.`
+    : 'No random events hit this flight.');
+  L.push(`Budget: $${r.total}M spent of $${r.budget}M. The $${r.leftover}M left adds ${r.bonus} bonus points. The ${r.vehName} took ${r.vehShare}% of the spend.`);
+  return L;
+}
+
+function li(ul, text, cls) {
+  const x = document.createElement('li');
+  if (cls) x.className = cls;
+  x.textContent = text;
+  ul.appendChild(x);
+}
+
+function buildOptions(key, elId, type, list) {
+  const box = $(elId);
+  REFS[key] = {};
+  list.forEach(([val, title, desc]) => {
+    const lab = document.createElement('label');
+    lab.className = 'opt-item';
+    const inp = document.createElement('input');
+    inp.type = type; inp.name = key; inp.value = val;
+    const span = document.createElement('span');
+    span.className = 'oi-text';
+    const b = document.createElement('b'); b.textContent = title;
+    const s = document.createElement('small'); s.textContent = desc;
+    const warn = document.createElement('small'); warn.className = 'warn';
+    span.append(b, s, warn);
+    lab.append(inp, span);
+    box.appendChild(lab);
+    REFS[key][val] = { lab, inp, warn };
+    inp.addEventListener('change', () => {
+      if (type === 'radio') D[key] = val;
+      else if (inp.checked) D.inst.add(val);
+      else D.inst.delete(val);
+      update();
+    });
+  });
+}
+
+function meter(label, pct, text, bad) {
+  return `<div class="meter"><div class="mt"><span>${label}</span><b>${text}</b></div><div class="track"><span style="width:${clampN(pct, 0, 100)}%;background:${bad ? 'var(--bad)' : 'var(--accent)'}"></span></div></div>`;
+}
+
+function renderChecks(e) {
+  const ul = $('checks');
+  ul.innerHTML = '';
+  e.reasons.forEach(t => li(ul, `Blocked: ${t}`, 'block'));
+  if (e.ok) {
+    const needs = OBJ[D.objective].needs;
+    const covered = needs.filter(nd => e.ins.some(i => i.cat === nd)).length;
+    if (e.duty < 1) li(ul, `Power short: instruments will run at ${Math.round(e.duty * 100)}% duty.`);
+    if (covered < needs.length) li(ul, `Objective partly covered: ${covered} of ${needs.length} needed instrument types.`);
+    if (ul.children.length === 0) li(ul, 'Design is valid and within limits. Launch when ready.');
+  }
+  ul.querySelectorAll('li').forEach(x => { if (!x.classList.contains('block')) x.style.color = 'var(--muted)'; });
+}
+
+function drawOrbit(e) {
+  const cv = $('orbit');
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = css('--surface-2');
+  ctx.fillRect(0, 0, W, H);
+  const o = ORBITS[D.orbit];
+  const body = o.body === 'earth' ? '#3f7fc0' : o.body === 'moon' ? '#9aa2ad' : '#c0603a';
+  const cx = W / 2, cy = H / 2 + 6;
+  const r = Math.min(H * 0.14, W * 0.07);
+  const f = { leo: 1.7, sso: 2.1, geo: 3.0, llo: 2.0, mars: 2.2 }[D.orbit];
+  const ry = D.orbit === 'sso' ? f * r * 0.55 : f * r;
+  ctx.strokeStyle = css('--muted'); ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.ellipse(cx, cy, f * r, ry, 0, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = body;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  const a = -0.8;
+  const sx = cx + f * r * Math.cos(a), sy = cy + ry * Math.sin(a);
+  ctx.fillStyle = css('--accent');
+  ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = css('--fg'); ctx.font = '12px system-ui'; ctx.textAlign = 'left';
+  ctx.fillText(o.name, 10, 16);
+  ctx.fillStyle = css('--muted'); ctx.textAlign = 'right';
+  ctx.fillText(`${e.ins.length} instrument${e.ins.length === 1 ? '' : 's'} · ${e.mass} kg`, W - 10, 16);
+}
+
+function drawYears() {
+  const cv = $('yrs');
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (!R || !R.launched) return;
+  const ys = R.yearsData;
+  const max = Math.max(1, ...ys.map(y => y.pts));
+  const bw = (W - 20) / ys.length;
+  ys.forEach((y, i) => {
+    const h = (H - 34) * y.pts / max;
+    const x = 10 + i * bw + bw * 0.15, w = bw * 0.7;
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = css('--accent');
+    ctx.fillRect(x, H - 22 - h, w, h);
+    ctx.globalAlpha = 1;
+    if (y.evs.length) {
+      ctx.fillStyle = css('--bad');
+      ctx.beginPath(); ctx.arc(x + w / 2, H - 22 - h - 8, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = css('--muted'); ctx.font = '11px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('Y' + y.y, x + w / 2, H - 6);
+  });
+}
+
+function renderResult() {
+  const box = $('result');
+  if (!R) { box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  $('resGrade').textContent = `Grade ${R.grade}`;
+  $('resScore').textContent = `Score ${R.score}`;
+  $('resDriver').textContent = R.launched ? driverOf(R) : 'Launch failed before science began.';
+  $('resStale').classList.toggle('hidden', R.key === designKey(D));
+  const ul = $('resWhy'); ul.innerHTML = '';
+  explainFlight(R).forEach(t => li(ul, t));
+  const ol = $('resYears'); ol.innerHTML = '';
+  if (R.launched) R.yearsData.forEach(y => li(ol, `Year ${y.y}: ${y.evs.length ? y.evs.join('; ') : 'quiet year'}. Science ${Math.round(y.pts)} points.`));
+  else li(ol, 'No flight data: the spacecraft was lost on ascent.');
+  drawYears();
+}
+
+function update() {
+  const e = evalDesign(D);
+  ['objective', 'orbit', 'vehicle', 'power'].forEach(key => {
+    for (const v in REFS[key]) {
+      const r = REFS[key][v], on = D[key] === v;
+      r.inp.checked = on; r.lab.classList.toggle('on', on);
+    }
+  });
+  for (const v in REFS.inst) {
+    const r = REFS.inst[v], on = D.inst.has(v);
+    r.inp.checked = on; r.lab.classList.toggle('on', on);
+    r.warn.textContent = OBJ[D.objective].needs.includes(INST[v].cat) ? 'Needed by this objective' : '';
+  }
+  for (const v in VEH) {
+    REFS.vehicle[v].warn.textContent = VEH[v].orbits.includes(D.orbit) ? '' : `Cannot reach ${ORBITS[D.orbit].name}`;
+  }
+  for (const v in REFS.orbit) REFS.orbit[v].warn.textContent = '';
+  for (const v in REFS.objective) REFS.objective[v].warn.textContent = '';
+  $('bOut').textContent = `$${D.budget}M`;
+  $('yOut').textContent = `${D.years} yr`;
+  $('budget').value = D.budget;
+  $('years').value = D.years;
+  $('meters').innerHTML =
+    meter('Mass', e.mass / e.cap * 100, `${e.mass} / ${e.cap} kg`, e.mass > e.cap) +
+    meter('Instrument duty (power)', e.duty * 100, `${Math.round(e.duty * 100)}% · ${e.demand} W need, ${Math.round(e.supply)} W supply`, e.duty < 1) +
+    meter('Budget incl. operations', e.total / D.budget * 100, `$${e.total}M of $${D.budget}M`, e.total > D.budget);
+  renderChecks(e);
+  $('launch').disabled = !e.ok;
+  $('reSame').disabled = !e.ok;
+  $('reNew').disabled = !e.ok;
+  drawOrbit(e);
+  renderResult();
+}
+
+function fromPreset(p) {
+  D = { ...D, objective: p.objective, orbit: p.orbit, vehicle: p.vehicle, power: p.power, inst: new Set(p.inst), budget: p.budget, years: p.years };
+  update();
+}
+
+function buildAll() {
+  buildOptions('objective', 'objs', 'radio', Object.keys(OBJ).map(k => [k, OBJ[k].name, `${OBJ[k].desc} Needs ${OBJ[k].needs.join(' + ')}.`]));
+  buildOptions('orbit', 'orbits', 'radio', Object.keys(ORBITS).map(k => [k, ORBITS[k].name, `${ORBITS[k].desc} Lift capacity ${Math.round(ORBITS[k].capF * 100)}%, data link ${Math.round(ORBITS[k].comms * 100)}%.`]));
+  buildOptions('vehicle', 'vehicles', 'radio', Object.keys(VEH).map(k => [k, VEH[k].name, `Lifts ${VEH[k].cap} kg to low Earth orbit before orbit penalty. Cost $${VEH[k].cost}M. Succeeds ${Math.round(VEH[k].rel * 100)}% of the time.`]));
+  buildOptions('power', 'powers', 'radio', Object.keys(POWER).map(k => [k, POWER[k].name, `${POWER[k].mass} kg, ${POWER[k].supply} W ${POWER[k].solar ? '(solar: scaled by sunlight)' : '(steady at any distance)'}, $${POWER[k].cost}M.`]));
+  buildOptions('inst', 'insts', 'checkbox', Object.keys(INST).map(k => [k, INST[k].name, `${INST[k].mass} kg · ${INST[k].power} W · $${INST[k].cost}M · science ${INST[k].sci} · ${INST[k].cat}`]));
+}
+
+$('budget').addEventListener('input', e => { D.budget = +e.target.value; update(); });
+$('years').addEventListener('input', e => { D.years = +e.target.value; update(); });
+$('seed').addEventListener('change', e => {
+  D.seed = clampN(Math.floor(+e.target.value) || 1, 1, 99999);
+  e.target.value = D.seed;
+  update();
+});
+$('newSeed').addEventListener('click', () => {
+  D.seed = 1 + Math.floor(Math.random() * 99998);
+  $('seed').value = D.seed;
+  update();
+});
+$('pStarter').addEventListener('click', () => fromPreset(PRE.starter));
+$('pIce').addEventListener('click', () => fromPreset(PRE.ice));
+$('pClear').addEventListener('click', () => { D.inst = new Set(); update(); });
+$('launch').addEventListener('click', () => { if (evalDesign(D).ok) { R = fly(D); update(); } });
+$('reSame').addEventListener('click', () => { if (evalDesign(D).ok) { R = fly(D); update(); } });
+$('reNew').addEventListener('click', () => {
+  if (!evalDesign(D).ok) return;
+  D.seed = 1 + Math.floor(Math.random() * 99998);
+  $('seed').value = D.seed;
+  R = fly(D);
+  update();
+});
+$('edit').addEventListener('click', () => document.querySelector('.design').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+window.addEventListener('resize', () => { update(); });
+
+buildAll();
+update();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/XSj59HAsViRqRq25H9Y8Wz" target="_blank" rel="noopener">Mars outpost trainer</a></li>
+<li><a href="https://claude.ai/artifact/E38NJQAjPdtV8fYEqLSdVW" target="_blank" rel="noopener">Astronaut health monitor</a></li>
+<li><a href="https://claude.ai/artifact/CezTh2sXLx9CoaW2gS1cuB" target="_blank" rel="noopener">Lunar site navigator</a></li>
+</ul>
+</nav>
+</body>
+</html>

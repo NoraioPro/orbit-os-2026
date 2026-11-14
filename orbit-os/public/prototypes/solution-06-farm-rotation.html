@@ -1,0 +1,464 @@
+<title>Field Shift Rotation Planner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Rule-based crop rotation ranking for a field's soil, a climate scenario and a farmer's priorities.">
+<style>
+:root{
+  --bg:#f5f4ef;--fg:#1d2420;--muted:#5b6560;--panel:#fffffe;--line:#d9ddd4;--field:#f0f2ec;
+  --acc:#2d6a4f;--acc-soft:#dfeee6;--on-acc:#ffffff;
+  --warn-bg:#fbf1dc;--warn-fg:#4f3c05;
+  --p0:#2a7fa0;--p1:#6f8f2f;--p2:#b9822a;--p3:#7a5aa8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111815;--fg:#e4ece6;--muted:#9baaa1;--panel:#18211d;--line:#2c3a33;--field:#141d19;
+    --acc:#7dcca0;--acc-soft:#1f3a2c;--on-acc:#0c1510;
+    --warn-bg:#3a3012;--warn-fg:#f2dca6;
+    --p0:#6cbbd8;--p1:#a7c85a;--p2:#e0b264;--p3:#b79ee0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111815;--fg:#e4ece6;--muted:#9baaa1;--panel:#18211d;--line:#2c3a33;--field:#141d19;
+  --acc:#7dcca0;--acc-soft:#1f3a2c;--on-acc:#0c1510;
+  --warn-bg:#3a3012;--warn-fg:#f2dca6;
+  --p0:#6cbbd8;--p1:#a7c85a;--p2:#e0b264;--p3:#b79ee0;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:18px;overflow-x:hidden;
+}
+main{display:grid;gap:14px;max-width:1100px;margin:0 auto;min-width:0}
+h1{font-size:1.6rem;line-height:1.2;margin:.1rem 0 .3rem;text-wrap:balance}
+h2{font-size:1.08rem;margin:0 0 .5rem}
+h3{font-size:.95rem;margin:0 0 .3rem}
+p{margin:.3rem 0}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin:0;font-weight:600}
+.lede{color:var(--muted);max-width:68ch}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.notice{background:var(--warn-bg);color:var(--warn-fg);border-radius:8px;padding:8px 10px;margin:.6rem 0 0;font-size:.9rem}
+.grid3{display:grid;gap:14px;grid-template-columns:1fr;min-width:0}
+@media (min-width:860px){.grid3{grid-template-columns:1fr 1fr 1fr}}
+.field{display:grid;gap:4px;min-width:0;margin-bottom:10px}
+.field label{font-size:.9rem;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+output{font-weight:600;font-variant-numeric:tabular-nums;color:var(--acc)}
+input[type="range"]{width:100%;accent-color:var(--acc);margin:2px 0}
+select,input[type="number"]{
+  font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);
+  border-radius:6px;padding:6px 8px;min-height:38px;max-width:100%
+}
+input[type="number"]{width:100%;min-width:0}
+.btn{
+  appearance:none;font:inherit;border:1px solid var(--acc);background:var(--acc);color:var(--on-acc);
+  border-radius:8px;padding:8px 14px;min-height:40px;cursor:pointer
+}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+.share{font-size:.85rem;color:var(--muted)}
+ol.rank{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--field);min-width:0}
+.card.top{border-color:var(--acc);box-shadow:inset 3px 0 0 var(--acc)}
+.card-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.score{font-size:1.4rem;font-weight:700;font-variant-numeric:tabular-nums}
+.bars{display:grid;gap:5px;margin:8px 0;grid-template-columns:1fr;min-width:0}
+@media (min-width:520px){.bars{grid-template-columns:1fr 1fr}}
+.bar{display:grid;grid-template-columns:72px 1fr 34px;gap:6px;align-items:center;font-size:.82rem}
+.track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.fill{height:100%;border-radius:4px}
+.bar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+ul.reasons{margin:6px 0 0;padding-left:1.1rem;font-size:.9rem}
+ul.reasons li{margin:.2rem 0}
+.tablewrap{overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.85rem}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+td input[type="number"]{min-width:64px}
+details summary{cursor:pointer;font-weight:600;margin-bottom:8px}
+.assume td:first-child{width:52%}
+.assume td input{width:110px}
+svg{display:block;width:100%;height:auto;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.85rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+ol.steps,ul.next{padding-left:1.2rem;margin:.4rem 0}
+li{margin:.35rem 0}
+footer{color:var(--muted);font-size:.85rem;padding-bottom:8px}
+</style>
+
+<main>
+  <header>
+    <p class="eyebrow">Agriculture &middot; Earth observation decision support</p>
+    <h1>Field Shift Rotation Planner</h1>
+    <p class="lede">Enter a field's soil, pick a climate scenario and set your priorities. Five crop rotations are scored with a transparent rule model, and every coefficient is editable below.</p>
+    <p class="notice"><strong>Synthetic sample data.</strong> The field values and rotation coefficients are illustrative, generated for this prototype. They are not agronomic calibration. Check results against local extension advice and your own records.</p>
+  </header>
+
+  <div class="grid3">
+    <section class="panel" aria-labelledby="h-soil">
+      <h2 id="h-soil">1. Field and soil</h2>
+      <div class="field">
+        <label for="om">Organic matter <output id="omO"></output></label>
+        <input id="om" type="range" min="0.5" max="6" step="0.1">
+      </div>
+      <div class="field">
+        <label for="drain">Drainage</label>
+        <select id="drain">
+          <option value="poor">Poor (wet, slow to drain)</option>
+          <option value="mod">Moderate</option>
+          <option value="well">Well drained</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ph">Soil pH <output id="phO"></output></label>
+        <input id="ph" type="range" min="4.5" max="8.5" step="0.1">
+      </div>
+      <div class="field">
+        <label for="sn">Available soil nitrogen <output id="snO"></output></label>
+        <input id="sn" type="range" min="10" max="200" step="5">
+      </div>
+      <div class="row">
+        <button class="btn" id="sample" type="button">Load another sample field</button>
+        <span class="small muted" id="sampleName"></span>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-clim">
+      <h2 id="h-clim">2. Climate scenario</h2>
+      <div class="field">
+        <label for="warm">Warmer <output id="warmO"></output></label>
+        <input id="warm" type="range" min="0" max="4" step="0.5">
+      </div>
+      <div class="field">
+        <label for="dry">Drier: rain lower by <output id="dryO"></output></label>
+        <input id="dry" type="range" min="0" max="40" step="5">
+      </div>
+      <div class="field">
+        <label for="wet">Wetter: rain higher by <output id="wetO"></output></label>
+        <input id="wet" type="range" min="0" max="40" step="5">
+      </div>
+      <p class="small muted" id="netRain"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="h-pri">
+      <h2 id="h-pri">3. Your priorities</h2>
+      <div class="field">
+        <label for="pw">Water saving <output id="pwO"></output></label>
+        <input id="pw" type="range" min="0" max="5" step="1">
+      </div>
+      <div class="field">
+        <label for="ps">Soil health <output id="psO"></output></label>
+        <input id="ps" type="range" min="0" max="5" step="1">
+      </div>
+      <div class="field">
+        <label for="pi">Income <output id="piO"></output></label>
+        <input id="pi" type="range" min="0" max="5" step="1">
+      </div>
+      <div class="field">
+        <label for="pn">Nitrogen (less fertilizer) <output id="pnO"></output></label>
+        <input id="pn" type="range" min="0" max="5" step="1">
+      </div>
+      <p class="share" id="weights"></p>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="h-rank">
+    <h2 id="h-rank">Ranking for this field and scenario</h2>
+    <p class="small muted">Total = weighted sum of four sub-scores (0 to 100). Each card lists the main reasons.</p>
+    <p id="warnTop" class="notice" hidden></p>
+    <ol class="rank" id="rank"></ol>
+  </section>
+
+  <section class="panel" aria-labelledby="h-trade">
+    <h2 id="h-trade">Trade-offs: water saving vs income</h2>
+    <p class="small muted">Horizontal axis is water saving, vertical axis is income. Circle size shows soil health. The filled circle is the current top rotation.</p>
+    <svg id="trade" viewBox="0 0 360 280" role="img" aria-label="Scatter plot of water saving against income for each rotation"></svg>
+  </section>
+
+  <section class="panel" aria-labelledby="h-assume">
+    <h2 id="h-assume">Assumptions you can edit</h2>
+    <p class="small muted">Every coefficient the score uses is shown here. Change a value and the ranking updates at once.</p>
+    <details open>
+      <summary>Climate, soil and water coefficients</summary>
+      <div class="tablewrap">
+        <table class="assume"><tbody id="assume"></tbody></table>
+      </div>
+    </details>
+    <details open>
+      <summary>Rotation parameters (per rotation, per year)</summary>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th scope="col">Rotation</th><th scope="col">Water use</th><th scope="col">Heat sens.</th><th scope="col">Drought sens.</th>
+            <th scope="col">Waterlog sens.</th><th scope="col">Soil base</th><th scope="col">Income</th>
+            <th scope="col">N need kg/ha</th><th scope="col">Legume N kg/ha</th><th scope="col">Residue cover</th>
+          </tr></thead>
+          <tbody id="rots"></tbody>
+        </table>
+      </div>
+    </details>
+    <h3 style="margin-top:12px">How the score is built</h3>
+    <ul class="small">
+      <li><strong>Yield factor</strong> = 1 minus heat loss minus drought loss minus waterlogging loss, plus organic matter gain, minus pH loss. Clamped to 0.2 to 1.1.</li>
+      <li><strong>Water saving</strong> = 100 x (1 minus demand / max demand), where demand = water use x (1 + warming and drought uplift).</li>
+      <li><strong>Soil health</strong> = soil base + organic matter points, minus heat loss on soils with less residue cover.</li>
+      <li><strong>Income</strong> = income x yield factor, minus a cost for each kg of fertilizer N.</li>
+      <li><strong>Nitrogen</strong> = 100 minus fertilizer N as a share of the maximum. Fertilizer N = need minus legume credit minus usable soil N.</li>
+    </ul>
+  </section>
+
+  <section class="panel" aria-labelledby="h-season">
+    <h2 id="h-season">Using this in a planning season</h2>
+    <ol class="steps">
+      <li>Before planting, enter the soil test values and the drainage you observed.</li>
+      <li>Set the climate scenario you want to plan against, such as a warmer, drier season.</li>
+      <li>Read the ranking and its reasons, then check the trade-off chart.</li>
+      <li>Shift the priorities to see whether the winner changes. Note any rotation that stays strong across scenarios.</li>
+      <li>After harvest, record actual yields and update the coefficients for the next season.</li>
+    </ol>
+  </section>
+
+  <section class="panel" aria-labelledby="h-next">
+    <h2 id="h-next">Next steps to use real data</h2>
+    <ul class="next">
+      <li><strong>Weather and climate:</strong> NASA POWER daily temperature and precipitation for the field's location, for history and scenario baselines.</li>
+      <li><strong>Rainfall:</strong> NASA and JAXA GPM IMERG precipitation estimates for local rainfall trends.</li>
+      <li><strong>Soil moisture:</strong> NASA SMAP soil moisture products to inform drying and irrigation scenarios.</li>
+      <li><strong>Crop condition:</strong> MODIS and Landsat or Harmonized Landsat Sentinel-2 vegetation indices, to check cover and vigor during the season.</li>
+      <li><strong>Soil profile:</strong> lab soil tests and local soil survey maps (for example USDA NRCS Web Soil Survey) in place of typed-in values.</li>
+      <li><strong>Calibration:</strong> replace the illustrative coefficients with extension trial data or a crop model, and validate against the farmer's yield records.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Prototype limits: five rotations, one field at a time, and no pest, disease, market or labor factors. Coefficients are illustrative and must be calibrated before any real planting decision.
+  </footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+function $(id){return document.getElementById(id);}
+function clamp(v,a,b){return Math.min(b,Math.max(a,v));}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function r1(v){return Math.round(v*10)/10;}
+function pct(v){return (v*100).toFixed(0);}
+
+var I={om:3.0,drain:"mod",ph:6.4,sn:60,warm:1.5,dry:10,wet:0,pw:4,ps:3,pi:4,pn:2};
+var A={heat:0.06,dry:0.10,wet:0.08,drainPoor:1.0,drainMod:0.5,drainWell:0.2,omYield:0.03,phYield:0.01,phLow:6.0,phHigh:7.5,warmWater:0.05,dryWater:0.10,dmax:120,omPts:6,heatSoil:2,nSupply:0.5,nCost:0.15,nMax:200};
+var DEFS=[
+  {k:"heat",label:"Yield loss per 1 °C of warming (x heat sensitivity)",step:0.01,min:0,max:0.3},
+  {k:"dry",label:"Yield loss per 10% rain deficit (x drought sensitivity)",step:0.01,min:0,max:0.5},
+  {k:"wet",label:"Yield loss per 10% rain surplus (x waterlog sensitivity x drainage factor)",step:0.01,min:0,max:0.5},
+  {k:"drainPoor",label:"Drainage factor: poor",step:0.05,min:0,max:1},
+  {k:"drainMod",label:"Drainage factor: moderate",step:0.05,min:0,max:1},
+  {k:"drainWell",label:"Drainage factor: well drained",step:0.05,min:0,max:1},
+  {k:"omYield",label:"Yield gain per 1% organic matter above 2.5%",step:0.01,min:0,max:0.2},
+  {k:"phYield",label:"Yield loss per 0.1 pH outside the good band",step:0.005,min:0,max:0.1},
+  {k:"phLow",label:"Good pH band: lower bound",step:0.1,min:4,max:8},
+  {k:"phHigh",label:"Good pH band: upper bound",step:0.1,min:6,max:9},
+  {k:"warmWater",label:"Extra water demand per 1 °C of warming (fraction)",step:0.01,min:0,max:0.3},
+  {k:"dryWater",label:"Extra irrigation demand per 10% rain deficit (fraction)",step:0.01,min:0,max:0.5},
+  {k:"dmax",label:"Water demand index that scores zero",step:1,min:40,max:250},
+  {k:"omPts",label:"Soil health points per 1% organic matter above 2.5%",step:0.5,min:0,max:20},
+  {k:"heatSoil",label:"Soil health points lost per 1 °C, scaled by (1 minus residue)",step:0.5,min:0,max:10},
+  {k:"nSupply",label:"Share of available soil N the crop can use",step:0.05,min:0,max:1},
+  {k:"nCost",label:"Income points lost per kg of fertilizer N",step:0.01,min:0,max:1},
+  {k:"nMax",label:"Fertilizer N (kg/ha) that scores zero",step:5,min:50,max:400}
+];
+var ROTS=[
+  {id:"msoy",name:"Maize–soybean",water:70,heat:0.6,drought:0.6,waterlog:0.5,soil:55,income:70,nneed:150,legume:40,residue:0.6},
+  {id:"cmaize",name:"Continuous maize",water:85,heat:0.7,drought:0.7,waterlog:0.5,soil:30,income:75,nneed:190,legume:0,residue:0.4},
+  {id:"wsoy",name:"Wheat–soybean",water:55,heat:0.4,drought:0.4,waterlog:0.6,soil:60,income:62,nneed:110,legume:40,residue:0.5},
+  {id:"scow",name:"Sorghum–cowpea",water:40,heat:0.2,drought:0.2,waterlog:0.4,soil:68,income:50,nneed:70,legume:50,residue:0.6},
+  {id:"bpw",name:"Barley–pea–wheat",water:50,heat:0.35,drought:0.35,waterlog:0.5,soil:72,income:55,nneed:90,legume:60,residue:0.7}
+];
+var COLNAMES=[["water","Water use",0,120,1],["heat","Heat sens.",0,1,0.05],["drought","Drought sens.",0,1,0.05],["waterlog","Waterlog sens.",0,1,0.05],["soil","Soil base",0,100,1],["income","Income",0,100,1],["nneed","N need",0,300,5],["legume","Legume N",0,150,5],["residue","Residue cover",0,1,0.05]];
+var SAMPLE_SEED=7;
+var LABELS=["Water saving","Soil health","Income","Nitrogen"];
+var CLS=["p0","p1","p2","p3"];
+
+function score(r){
+  var drainF=I.drain==="poor"?A.drainPoor:(I.drain==="well"?A.drainWell:A.drainMod);
+  var lossHeat=A.heat*r.heat*I.warm;
+  var lossDry=A.dry*r.drought*(I.dry/10);
+  var lossWet=A.wet*r.waterlog*drainF*(I.wet/10);
+  var omFx=A.omYield*(I.om-2.5);
+  var phDev=Math.max(0,A.phLow-I.ph,I.ph-A.phHigh);
+  var lossPh=A.phYield*phDev*10;
+  var Y=clamp(1-lossHeat-lossDry-lossWet+omFx-lossPh,0.2,1.1);
+  var D=r.water*(1+A.warmWater*I.warm+A.dryWater*I.dry/10);
+  var W=clamp(100*(1-D/A.dmax),0,100);
+  var H=clamp(r.soil+A.omPts*(I.om-2.5)-A.heatSoil*I.warm*(1-r.residue),0,100);
+  var nfert=Math.max(0,r.nneed-r.legume-I.sn*A.nSupply);
+  var Inc=clamp(r.income*Y-A.nCost*nfert,0,100);
+  var N=clamp(100-nfert/A.nMax*100,0,100);
+  return {W:W,H:H,I:Inc,N:N,Y:Y,D:D,nfert:nfert,lossHeat:lossHeat,lossDry:lossDry,lossWet:lossWet,lossPh:lossPh,drainF:drainF};
+}
+function weights(){
+  var p=[I.pw,I.ps,I.pi,I.pn],t=p[0]+p[1]+p[2]+p[3];
+  if(t<=0)return [0.25,0.25,0.25,0.25];
+  return p.map(function(v){return v/t;});
+}
+function reasons(r,s){
+  var out=[],drainName={poor:"poor",mod:"moderate",well:"well-drained"}[I.drain];
+  if(s.W>=60)out.push("Low water demand (index "+s.D.toFixed(0)+" under this climate), so less irrigation is likely.");
+  else if(s.W<35)out.push("High water demand (index "+s.D.toFixed(0)+"), the main risk under drying.");
+  if(s.lossDry>0.05)out.push("Drought sensitive: about "+pct(s.lossDry)+"% yield loss at this drying level.");
+  if(s.lossHeat>0.05)out.push("Heat sensitive: about "+pct(s.lossHeat)+"% yield loss at this warming level.");
+  if(s.lossWet>0.03)out.push("Waterlogging risk: about "+pct(s.lossWet)+"% yield loss in the wetter scenario on "+drainName+" drainage.");
+  if(r.legume>=40)out.push("Legume N credit of "+r.legume+" kg/ha lowers fertilizer need.");
+  if(s.nfert>100)out.push("High fertilizer N need: about "+Math.round(s.nfert)+" kg/ha after soil and legume credits.");
+  else if(s.nfert<=20)out.push("Little fertilizer N needed after soil and legume credits.");
+  if(s.H>=65)out.push("Soil health held up by a residue-rich crop mix.");
+  else if(s.H<45)out.push("Weak soil health base: organic matter may decline.");
+  if(s.lossPh>0.02)out.push("Soil pH outside the "+A.phLow+" to "+A.phHigh+" band cuts yield by about "+pct(s.lossPh)+"%.");
+  if(!out.length)out.push("No single driver stands out for this field.");
+  return out.slice(0,4);
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function renderRank(list,w){
+  var html="";
+  list.forEach(function(e,idx){
+    var s=e.s,tot=e.tot;
+    var subs=[s.W,s.H,s.I,s.N];
+    html+='<li class="card'+(idx===0?' top':'')+'"><div class="card-head"><strong>'+(idx+1)+'. '+esc(e.r.name)+'</strong><span class="score">'+tot.toFixed(0)+' / 100</span></div>';
+    html+='<div class="bars">';
+    for(var k=0;k<4;k++){
+      html+='<div class="bar"><span>'+LABELS[k]+'</span><span class="track"><span class="fill" style="display:block;width:'+subs[k].toFixed(0)+'%;background:var(--'+CLS[k]+')"></span></span><span>'+subs[k].toFixed(0)+'</span></div>';
+    }
+    html+='</div><ul class="reasons">'+reasons(e.r,s).map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ul></li>';
+  });
+  $("rank").innerHTML=html;
+}
+function renderTrade(list){
+  var svg=$("trade"),L=44,R=20,T=16,B=40,w=360,h=280;
+  function X(v){return L+(w-L-R)*v/100;}
+  function Y(v){return T+(h-T-B)*(100-v)/100;}
+  var out='';
+  [0,25,50,75,100].forEach(function(v){
+    out+='<line x1="'+X(v)+'" x2="'+X(v)+'" y1="'+Y(0)+'" y2="'+Y(100)+'" style="stroke:var(--line)"/>';
+    out+='<line x1="'+X(0)+'" x2="'+X(100)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" style="stroke:var(--line)"/>';
+    out+='<text x="'+X(v)+'" y="'+(h-B+16)+'" text-anchor="middle" style="fill:var(--muted);font-size:11px">'+v+'</text>';
+    out+='<text x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end" style="fill:var(--muted);font-size:11px">'+v+'</text>';
+  });
+  out+='<text x="'+((L+w-R)/2)+'" y="'+(h-6)+'" text-anchor="middle" style="fill:var(--fg);font-size:12px">Water saving score</text>';
+  out+='<text x="12" y="'+((T+h-B)/2)+'" text-anchor="middle" transform="rotate(-90 12 '+((T+h-B)/2)+')" style="fill:var(--fg);font-size:12px">Income score</text>';
+  list.forEach(function(e,idx){
+    var cx=X(e.s.W),cy=Y(e.s.I),rad=5+e.s.H/12;
+    var fill=idx===0?'var(--acc)':'var(--muted)';
+    var anchor=cx>w*0.7?'end':'start',dx=cx>w*0.7?-(rad+4):(rad+4);
+    out+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+rad.toFixed(1)+'" style="fill:'+fill+';fill-opacity:'+(idx===0?0.9:0.45)+';stroke:var(--panel);stroke-width:1.5"/>';
+    out+='<text x="'+(cx+dx).toFixed(1)+'" y="'+(cy+4).toFixed(1)+'" text-anchor="'+anchor+'" style="fill:var(--fg);font-size:11.5px">'+esc(e.r.name)+'</text>';
+  });
+  svg.innerHTML=out;
+}
+function fmtNum(v,step){return step<1?Number(v).toFixed(2):String(Math.round(v));}
+function buildForms(){
+  var h="";
+  DEFS.forEach(function(d){
+    h+='<tr><td><label for="a_'+d.k+'">'+d.label+'</label></td><td><input type="number" id="a_'+d.k+'" min="'+d.min+'" max="'+d.max+'" step="'+d.step+'" value="'+A[d.k]+'"></td></tr>';
+  });
+  $("assume").innerHTML=h;
+  DEFS.forEach(function(d){
+    $("a_"+d.k).addEventListener("input",function(e){
+      var v=parseFloat(e.target.value);
+      if(!isNaN(v))A[d.k]=v;
+      renderAll();
+    });
+  });
+  var rh="";
+  ROTS.forEach(function(r){
+    rh+='<tr><th scope="row" style="text-transform:none;letter-spacing:0;color:var(--fg);font-size:.85rem">'+esc(r.name)+'</th>';
+    COLNAMES.forEach(function(c){
+      rh+='<td><input type="number" id="r_'+r.id+'_'+c[0]+'" min="'+c[2]+'" max="'+c[3]+'" step="'+c[4]+'" value="'+r[c[0]]+'" aria-label="'+esc(r.name)+' '+c[1]+'"></td>';
+    });
+    rh+='</tr>';
+  });
+  $("rots").innerHTML=rh;
+  ROTS.forEach(function(r){
+    COLNAMES.forEach(function(c){
+      $("r_"+r.id+"_"+c[0]).addEventListener("input",function(e){
+        var v=parseFloat(e.target.value);
+        if(!isNaN(v))r[c[0]]=v;
+        renderAll();
+      });
+    });
+  });
+}
+function renderAll(){
+  $("omO").textContent=I.om.toFixed(1)+"%";
+  $("phO").textContent=I.ph.toFixed(1);
+  $("snO").textContent=I.sn+" kg/ha";
+  $("warmO").textContent="+"+I.warm.toFixed(1)+" °C";
+  $("dryO").textContent=I.dry+"%";
+  $("wetO").textContent=I.wet+"%";
+  $("netRain").textContent="Net rainfall change: "+((I.wet-I.dry)>=0?"+":"")+(I.wet-I.dry)+"% (wetter minus drier).";
+  $("pwO").textContent=I.pw;$("psO").textContent=I.ps;$("piO").textContent=I.pi;$("pnO").textContent=I.pn;
+  var w=weights();
+  $("weights").textContent="Weights: water "+pct(w[0])+"%, soil "+pct(w[1])+"%, income "+pct(w[2])+"%, nitrogen "+pct(w[3])+"%.";
+  var list=ROTS.map(function(r){
+    var s=score(r),tot=w[0]*s.W+w[1]*s.H+w[2]*s.I+w[3]*s.N;
+    return {r:r,s:s,tot:tot};
+  });
+  list.sort(function(a,b){return b.tot-a.tot;});
+  var top=list[0];
+  var warn=$("warnTop");
+  if(top.s.Y<0.6){warn.hidden=false;warn.textContent="The top rotation has a yield factor of "+top.s.Y.toFixed(2)+". Check pH, drainage and organic matter, as they are limiting yield here.";}
+  else{warn.hidden=true;warn.textContent="";}
+  renderRank(list,w);
+  renderTrade(list);
+}
+function syncInputs(){
+  $("om").value=I.om;$("drain").value=I.drain;$("ph").value=I.ph;$("sn").value=I.sn;
+  $("warm").value=I.warm;$("dry").value=I.dry;$("wet").value=I.wet;
+  $("pw").value=I.pw;$("ps").value=I.ps;$("pi").value=I.pi;$("pn").value=I.pn;
+}
+function sampleField(){
+  var rnd=mulberry32(SAMPLE_SEED*977+13);
+  I.om=r1(1.2+4.2*rnd());
+  I.drain=["poor","mod","well"][Math.floor(rnd()*3)];
+  I.ph=r1(5.0+2.6*rnd());
+  I.sn=Math.round((20+170*rnd())/5)*5;
+  $("sampleName").textContent="Sample field "+SAMPLE_SEED+" (seeded synthetic values)";
+  SAMPLE_SEED++;
+  syncInputs();
+  renderAll();
+}
+function bindRange(id,key,parse){
+  $(id).addEventListener("input",function(e){I[key]=parse(e.target.value);renderAll();});
+}
+function init(){
+  buildForms();
+  syncInputs();
+  bindRange("om","om",parseFloat);
+  bindRange("ph","ph",parseFloat);
+  bindRange("sn","sn",function(v){return parseInt(v,10);});
+  bindRange("warm","warm",parseFloat);
+  bindRange("dry","dry",function(v){return parseInt(v,10);});
+  bindRange("wet","wet",function(v){return parseInt(v,10);});
+  bindRange("pw","pw",function(v){return parseInt(v,10);});
+  bindRange("ps","ps",function(v){return parseInt(v,10);});
+  bindRange("pi","pi",function(v){return parseInt(v,10);});
+  bindRange("pn","pn",function(v){return parseInt(v,10);});
+  $("drain").addEventListener("change",function(e){I.drain=e.target.value;renderAll();});
+  $("sample").addEventListener("click",sampleField);
+  $("sampleName").textContent="Sample field: typed-in starting values";
+  renderAll();
+}
+init();
+})();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/YSGJMm5vtAHnxdxyiH6mZF" target="_blank" rel="noopener">Radar surface change</a></li>
+<li><a href="https://claude.ai/artifact/3t7SJKQ2zw9u81HaJNWh3k" target="_blank" rel="noopener">Fire calendar harmonizer</a></li>
+</ul>
+</nav>

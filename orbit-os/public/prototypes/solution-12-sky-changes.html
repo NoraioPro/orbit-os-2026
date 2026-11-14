@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Sky Change Viewer</title>
+<style>
+:root {
+  --bg: #f4f5f8; --surface: #ffffff; --fg: #15192a; --muted: #5a6175; --line: #d8dce8;
+  --accent: #6a4bd6; --accent-soft: #ebe6fb; --pos: #d9423a; --neg: #3f7fe0; --hit: #e9a100; --chip: #e8ebf3;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #080b14; --surface: #121729; --fg: #e8ebf5; --muted: #98a0b8; --line: #252d45;
+    --accent: #a897ff; --accent-soft: #241f42; --pos: #ff7b70; --neg: #6aa6ff; --hit: #ffc94a; --chip: #1c2238;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #080b14; --surface: #121729; --fg: #e8ebf5; --muted: #98a0b8; --line: #252d45;
+  --accent: #a897ff; --accent-soft: #241f42; --pos: #ff7b70; --neg: #6aa6ff; --hit: #ffc94a; --chip: #1c2238;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 15px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+h1, h2 { font-family: "Space Grotesk", Inter, system-ui, sans-serif; line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.55rem; }
+h2 { font-size: 1.05rem; margin-bottom: 10px; }
+p { margin: 0; }
+.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 16px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.muted { color: var(--muted); font-size: 13px; }
+.notice { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+.explain { display: grid; gap: 8px; }
+.grid2 { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .grid2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.frames { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+canvas.view {
+  width: 100%; aspect-ratio: 200 / 130; height: auto; display: block;
+  background: #02040a; border-radius: 8px; image-rendering: pixelated; border: 1px solid var(--line);
+}
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+button, select { font: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); min-width: 0; }
+button { cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+label { font-size: 13px; color: var(--muted); display: grid; gap: 4px; min-width: 0; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.pair { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); align-items: end; margin-bottom: 10px; }
+select { width: 100%; }
+.tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--chip); }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.tablewrap { overflow-x: auto; margin-top: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.empty { color: var(--muted); padding: 10px 0; }
+.hidden { display: none !important; }
+button:disabled { opacity: .5; cursor: default; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="card" style="display:grid;gap:6px">
+    <span class="eyebrow">Challenge 12 · Prototype</span>
+    <h1>Sky Change Viewer</h1>
+    <p class="muted">Browse a short sequence of sky images, compare any two frames, and find points that moved between them.</p>
+    <p class="notice"><b>Synthetic sample data.</b> The stars and moving points below are generated in the page from a fixed random seed. They are not SPHEREx or any other real observation.</p>
+  </header>
+
+  <section class="card explain" aria-label="What is a mover">
+    <h2>What is a mover?</h2>
+    <p>Most points of light in the sky stay in the same place from one image to the next, so they are stars or distant galaxies. A <b>mover</b> is a point that changes position between images taken at different times. Comets, asteroids and some distant planets can show up this way. Finding movers means comparing images and checking which points shifted, and by how much.</p>
+    <p class="muted">Use the blink view to watch the motion by eye, the difference view to see what changed, and the detector to list each mover with its direction and speed.</p>
+  </section>
+
+  <section class="card" aria-label="Blink comparator">
+    <div class="row" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <h2 style="margin:0">1. Blink comparator</h2>
+      <span class="tag" id="frameLabel">Frame 1 of 4</span>
+    </div>
+    <div class="frames" style="margin-top:12px">
+      <canvas class="view" id="blink" width="200" height="130" role="img" aria-label="Current sky frame"></canvas>
+    </div>
+    <div class="toolbar">
+      <button id="prev">← Previous frame</button>
+      <button id="play" class="primary">Pause</button>
+      <button id="next">Next frame →</button>
+    </div>
+    <label style="margin-top:12px">Animation speed: <b id="fpsVal">2</b> frames per second
+      <input type="range" id="fps" min="1" max="4" step="1" value="2">
+    </label>
+  </section>
+
+  <div class="grid2">
+    <section class="card" aria-label="Difference image">
+      <h2>2. Difference image</h2>
+      <div class="pair">
+        <label>Frame A
+          <select id="fa"></select>
+        </label>
+        <label>Frame B
+          <select id="fb"></select>
+        </label>
+      </div>
+      <canvas class="view" id="diff" width="200" height="130" role="img" aria-label="Difference image between frame A and frame B"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--pos)"></i>Brighter in B</span>
+        <span><i style="background:var(--neg)"></i>Brighter in A</span>
+        <span>Dark = no change</span>
+      </div>
+      <p class="muted" style="margin-top:8px">Stars cancel out and leave no mark. A mover leaves a pair of marks: red where it now is, blue where it was.</p>
+    </section>
+
+    <section class="card" aria-label="Mover detector">
+      <h2>3. Mover detector</h2>
+      <label>Detection sensitivity (lower finds fainter points): <b id="thrVal">0.18</b>
+        <input type="range" id="thr" min="0.10" max="0.60" step="0.01" value="0.18">
+      </label>
+      <label style="margin-top:10px">Largest motion counted, in pixels between frames: <b id="maxVal">12</b>
+        <input type="range" id="maxMove" min="4" max="20" step="1" value="12">
+      </label>
+      <canvas class="view" id="det" width="200" height="130" role="img" aria-label="Frame B with detected movers circled" style="margin-top:12px"></canvas>
+      <p class="muted" style="margin-top:8px" id="summary"></p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Mover</th><th>From (x, y)</th><th>To (x, y)</th><th>Shift (dx, dy)</th><th>Speed px/frame</th></tr></thead>
+          <tbody id="movers"></tbody>
+        </table>
+      </div>
+      <p id="none" class="empty hidden" hidden>No movers found with these settings. Try a lower sensitivity.</p>
+    </section>
+  </div>
+
+  <section class="card" aria-label="Method">
+    <h2>How the detector works</h2>
+    <ul>
+      <li>Find points brighter than the sensitivity threshold and brighter than their neighbors, in each frame. Each point's position is refined to a fraction of a pixel.</li>
+      <li>Compare the two chosen frames. A point present in both at the same place is a fixed star or galaxy and is ignored.</li>
+      <li>Pair each point that appears only in frame A with a point that appears only in frame B, within the largest motion you allow. Each pair is one mover, and its shift gives direction and speed.</li>
+      <li>This prototype assumes the frames are already lined up. A real pipeline must first align each image to a reference star catalog.</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-label="Next steps to use real data">
+    <h2>Next steps to use real data</h2>
+    <ul>
+      <li>Load real SPHEREx sky images and their associated products from NASA's SPHEREx data archive, which is hosted by the NASA/IPAC Infrared Science Archive. Check the product list for the image level you need.</li>
+      <li>Align frames with a star catalog such as ESA's Gaia, using a proper world-coordinate transform rather than assumed alignment.</li>
+      <li>Check candidate movers against known solar system objects, using the Minor Planet Center's published orbit data, before calling any point new.</li>
+      <li>Measure brightness and noise per band, and use the error estimates to set a detection threshold that controls false positives.</li>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+// ---- Seeded synthetic sky (mulberry32) ----
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rnd = mulberry32(12);
+const gauss = () => Math.sqrt(-2 * Math.log(rnd() + 1e-12)) * Math.cos(2 * Math.PI * rnd());
+const W = 200, H = 130, NF = 4, SIG = 1.1, NOISE = 0.012;
+
+// Fixed stars
+const stars = [];
+for (let i = 0; i < 90; i++) stars.push({ x: 4 + rnd() * (W - 8), y: 4 + rnd() * (H - 8), b: 0.35 + rnd() * 0.65 });
+// Movers: faint points with a constant velocity (px per frame)
+const movers = [];
+for (let i = 0; i < 5; i++) {
+  let vx = 0, vy = 0;
+  while (Math.hypot(vx, vy) < 2) { vx = (rnd() * 2 - 1) * 4; vy = (rnd() * 2 - 1) * 4; }
+  movers.push({ id: "M" + (i + 1), x0: 30 + rnd() * (W - 60), y0: 25 + rnd() * (H - 50), vx, vy, b: 0.28 + rnd() * 0.12 });
+}
+
+function addPoint(img, x, y, b) {
+  const x0 = Math.floor(x), y0 = Math.floor(y);
+  for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+    const px = x0 + dx, py = y0 + dy;
+    if (px < 0 || py < 0 || px >= W || py >= H) continue;
+    const r2 = (px - x) * (px - x) + (py - y) * (py - y);
+    img[py * W + px] += b * Math.exp(-r2 / (2 * SIG * SIG));
+  }
+}
+const frames = [];
+for (let f = 0; f < NF; f++) {
+  const img = new Float32Array(W * H);
+  stars.forEach(s => addPoint(img, s.x, s.y, s.b));
+  movers.forEach(m => addPoint(img, m.x0 + m.vx * f, m.y0 + m.vy * f, m.b));
+  for (let i = 0; i < img.length; i++) img[i] += NOISE * gauss();
+  frames.push(img);
+}
+
+// ---- Canvas helpers ----
+const $ = id => document.getElementById(id);
+function drawGray(c, img) {
+  const ctx = c.getContext("2d");
+  const id = ctx.createImageData(W, H);
+  for (let i = 0; i < W * H; i++) {
+    const g = Math.round(255 * Math.min(1, Math.sqrt(Math.max(0, img[i]))));
+    id.data[i * 4] = g; id.data[i * 4 + 1] = g; id.data[i * 4 + 2] = g; id.data[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(id, 0, 0);
+}
+function drawDiff(c, a, b) {
+  const ctx = c.getContext("2d");
+  const d = new Float32Array(W * H);
+  let scale = 0.001;
+  for (let i = 0; i < d.length; i++) { d[i] = b[i] - a[i]; scale = Math.max(scale, Math.abs(d[i])); }
+  const id = ctx.createImageData(W, H);
+  for (let i = 0; i < d.length; i++) {
+    const t = Math.max(-1, Math.min(1, d[i] / scale));
+    const k = Math.min(1, Math.abs(t) * 1.4);
+    const base = 6;
+    let r = base, g = base, bl = base + 8;
+    if (t > 0) { r = base + 249 * k; g = base + 60 * k * (1 - k); bl = base + 40 * k * (1 - k); }
+    else { bl = base + 240 * k; g = base + 90 * k * (1 - k); r = base + 40 * k * (1 - k); }
+    id.data[i * 4] = r; id.data[i * 4 + 1] = g; id.data[i * 4 + 2] = bl; id.data[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(id, 0, 0);
+}
+
+// ---- Detection ----
+function detect(img, thr) {
+  const out = [];
+  for (let y = 2; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+    const v = img[y * W + x];
+    if (v < thr) continue;
+    let peak = true;
+    for (let dy = -1; dy <= 1 && peak; dy++) for (let dx = -1; dx <= 1; dx++) {
+      if (dx || dy) { const n = img[(y + dy) * W + (x + dx)]; if (n > v || (n === v && (dy < 0 || (dy === 0 && dx < 0)))) { peak = false; break; } }
+    }
+    if (!peak) continue;
+    let sw = 0, sx = 0, sy = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const w = Math.max(0, img[(y + dy) * W + (x + dx)] - thr * 0.5);
+      sw += w; sx += w * (x + dx); sy += w * (y + dy);
+    }
+    out.push({ x: sx / sw, y: sy / sw, v });
+  }
+  return out;
+}
+
+let fa = 0, fb = 1, cur = 0, playing = true;
+
+function analyze() {
+  const thr = +$("thr").value, maxMove = +$("maxMove").value;
+  $("thrVal").textContent = thr.toFixed(2);
+  $("maxVal").textContent = maxMove;
+  const gap = Math.abs(fb - fa) || 1;
+  const A = detect(frames[fa], thr), B = detect(frames[fb], thr);
+  const near = (p, list, tol) => list.some(q => Math.hypot(p.x - q.x, p.y - q.y) <= tol);
+  const onlyA = A.filter(p => !near(p, B, 1.5));
+  const onlyB = B.filter(p => !near(p, A, 1.5));
+  const matchedStars = A.length - onlyA.length;
+  // Greedy pairing of disappearances with appearances within the allowed motion
+  const used = new Set(), found = [];
+  const pairs = [];
+  onlyA.forEach((a, ia) => onlyB.forEach((b, ib) => {
+    const d = Math.hypot(b.x - a.x, b.y - a.y);
+    if (d >= 2 && d <= maxMove) pairs.push({ d, ia, ib, a, b });
+  }));
+  pairs.sort((p, q) => p.d - q.d);
+  const usedA = new Set();
+  pairs.forEach(p => { if (usedA.has(p.ia) || used.has(p.ib)) return; usedA.add(p.ia); used.add(p.ib); found.push(p); });
+  found.sort((p, q) => q.a.x - p.a.x);
+  drawDiff($("diff"), frames[fa], frames[fb]);
+  drawGray($("det"), frames[fb]);
+  const ctx = $("det").getContext("2d");
+  ctx.lineWidth = 1.2; ctx.strokeStyle = css("--hit"); ctx.font = "7px Inter, sans-serif"; ctx.fillStyle = css("--hit");
+  found.forEach((p, i) => {
+    ctx.beginPath(); ctx.arc(p.b.x, p.b.y, 9, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillText("M" + (i + 1), p.b.x + 10, p.b.y - 6);
+  });
+  const body = $("movers");
+  body.innerHTML = found.map((p, i) => {
+    const dx = p.b.x - p.a.x, dy = p.b.y - p.a.y;
+    const speed = Math.hypot(dx, dy) / gap;
+    return `<tr><td>M${i + 1}</td><td>${p.a.x.toFixed(1)}, ${p.a.y.toFixed(1)}</td><td>${p.b.x.toFixed(1)}, ${p.b.y.toFixed(1)}</td>` +
+      `<td>${dx >= 0 ? "+" : ""}${dx.toFixed(1)}, ${dy >= 0 ? "+" : ""}${dy.toFixed(1)}</td><td>${speed.toFixed(2)}</td></tr>`;
+  }).join("");
+  $("none").hidden = found.length > 0;
+  $("summary").textContent = `Comparing frame ${fa + 1} with frame ${fb + 1} (${gap} frame${gap === 1 ? "" : "s"} apart): ` +
+    `${found.length} mover${found.length === 1 ? "" : "s"} found, ${matchedStars} fixed point${matchedStars === 1 ? "" : "s"} matched and ignored.`;
+}
+
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+// ---- Blink ----
+function showFrame() {
+  drawGray($("blink"), frames[cur]);
+  $("frameLabel").textContent = `Frame ${cur + 1} of ${NF}`;
+}
+function step(d) { cur = (cur + d + NF) % NF; showFrame(); }
+let timer = null;
+function startTimer() {
+  clearInterval(timer);
+  if (playing) timer = setInterval(() => step(1), 1000 / +$("fps").value);
+  $("play").textContent = playing ? "Pause" : "Play";
+}
+$("prev").addEventListener("click", () => { step(-1); });
+$("next").addEventListener("click", () => { step(1); });
+$("play").addEventListener("click", () => { playing = !playing; startTimer(); });
+$("fps").addEventListener("input", () => { $("fpsVal").textContent = $("fps").value; startTimer(); });
+
+// ---- Frame selectors ----
+for (let i = 0; i < NF; i++) {
+  ["fa", "fb"].forEach(id => { const o = document.createElement("option"); o.value = i; o.textContent = `Frame ${i + 1}`; $(id).appendChild(o); });
+}
+$("fa").value = fa; $("fb").value = fb;
+$("fa").addEventListener("change", () => { fa = +$("fa").value; analyze(); });
+$("fb").addEventListener("change", () => { fb = +$("fb").value; analyze(); });
+$("thr").addEventListener("input", analyze);
+$("maxMove").addEventListener("input", analyze);
+
+showFrame();
+startTimer();
+analyze();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/Bn5kcKER4P7u6N2zikN24P" target="_blank" rel="noopener">Earth sound jukebox</a></li>
+<li><a href="https://claude.ai/artifact/2rPJsWqmQjY4EAMN3xVneN" target="_blank" rel="noopener">Earth trend detective</a></li>
+</ul>
+</nav>
+</body>
+</html>

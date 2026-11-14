@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Earth Analog Ranker</title>
+<style>
+/* Layout: one column of controls, then results. Two columns from 760px up.
+   Tokens are defined once; dark values repeat under both dark selectors. */
+:root {
+  --bg: #f5f4ef; --fg: #1c1f23; --muted: #5b626b; --panel: #ffffff; --line: #d8dbe0;
+  --accent: #2c5b86; --accent-fg: #ffffff; --note-bg: #fdf3dc; --note-fg: #6b4a00;
+  --s1: #c2410c; --s2: #2c5b86; --s3: #3d7a4d; --s4: #7c3aed; --target: #7c3aed;
+  --bar: #2c5b86; --bar-bg: #e5e8ec;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1317; --fg: #e6e9ed; --muted: #9aa3ad; --panel: #171c22; --line: #2a323b;
+    --accent: #86b6e8; --accent-fg: #0f1317; --note-bg: #2b2411; --note-fg: #f0d28a;
+    --s1: #fb9a5b; --s2: #86b6e8; --s3: #7fcf93; --s4: #b99cff; --target: #b99cff;
+    --bar: #86b6e8; --bar-bg: #262e37;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1317; --fg: #e6e9ed; --muted: #9aa3ad; --panel: #171c22; --line: #2a323b;
+  --accent: #86b6e8; --accent-fg: #0f1317; --note-bg: #2b2411; --note-fg: #f0d28a;
+  --s1: #fb9a5b; --s2: #86b6e8; --s3: #7fcf93; --s4: #b99cff; --target: #b99cff;
+  --bar: #86b6e8; --bar-bg: #262e37;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: 20px; padding-bottom: 32px;
+  overflow-x: hidden;
+}
+h1 { font-size: 22px; margin: 0 0 4px; text-wrap: balance; }
+h2 { font-size: 16px; margin: 0 0 10px; }
+p { margin: 0 0 8px; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.banner {
+  background: var(--note-bg); color: var(--note-fg);
+  border-radius: 8px; padding: 10px 12px; margin: 12px 0 16px; font-size: 13px;
+}
+.grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px; min-width: 0;
+}
+.controls label { display: block; font-size: 13px; margin-bottom: 2px; }
+.field { margin-bottom: 12px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.row input[type="range"] { flex: 1; min-width: 0; accent-color: var(--accent); }
+.val { font-variant-numeric: tabular-nums; min-width: 1.5em; text-align: right; color: var(--muted); }
+select, button {
+  font: inherit; color: var(--fg); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; max-width: 100%;
+}
+select { width: 100%; }
+button { cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.table-wrap { overflow-x: auto; min-width: 0; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; }
+.bar { height: 8px; background: var(--bar-bg); border-radius: 4px; overflow: hidden; min-width: 60px; }
+.bar i { display: block; height: 100%; background: var(--bar); }
+.rank { color: var(--muted); width: 2em; }
+canvas { width: 100%; height: auto; display: block; max-width: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; background: var(--c, var(--accent)); }
+svg text { fill: var(--muted); font-size: 11px; }
+.next ul { margin: 6px 0 0; padding-left: 18px; }
+.next li { margin-bottom: 6px; }
+@media (min-width: 760px) {
+  body { padding-top: 28px; }
+  .grid.two { grid-template-columns: minmax(0, 320px) minmax(0, 1fr); align-items: start; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Earth Analog Ranker</h1>
+  <p class="muted">Rank Earth sites by how closely they match a Moon south pole or Mars target profile.</p>
+</header>
+
+<div class="banner" role="note">
+  <strong>Illustrative placeholder data.</strong> Every site value and target value below is invented to test the ranking logic. None of them is a measurement of a real site, and the prototype fetches no data. Replace each value with a documented, sourced figure before any use.
+</div>
+
+<div class="grid two">
+  <section class="panel controls" aria-labelledby="ctl-h">
+    <h2 id="ctl-h">Target and weights</h2>
+    <div class="field">
+      <label for="target">Target profile</label>
+      <select id="target">
+        <option value="moon">Moon south pole (illustrative)</option>
+        <option value="mars">Mars (illustrative)</option>
+      </select>
+    </div>
+    <div id="weights"></div>
+    <div class="row" style="margin-top:6px">
+      <button type="button" id="reset">Reset weights</button>
+      <span class="small muted" id="wsum"></span>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+    <h2>Chart settings</h2>
+    <div class="field">
+      <label for="ax">Scatter x axis</label>
+      <select id="ax"></select>
+    </div>
+    <div class="field">
+      <label for="ay">Scatter y axis</label>
+      <select id="ay"></select>
+    </div>
+    <div class="field">
+      <label for="topn">Sites shown in radar</label>
+      <select id="topn">
+        <option value="1">Top 1</option>
+        <option value="2">Top 2</option>
+        <option value="3" selected>Top 3</option>
+        <option value="4">Top 4</option>
+      </select>
+    </div>
+  </section>
+
+  <div style="display:grid; gap:16px; min-width:0">
+    <section class="panel" aria-labelledby="rank-h">
+      <h2 id="rank-h">Ranking</h2>
+      <p class="small muted" id="summary"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Analog site (placeholder)</th><th class="num">Match</th><th>Similarity</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="small muted" style="margin-top:8px">Match = 100 x (1 - weighted distance). Distance uses the weights on the left, so 100 is an exact match on every weighted characteristic.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="sc-h">
+      <h2 id="sc-h">Scatter: sites against the target</h2>
+      <canvas id="scatter" height="320" aria-label="Scatter plot of sites on the two chosen characteristics"></canvas>
+      <div class="legend" id="sc-legend"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="rd-h">
+      <h2 id="rd-h">Radar: top matches against the target</h2>
+      <svg id="radar" viewBox="0 0 320 300" role="img" aria-label="Radar chart of the top sites against the target profile"></svg>
+      <div class="legend" id="rd-legend"></div>
+    </section>
+  </div>
+</div>
+
+<section class="panel next" style="margin-top:16px" aria-labelledby="next-h">
+  <h2 id="next-h">Next steps to use real data</h2>
+  <p>This prototype embeds placeholder values only. A real version would replace each characteristic with a sourced, dated average for each site and each target, then keep the same ranking math.</p>
+  <ul>
+    <li><strong>Moon south pole target:</strong> LRO LOLA topography and slope, LRO Diviner surface temperature, and LRO CRaTER radiation measurements for the lunar targets.</li>
+    <li><strong>Mars target:</strong> MRO CTX and HiRISE imagery for roughness, MOLA-derived elevation, THEMIS thermal data for temperature range, and CRISM or THEMIS for rock type.</li>
+    <li><strong>Earth analog sites:</strong> Landsat and Sentinel-2 imagery for surface roughness, ASTER or Copernicus DEM elevation, MODIS land products for aridity proxies, and ASTER spectral data for rock type.</li>
+    <li><strong>Climate and radiation:</strong> NASA MERRA-2 or CERES for climate context, with ECMWF ERA5 (not NASA) as an alternative for temperature range.</li>
+    <li><strong>Validation:</strong> check the ranking against field reports from published analog studies before presenting it to mission teams.</li>
+  </ul>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  // Placeholder characteristics, normalized 0 to 1. ALL VALUES ARE ILLUSTRATIVE.
+  var CHARS = [
+    { key: "elev",  label: "Elevation" },
+    { key: "arid",  label: "Aridity" },
+    { key: "rough", label: "Surface roughness" },
+    { key: "temp",  label: "Temperature range" },
+    { key: "mafic", label: "Basaltic rock fraction" },
+    { key: "rad",   label: "Radiation proxy" }
+  ];
+  var DEFAULT_W = { elev: 3, arid: 4, rough: 2, temp: 3, mafic: 2, rad: 3 };
+
+  var SITES = [
+    { id: "atacama", short: "Atacama", name: "Atacama Desert", type: "Hyper-arid desert basin", v: { elev: 0.75, arid: 0.98, rough: 0.60, temp: 0.70, mafic: 0.35, rad: 0.85 } },
+    { id: "haughton", short: "Haughton", name: "Haughton Crater", type: "Impact crater, polar", v: { elev: 0.20, arid: 0.80, rough: 0.50, temp: 0.80, mafic: 0.30, rad: 0.40 } },
+    { id: "deathv", short: "Death Valley", name: "Death Valley", type: "Arid basin", v: { elev: 0.10, arid: 0.95, rough: 0.45, temp: 0.85, mafic: 0.40, rad: 0.30 } },
+    { id: "maunakea", short: "Mauna Kea", name: "Mauna Kea volcanic fields", type: "Volcanic highland", v: { elev: 0.90, arid: 0.55, rough: 0.70, temp: 0.50, mafic: 0.95, rad: 0.35 } },
+    { id: "dryvalleys", short: "Dry Valleys", name: "Antarctic Dry Valleys", type: "Polar cold desert", v: { elev: 0.30, arid: 0.90, rough: 0.40, temp: 0.90, mafic: 0.50, rad: 0.25 } },
+    { id: "lavatube", short: "Lava tube", name: "Lava-tube cave site", type: "Subsurface basaltic cave", v: { elev: 0.35, arid: 0.50, rough: 0.55, temp: 0.15, mafic: 0.90, rad: 0.05 } },
+    { id: "iceland", short: "Iceland", name: "Iceland highland basalt", type: "Basaltic highland field", v: { elev: 0.50, arid: 0.45, rough: 0.65, temp: 0.60, mafic: 0.85, rad: 0.30 } }
+  ];
+
+  var TARGETS = {
+    moon: { name: "Moon south pole", v: { elev: 0.70, arid: 1.00, rough: 0.80, temp: 1.00, mafic: 0.50, rad: 1.00 } },
+    mars: { name: "Mars", v: { elev: 0.45, arid: 0.95, rough: 0.60, temp: 0.75, mafic: 0.60, rad: 0.70 } }
+  };
+
+  var W = {};
+  var $ = function (id) { return document.getElementById(id); };
+
+  function tok(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function buildControls() {
+    var wrap = $("weights");
+    wrap.innerHTML = "";
+    CHARS.forEach(function (c) {
+      var div = document.createElement("div");
+      div.className = "field";
+      div.innerHTML =
+        '<label for="w-' + c.key + '">' + c.label + '</label>' +
+        '<div class="row"><input type="range" id="w-' + c.key + '" min="0" max="5" step="1" value="' + W[c.key] + '">' +
+        '<span class="val" id="wv-' + c.key + '">' + W[c.key] + '</span></div>';
+      wrap.appendChild(div);
+      $("w-" + c.key).addEventListener("input", function (e) {
+        W[c.key] = +e.target.value;
+        $("wv-" + c.key).textContent = W[c.key];
+        render();
+      });
+    });
+    var axOpts = "", ayOpts = "";
+    CHARS.forEach(function (c, i) {
+      axOpts += '<option value="' + c.key + '"' + (c.key === "arid" ? " selected" : "") + '>' + c.label + '</option>';
+      ayOpts += '<option value="' + c.key + '"' + (c.key === "rough" ? " selected" : "") + '>' + c.label + '</option>';
+    });
+    $("ax").innerHTML = axOpts;
+    $("ay").innerHTML = ayOpts;
+  }
+
+  function resetWeights() {
+    W = {};
+    Object.keys(DEFAULT_W).forEach(function (k) { W[k] = DEFAULT_W[k]; });
+    CHARS.forEach(function (c) {
+      $("w-" + c.key).value = W[c.key];
+      $("wv-" + c.key).textContent = W[c.key];
+    });
+    render();
+  }
+
+  function compute() {
+    var t = TARGETS[$("target").value].v;
+    var sumW = 0;
+    CHARS.forEach(function (c) { sumW += W[c.key]; });
+    $("wsum").textContent = "Total weight " + sumW;
+    if (sumW === 0) return null;
+    var out = SITES.map(function (s) {
+      var acc = 0;
+      CHARS.forEach(function (c) {
+        var d = s.v[c.key] - t[c.key];
+        acc += W[c.key] * d * d;
+      });
+      var dist = Math.sqrt(acc / sumW);
+      return { s: s, dist: dist, score: Math.round((1 - dist) * 100) };
+    });
+    out.sort(function (a, b) { return b.score - a.score; });
+    return out;
+  }
+
+  function renderTable(res) {
+    var tb = $("rows");
+    if (!res) {
+      tb.innerHTML = '<tr><td colspan="4" class="muted">Set at least one weight above 0 to rank the sites.</td></tr>';
+      $("summary").textContent = "No ranking: every weight is 0.";
+      return;
+    }
+    var html = "";
+    res.forEach(function (r, i) {
+      html += '<tr><td class="rank">' + (i + 1) + '</td>' +
+        '<td>' + r.s.name + '<div class="small muted">' + r.s.type + '</div></td>' +
+        '<td class="num">' + r.score + '</td>' +
+        '<td><div class="bar"><i style="width:' + r.score + '%"></i></div></td></tr>';
+    });
+    tb.innerHTML = html;
+    $("summary").textContent = "Best match for " + TARGETS[$("target").value].name + ": " + res[0].s.name + " (" + res[0].score + ").";
+  }
+
+  function drawScatter(res) {
+    var cv = $("scatter");
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || 600, h = 320;
+    cv.width = w * dpr; cv.height = h * dpr;
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    var L = 52, R = w - 18, T = 16, B = h - 44;
+    var xk = $("ax").value, yk = $("ay").value;
+    var fg = tok("--fg"), muted = tok("--muted"), line = tok("--line");
+
+    ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.fillStyle = muted; ctx.font = "11px system-ui, sans-serif";
+    for (var g = 0; g <= 4; g++) {
+      var gx = L + (R - L) * g / 4, gy = B - (B - T) * g / 4;
+      ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, B); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(L, gy); ctx.lineTo(R, gy); ctx.stroke();
+      ctx.textAlign = "center"; ctx.fillText((g / 4).toFixed(2), gx, B + 14);
+      ctx.textAlign = "right"; ctx.fillText((g / 4).toFixed(2), L - 6, gy + 4);
+    }
+    ctx.textAlign = "center";
+    ctx.fillText(labelOf(xk), (L + R) / 2, h - 8);
+    ctx.save(); ctx.translate(14, (T + B) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText(labelOf(yk), 0, 0); ctx.restore();
+
+    var topSet = {};
+    if (res) res.slice(0, +$("topn").value).forEach(function (r) { topSet[r.s.id] = true; });
+
+    SITES.forEach(function (s) {
+      var px = L + (R - L) * s.v[xk], py = B - (B - T) * s.v[yk];
+      var top = !!topSet[s.id];
+      ctx.beginPath(); ctx.arc(px, py, top ? 7 : 5, 0, Math.PI * 2);
+      ctx.fillStyle = top ? tok("--s1") : tok("--s2");
+      ctx.globalAlpha = top ? 1 : 0.55; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.fillStyle = fg; ctx.textAlign = px > (L + R) / 2 ? "right" : "left";
+      ctx.fillText(s.short, px + (px > (L + R) / 2 ? -9 : 9), py + 4);
+    });
+
+    var tv = TARGETS[$("target").value].v;
+    var tx = L + (R - L) * tv[xk], ty = B - (B - T) * tv[yk];
+    ctx.beginPath();
+    for (var k = 0; k < 10; k++) {
+      var ang = -Math.PI / 2 + k * Math.PI / 5;
+      var rr = k % 2 === 0 ? 10 : 4;
+      var sx = tx + rr * Math.cos(ang), sy = ty + rr * Math.sin(ang);
+      if (k === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+    }
+    ctx.closePath(); ctx.fillStyle = tok("--target"); ctx.fill();
+    ctx.fillStyle = fg; ctx.textAlign = "left"; ctx.fillText("Target", tx + 13, ty + 4);
+
+    $("sc-legend").innerHTML =
+      '<span style="--c:' + tok("--s1") + '">Top matches</span>' +
+      '<span style="--c:' + tok("--s2") + '">Other sites</span>' +
+      '<span style="--c:' + tok("--target") + '">Target (star)</span>';
+  }
+
+  function labelOf(key) {
+    for (var i = 0; i < CHARS.length; i++) if (CHARS[i].key === key) return CHARS[i].label;
+    return key;
+  }
+
+  function drawRadar(res) {
+    var svg = $("radar");
+    var cx = 160, cy = 146, R = 105, n = CHARS.length;
+    var parts = [];
+    var ring = tok("--line"), muted = tok("--muted");
+    for (var ri = 1; ri <= 4; ri++) {
+      var pts = [];
+      for (var i = 0; i < n; i++) {
+        var a = -Math.PI / 2 + i * 2 * Math.PI / n;
+        pts.push((cx + R * ri / 4 * Math.cos(a)).toFixed(1) + "," + (cy + R * ri / 4 * Math.sin(a)).toFixed(1));
+      }
+      parts.push('<polygon points="' + pts.join(" ") + '" fill="none" stroke="' + ring + '"/>');
+    }
+    for (var j = 0; j < n; j++) {
+      var aa = -Math.PI / 2 + j * 2 * Math.PI / n;
+      var ex = cx + R * Math.cos(aa), ey = cy + R * Math.sin(aa);
+      parts.push('<line x1="' + cx + '" y1="' + cy + '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) + '" stroke="' + ring + '"/>');
+      var lx = cx + (R + 16) * Math.cos(aa), ly = cy + (R + 16) * Math.sin(aa);
+      var anchor = Math.abs(lx - cx) < 4 ? "middle" : (lx > cx ? "start" : "end");
+      parts.push('<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '">' + CHARS[j].label + '</text>');
+    }
+    function poly(vals, color, dashed) {
+      var p = [];
+      for (var q = 0; q < n; q++) {
+        var ang = -Math.PI / 2 + q * 2 * Math.PI / n;
+        p.push((cx + R * vals[CHARS[q].key] * Math.cos(ang)).toFixed(1) + "," + (cy + R * vals[CHARS[q].key] * Math.sin(ang)).toFixed(1));
+      }
+      return '<polygon points="' + p.join(" ") + '" fill="' + color + '" fill-opacity="' + (dashed ? "0" : "0.12") + '" stroke="' + color + '" stroke-width="2"' + (dashed ? ' stroke-dasharray="5 4"' : "") + '/>';
+    }
+    var legend = [];
+    parts.push(poly(TARGETS[$("target").value].v, tok("--target"), true));
+    legend.push('<span style="--c:' + tok("--target") + '">Target (dashed)</span>');
+    var colors = ["--s1", "--s2", "--s3", "--s4"];
+    if (res) {
+      res.slice(0, +$("topn").value).forEach(function (r, idx) {
+        var col = tok(colors[idx]);
+        parts.push(poly(r.s.v, col, false));
+        legend.push('<span style="--c:' + col + '">' + (idx + 1) + ". " + r.s.short + "</span>");
+      });
+    }
+    svg.innerHTML = parts.join("");
+    $("rd-legend").innerHTML = legend.join("");
+  }
+
+  function render() {
+    var res = compute();
+    renderTable(res);
+    drawScatter(res);
+    drawRadar(res);
+  }
+
+  function init() {
+    W = {};
+    Object.keys(DEFAULT_W).forEach(function (k) { W[k] = DEFAULT_W[k]; });
+    buildControls();
+    $("target").addEventListener("change", render);
+    $("ax").addEventListener("change", render);
+    $("ay").addEventListener("change", render);
+    $("topn").addEventListener("change", render);
+    $("reset").addEventListener("click", resetWeights);
+    window.addEventListener("resize", render);
+    if (window.matchMedia) {
+      var mq = window.matchMedia("(prefers-color-scheme: dark)");
+      if (mq.addEventListener) mq.addEventListener("change", render);
+    }
+    render();
+  }
+
+  init();
+})();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/WhZcavCNKvSQBJj4nuL6qQ" target="_blank" rel="noopener">Martian route map</a></li>
+<li><a href="https://claude.ai/artifact/CezTh2sXLx9CoaW2gS1cuB" target="_blank" rel="noopener">Lunar site navigator</a></li>
+</ul>
+</nav>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Suggested .gitignore for the shared repo root (orbit-os/ + data-collector/)
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+# raw collector output is large (FIRMS ~84 MB); the app commits only its derived files in orbit-os/public/data/live
+data-collector/out/firms.json
+data-collector/out/nasa-power.json
+
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log

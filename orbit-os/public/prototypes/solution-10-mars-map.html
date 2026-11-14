@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Martian Route Map</title>
+<meta name="description" content="Prototype: layered Mars-like site map with slope hazards and a slope-aware route planner, using generated synthetic terrain.">
+<style>
+:root{--bg:#f6f4f1;--fg:#25201c;--muted:#65594f;--card:#ffffff;--line:#d9d1c8;--accent:#b5481f;--accent2:#1e6fa8;--route:#00a6c7;--warn:#8a5a00;--alert:#b3261e;--ok:#1c6b43;--okbg:#e0f4e8;--chip:#efe9e2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15110f;--fg:#efe7df;--muted:#b3a698;--card:#211b18;--line:#3b322c;--accent:#ff8a5c;--accent2:#7cc4ee;--route:#38e1ff;--warn:#ffc66b;--alert:#ff8c82;--ok:#7fd8a3;--okbg:#13301e;--chip:#2c2420}}
+:root[data-theme="dark"]{--bg:#15110f;--fg:#efe7df;--muted:#b3a698;--card:#211b18;--line:#3b322c;--accent:#ff8a5c;--accent2:#7cc4ee;--route:#38e1ff;--warn:#ffc66b;--alert:#ff8c82;--ok:#7fd8a3;--okbg:#13301e;--chip:#2c2420}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:16px}
+main{max-width:960px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:1.35rem;margin:4px 0 0}
+h2{font-size:1.02rem;margin:0 0 8px}
+p{margin:6px 0}
+.muted{color:var(--muted);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.pill{display:inline-block;font-size:.78rem;padding:2px 8px;border-radius:999px;background:var(--chip);color:var(--fg)}
+.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+#wrap{position:relative;width:100%}
+canvas#map{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--line);cursor:crosshair;touch-action:manipulation;background:var(--chip)}
+.layers{display:flex;flex-wrap:wrap;gap:8px 14px;margin:10px 0 2px;font-size:.92rem}
+.layers label{display:flex;gap:6px;align-items:center}
+.ctrl{display:grid;gap:10px}
+.ctrl label{display:grid;gap:4px;font-size:.9rem}
+select,input[type=number]{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;min-width:0}
+input[type=range]{width:100%}
+button{font:inherit;padding:9px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0}
+.stat .v{font-size:1.2rem;font-weight:700;overflow-wrap:anywhere}
+.hazard{border-radius:10px;padding:10px;background:var(--chip);font-size:.92rem;margin-top:10px}
+.hazard.warn{border-left:4px solid var(--warn)}
+.hazard.bad{border-left:4px solid var(--alert)}
+.hazard.ok{border-left:4px solid var(--ok)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.84rem;color:var(--muted);margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+.ph{display:inline-block;font-size:.75rem;padding:1px 6px;border-radius:6px;border:1px dashed var(--warn);color:var(--warn)}
+ul.next{margin:6px 0 0 18px;padding:0}
+ul.next li{margin:4px 0}
+.hint{font-weight:600;color:var(--accent2)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="pill">SYNTHETIC SAMPLE TERRAIN</span>
+    <h1>Martian Route Map (prototype)</h1>
+    <p class="muted">A generated Mars-like site with toggleable layers. Click the map to set a start and a goal. The route avoids steep ground and reports distance and hazards.</p>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-label="Map">
+      <div id="wrap"><canvas id="map" aria-label="Layered Mars-like site map. Click to set start, then goal."></canvas></div>
+      <div class="layers" role="group" aria-label="Map layers">
+        <label><input type="checkbox" id="lElev" checked> Elevation shading</label>
+        <label><input type="checkbox" id="lSlope" checked> Slope hazard</label>
+        <label><input type="checkbox" id="lTemp"> Surface temperature sample</label>
+        <label><input type="checkbox" id="lWay" checked> Waypoints</label>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="background:#f2d27a"></i>Slope above caution</span>
+        <span><i class="sw" style="background:#e0763c"></i>Steep, costly</span>
+        <span><i class="sw" style="background:#d52b2b"></i>Above limit (blocked)</span>
+        <span><i class="sw" style="background:var(--route)"></i>Route</span>
+      </div>
+      <p class="hint" id="hint" aria-live="polite"></p>
+    </section>
+
+    <section class="card" aria-label="Controls and results">
+      <div class="ctrl">
+        <label>Terrain seed
+          <select id="seed"></select>
+        </label>
+        <label>Blocked slope limit: <b id="smaxv"></b>&deg; <span class="ph">PLACEHOLDER</span>
+          <input type="range" id="smax" min="8" max="30" step="1" value="20">
+        </label>
+        <label>Hazard weight (route avoids steeper ground): <b id="hwv"></b>
+          <input type="range" id="hw" min="0" max="6" step="0.5" value="2">
+        </label>
+        <label>Local time for temperature layer: <b id="tv"></b> h
+          <input type="range" id="time" min="0" max="23" step="1" value="14">
+        </label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" id="clear">Clear route</button>
+          <button type="button" class="ghost" id="next">New terrain</button>
+        </div>
+      </div>
+      <div class="stats" id="stats" style="margin-top:12px"></div>
+      <div class="hazard" id="hazard" role="status" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="wp">
+    <h2 id="wp">Waypoints (sample)</h2>
+    <p class="muted" id="wpList"></p>
+  </section>
+
+  <section class="card" aria-labelledby="ns">
+    <h2 id="ns">Next steps to use real data</h2>
+    <ul class="next muted">
+      <li>Replace the generated terrain with a real digital elevation model from the Mars Orbiter Laser Altimeter (MOLA) data on the NASA Planetary Data System (PDS) Geosciences archive.</li>
+      <li>Add high-resolution slope checks from HiRISE and CTX images from the Mars Reconnaissance Orbiter, to find hazards MOLA is too coarse to see.</li>
+      <li>Use THEMIS thermal observations (Mars Odyssey) for the temperature layer, and rover weather records (Curiosity REMS) to check the model against measured surface temperatures.</li>
+      <li>Calibrate the slope limit and hazard weights with mission planners and rover drivers, since current values are placeholders.</li>
+      <li>Include a rover or astronaut route-check step using a tested, ground-verified traverse plan before any real use.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var N=96, CELL=200;           // grid size and cell size in metres (sample scale)
+var CAUTION=10;               // degrees, placeholder caution threshold
+var SPEED=1.0;                // km/h, placeholder walking pace
+
+function hash(ix,iy,s){var n=Math.imul(ix,374761393)+Math.imul(iy,668265263)+Math.imul(s,1442695041);n=Math.imul(n^(n>>>13),1274126177);n^=n>>>16;return (n>>>0)/4294967296;}
+function smooth(t){return t*t*(3-2*t);}
+function vnoise(x,y,s){var x0=Math.floor(x),y0=Math.floor(y),tx=smooth(x-x0),ty=smooth(y-y0);
+  var a=hash(x0,y0,s),b=hash(x0+1,y0,s),c=hash(x0,y0+1,s),d=hash(x0+1,y0+1,s);
+  return (a+(b-a)*tx)+((c+(d-c)*tx)-(a+(b-a)*tx))*ty;}
+function fbm(x,y,s){var sum=0,amp=0.5,f=1,norm=0;for(var o=0;o<5;o++){sum+=amp*vnoise(x*f,y*f,s+o*17);norm+=amp;amp*=0.5;f*=2;}return sum/norm;}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+
+var seeds=[11,27,42,58,73,91];
+var S={seedIdx:0,elev:null,slope:null,temp:null,way:[],start:null,goal:null,route:null,cost:0};
+
+function build(seed){
+  var E=new Float32Array(N*N), i, j, k;
+  var craters=[];
+  for(k=0;k<7;k++){craters.push({x:hash(k,1,seed)*N,y:hash(k,2,seed)*N,r:4+hash(k,3,seed)*9,d:300+hash(k,4,seed)*900});}
+  for(j=0;j<N;j++)for(i=0;i<N;i++){
+    var h=fbm(i/N*4,j/N*4,seed);
+    var e=(h-0.5)*5200;
+    craters.forEach(function(c){
+      var dx=i-c.x,dy=j-c.y,dd=Math.sqrt(dx*dx+dy*dy)/c.r;
+      if(dd<1.6){var t=clamp(1-dd*dd,0,1);e-=c.d*t*(dd<1?1:0.2);}
+    });
+    E[j*N+i]=e;
+  }
+  var SL=new Float32Array(N*N), TM=new Float32Array(N*N);
+  for(j=0;j<N;j++)for(i=0;i<N;i++){
+    var il=clamp(i-1,0,N-1),ir=clamp(i+1,0,N-1),jd=clamp(j-1,0,N-1),ju=clamp(j+1,0,N-1);
+    var gx=(E[j*N+ir]-E[j*N+il])/(2*CELL), gy=(E[ju*N+i]-E[jd*N+i])/(2*CELL);
+    SL[j*N+i]=Math.atan(Math.sqrt(gx*gx+gy*gy))*180/Math.PI;
+    TM[j*N+i]=hash(i,j,seed+99);
+  }
+  var way=[];
+  var names=["Sample landing ellipse","Layered mesa (sample)","Gully fan (sample)","Crater rim (sample)","Dune field (sample)"];
+  for(k=0;k<names.length;k++){
+    var wx=Math.floor(8+hash(k,7,seed)*(N-16)), wy=Math.floor(8+hash(k,8,seed)*(N-16));
+    way.push({name:names[k],x:wx,y:wy});
+  }
+  S.elev=E;S.slope=SL;S.temp=TM;S.way=way;S.start=null;S.goal=null;S.route=null;
+}
+
+function tempAt(idx,hour){
+  var e=S.elev[idx], base=-60-0.0045*e+8*(S.temp[idx]-0.5);
+  var amp=38*(1-0.3*S.temp[idx]);
+  return base+amp*Math.cos(2*Math.PI*(hour-14)/24);
+}
+
+// Binary heap for Dijkstra
+function Heap(){this.k=[];this.v=[];}
+Heap.prototype.push=function(key,val){var k=this.k,v=this.v,i=k.length;k.push(key);v.push(val);
+  while(i>0){var p=(i-1)>>1;if(k[p]<=k[i])break;this.swap(i,p);i=p;}};
+Heap.prototype.swap=function(a,b){var k=this.k,v=this.v,t=k[a];k[a]=k[b];k[b]=t;t=v[a];v[a]=v[b];v[b]=t;};
+Heap.prototype.pop=function(){var k=this.k,v=this.v,top=v[0],n=k.length-1;k[0]=k[n];v[0]=v[n];k.pop();v.pop();
+  var i=0;for(;;){var l=2*i+1,r=l+1,m=i;if(l<k.length&&k[l]<k[m])m=l;if(r<k.length&&k[r]<k[m])m=r;if(m===i)break;this.swap(i,m);i=m;}
+  return top;};
+Heap.prototype.size=function(){return this.k.length;};
+
+function planRoute(){
+  S.route=null;S.cost=0;
+  if(S.start==null||S.goal==null)return;
+  var maxS=+$("smax").value, hw=+$("hw").value;
+  if(S.slope[S.start]>maxS||S.slope[S.goal]>maxS){S.route={blocked:true};return;}
+  var dist=new Float64Array(N*N).fill(Infinity), prev=new Int32Array(N*N).fill(-1);
+  var h=new Heap(), s=S.start;
+  dist[s]=0;h.push(0,s);
+  var dirs=[[1,0,1],[-1,0,1],[0,1,1],[0,-1,1],[1,1,1.4142],[1,-1,1.4142],[-1,1,1.4142],[-1,-1,1.4142]];
+  while(h.size()){
+    var d=h.k[0], u=h.pop();
+    if(d>dist[u])continue;
+    if(u===S.goal)break;
+    var ux=u%N, uy=(u-ux)/N;
+    for(var q=0;q<dirs.length;q++){
+      var nx=ux+dirs[q][0], ny=uy+dirs[q][1];
+      if(nx<0||ny<0||nx>=N||ny>=N)continue;
+      var v=ny*N+nx, sl=S.slope[v];
+      if(sl>maxS)continue;
+      var step=CELL*dirs[q][2];
+      var c=step*(1+hw*Math.pow(sl/CAUTION,2));
+      if(dist[u]+c<dist[v]){dist[v]=dist[u]+c;prev[v]=u;h.push(dist[v],v);}
+    }
+  }
+  if(!isFinite(dist[S.goal])){S.route={blocked:true,none:true};return;}
+  var path=[],cur=S.goal;
+  while(cur!==-1){path.push(cur);if(cur===s)break;cur=prev[cur];}
+  path.reverse();
+  var km=0,sum=0,mx=0,caution=0;
+  for(var p=1;p<path.length;p++){
+    var a=path[p-1],b=path[p];
+    var ax=a%N,ay=(a-ax)/N,bx=b%N,by=(b-bx)/N;
+    var diag=(ax!==bx&&ay!==by);
+    km+=CELL*(diag?1.4142:1)/1000;
+    var sl2=S.slope[b];sum+=sl2;if(sl2>mx)mx=sl2;if(sl2>CAUTION)caution++;
+  }
+  var sx=s%N,sy=(s-sx)/N,gx=S.goal%N,gy=(S.goal-gx)/N;
+  var straight=Math.sqrt((gx-sx)*(gx-sx)+(gy-sy)*(gy-sy))*CELL/1000;
+  S.cost=dist[S.goal];
+  S.route={path:path,km:km,mean:path.length>1?sum/(path.length-1):0,max:mx,caution:caution,steps:path.length-1,straight:straight};
+}
+
+function colorElev(t){
+  var a=[70,36,26],b=[186,92,54],c=[236,200,160],r,g,bl;
+  if(t<0.5){var u=t*2;r=a[0]+(b[0]-a[0])*u;g=a[1]+(b[1]-a[1])*u;bl=a[2]+(b[2]-a[2])*u;}
+  else{var v=(t-0.5)*2;r=b[0]+(c[0]-b[0])*v;g=b[1]+(c[1]-b[1])*v;bl=b[2]+(c[2]-b[2])*v;}
+  return [r,g,bl];
+}
+function colorTemp(T){
+  var t=clamp((T+110)/130,0,1), a=[30,90,210], b=[245,235,220], c=[215,50,30], r,g,bl;
+  if(t<0.5){var u=t*2;r=a[0]+(b[0]-a[0])*u;g=a[1]+(b[1]-a[1])*u;bl=a[2]+(b[2]-a[2])*u;}
+  else{var v=(t-0.5)*2;r=b[0]+(c[0]-b[0])*v;g=b[1]+(c[1]-b[1])*v;bl=b[2]+(c[2]-b[2])*v;}
+  return [r,g,bl];
+}
+
+function draw(){
+  var cv=$("map"), ctx=cv.getContext("2d"), dpr=window.devicePixelRatio||1;
+  var W=cv.clientWidth||320; cv.width=Math.round(W*dpr); cv.height=Math.round(W*dpr); cv.style.height=W+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  var px=W/N, hour=+$("time").value, maxS=+$("smax").value;
+  var img=ctx.createImageData(N,N), d=img.data;
+  var showE=$("lElev").checked, showS=$("lSlope").checked, showT=$("lTemp").checked;
+  for(var j=0;j<N;j++)for(var i=0;i<N;i++){
+    var idx=j*N+i, o=idx*4, c=[120,80,60];
+    var e=S.elev[idx];
+    if(showT){c=colorTemp(tempAt(idx,hour));}
+    else if(showE){c=colorElev(clamp((e+2600)/5200,0,1));}
+    else{c=[60,50,46];}
+    if(showS&&!showT){
+      var sl=S.slope[idx];
+      if(sl>maxS)c=[213,43,43];
+      else if(sl>CAUTION){var m=clamp((sl-CAUTION)/(maxS-CAUTION),0,1);c=[238,210-90*m,110-70*m];}
+      else if(sl>CAUTION*0.6){c=[c[0]*0.85+242*0.15,c[1]*0.85+210*0.15,c[2]*0.85+122*0.15];}
+    }
+    d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255;
+  }
+  var tmp=document.createElement("canvas");tmp.width=N;tmp.height=N;tmp.getContext("2d").putImageData(img,0,0);
+  ctx.imageSmoothingEnabled=false;ctx.drawImage(tmp,0,0,W,W);
+
+  if($("lWay").checked){
+    ctx.font="12px system-ui,sans-serif";
+    S.way.forEach(function(w,k){
+      var x=(w.x+0.5)*px,y=(w.y+0.5)*px;
+      ctx.fillStyle="#fff";ctx.strokeStyle="#111";ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle="#fff";ctx.strokeStyle="rgba(0,0,0,.7)";ctx.lineWidth=3;
+      ctx.strokeText(String(k+1),x+7,y-6);ctx.fillText(String(k+1),x+7,y-6);
+    });
+  }
+  if(S.route&&S.route.path){
+    ctx.strokeStyle="#0a0a0a";ctx.lineWidth=5;ctx.lineJoin="round";ctx.beginPath();
+    S.route.path.forEach(function(p,n){var x=(p%N+0.5)*px,y=(Math.floor(p/N)+0.5)*px;n?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+    ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--route").trim()||"#00a6c7";ctx.lineWidth=3;ctx.stroke();
+  }
+  [[S.start,"#2fbf5b","S"],[S.goal,"#ff4d4d","G"]].forEach(function(m){
+    if(m[0]==null)return;
+    var x=(m[0]%N+0.5)*px,y=(Math.floor(m[0]/N)+0.5)*px;
+    ctx.fillStyle=m[1];ctx.strokeStyle="#000";ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.fillStyle="#000";ctx.font="bold 11px system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(m[2],x,y+0.5);
+    ctx.textAlign="start";ctx.textBaseline="alphabetic";
+  });
+}
+
+function renderPanel(){
+  var st=$("stats"), hz=$("hazard"), r=S.route;
+  var cells=[];
+  var total=N*N, steep=0, cautionCells=0;
+  var maxS=+$("smax").value;
+  for(var k=0;k<total;k++){if(S.slope[k]>maxS)steep++;else if(S.slope[k]>CAUTION)cautionCells++;}
+  var rows=[];
+  if(r&&r.path){
+    rows=[["Distance",r.km.toFixed(1)+" km"],["Straight line",r.straight.toFixed(1)+" km"],["Detour",r.straight>0?(r.km/r.straight).toFixed(2)+"x":"-"],["Walk time (placeholder pace "+SPEED+" km/h)",(r.km/SPEED).toFixed(1)+" h"],["Route cost (weighted)",S.cost.toFixed(0)],["Max slope on route",r.max.toFixed(1)+"&deg;"],["Mean slope",r.mean.toFixed(1)+"&deg;"],["Steps above caution "+CAUTION+"&deg;",r.caution+" of "+r.steps]];
+  }else{
+    rows=[["Distance","-"],["Route","Not set"],["Terrain blocked above",maxS+"&deg;"],["Cells above limit",(steep/total*100).toFixed(1)+"%"],["Cells above caution",(cautionCells/total*100).toFixed(1)+"%"],["Start / goal","Click map"]];
+  }
+  st.innerHTML="";
+  rows.forEach(function(rw){var div=document.createElement("div");div.className="stat";div.innerHTML='<div class="muted" style="font-size:.8rem"></div><div class="v"></div>';div.children[0].textContent=rw[0];div.children[1].innerHTML=rw[1];st.appendChild(div);});
+  var hint=$("hint");
+  if(S.start==null){hint.textContent="Click the map to set the start (S).";}
+  else if(S.goal==null){hint.textContent="Start set. Click again to set the goal (G).";}
+  else{hint.textContent="Route set. Click again to start a new route.";}
+  if(!r){hz.className="hazard ok";hz.textContent="Route hazards appear here once start and goal are set. Terrain above the blocked slope limit cannot be crossed.";return;}
+  if(r.blocked){hz.className="hazard bad";hz.textContent=r.none?"No route found under this slope limit. Try a higher limit, a lower hazard weight, or another start or goal.":"Start or goal is on ground steeper than the blocked limit. Pick another cell.";return;}
+  var pct=r.steps?(r.caution/r.steps*100):0;
+  hz.className="hazard "+(pct>25?"bad":(pct>0?"warn":"ok"));
+  hz.textContent="Hazard summary: "+r.caution+" of "+r.steps+" steps ("+pct.toFixed(0)+"%) cross ground steeper than the "+CAUTION+"° caution level (placeholder). Steepest step "+r.max.toFixed(1)+"°. The planner trades distance for lower slope using the hazard weight.";
+}
+
+function setup(){
+  var sel=$("seed");
+  seeds.forEach(function(s,k){var o=document.createElement("option");o.value=k;o.textContent="Terrain "+(k+1)+" (seed "+s+")";sel.appendChild(o);});
+  build(seeds[S.seedIdx]);
+  $("wpList").textContent=S.way.map(function(w,k){return (k+1)+". "+w.name;}).join("   ");
+  function refresh(){
+    $("smaxv").textContent=$("smax").value;$("hwv").textContent=$("hw").value;$("tv").textContent=$("time").value;
+    planRoute();draw();renderPanel();
+  }
+  sel.addEventListener("change",function(){S.seedIdx=+sel.value;build(seeds[S.seedIdx]);refresh();});
+  $("next").addEventListener("click",function(){S.seedIdx=(S.seedIdx+1)%seeds.length;sel.value=S.seedIdx;build(seeds[S.seedIdx]);refresh();});
+  $("clear").addEventListener("click",function(){S.start=null;S.goal=null;S.route=null;refresh();});
+  ["smax","hw","time"].forEach(function(id){$(id).addEventListener("input",refresh);});
+  ["lElev","lSlope","lTemp","lWay"].forEach(function(id){$(id).addEventListener("change",refresh);});
+  $("map").addEventListener("click",function(e){
+    var cv=$("map"), rect=cv.getBoundingClientRect();
+    var px=(e.clientX-rect.left)/rect.width*N, py=(e.clientY-rect.top)/rect.height*N;
+    var i=clamp(Math.floor(px),0,N-1), j=clamp(Math.floor(py),0,N-1), idx=j*N+i;
+    if(S.start==null||S.goal!=null){S.start=idx;S.goal=null;}
+    else{S.goal=idx;}
+    refresh();
+  });
+  window.addEventListener("resize",draw);
+  refresh();
+}
+setup();
+})();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/56hEjcZFsa7V6pjTt3qZgs" target="_blank" rel="noopener">Retired Hardware Story</a></li>
+<li><a href="https://claude.ai/artifact/9xorVhtCqDyLRADG3n5Eo2" target="_blank" rel="noopener">Earth Analog Ranker</a></li>
+<li><a href="https://claude.ai/artifact/XSj59HAsViRqRq25H9Y8Wz" target="_blank" rel="noopener">Mars Outpost Trainer</a></li>
+</ul>
+</nav>
+</body>
+</html>

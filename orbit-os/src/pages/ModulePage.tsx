@@ -1,0 +1,76 @@
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
+import { DATASETS } from '../data/datasets';
+import { CHALLENGES, moduleById, SDGS } from '../data/modules';
+import { PATTERNS } from '../kernel';
+import { EarthPulse } from '../modules/EarthPulse';
+import { AcademyWidget, AgriWidget, AutonomyWidget, DisasterWidget, ExplorerWidget, GnssWidget, HumanWidget, InfraWidget, OceanWidget } from '../modules/widgets';
+import { QuickInvestigation } from '../components/QuickInvestigation';
+import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
+import { useAssets } from '../data/assets';
+import { NarrationButton } from '../components/Narration';
+
+const WIDGET: Record<string, () => JSX.Element> = {
+  earth: () => (
+    <div className="grid grid-cols-[minmax(0,1fr)_300px] gap-3">
+      <div className="space-y-3"><EarthPulse /><HarvestPulse /></div>
+      <div className="space-y-3">
+        <QuickInvestigation compact />
+        <Glass className="p-4 text-xs text-slate-300"><div className="h-title mb-1">Earth Pulse bundle</div>Challenges 2 (trend), 5 (radar change), 6 (field shift), 8 (fire calendar) and 14 (sonification) share one change engine. Challenge 7 (ISS combustion) is deliberately <b>not</b> merged with Earth fire data.</Glass>
+      </div>
+    </div>
+  ),
+  disaster: DisasterWidget, agri: AgriWidget, ocean: OceanWidget, infrastructure: InfraWidget, gnss: () => <div className="grid grid-cols-2 gap-3"><GnssWidget /><SpaceWeather compact /></div>,
+  autonomy: AutonomyWidget, explorer: () => <div className="space-y-3"><SpaceWeather /><ExplorerWidget /></div>, academy: AcademyWidget, human: HumanWidget,
+};
+
+export default function ModulePage() {
+  const { id = '' } = useParams();
+  const m = moduleById(id);
+  const nav = useNavigate();
+  const [proto, setProto] = useState<string | null>(null);
+  const assets = useAssets();
+  if (!m) return <p>Unknown module.</p>;
+  const art = assets.modules[m.id];
+  const W = WIDGET[m.id];
+  const ds = m.datasets.map((d) => DATASETS.find((x) => x.id === d)!).filter(Boolean);
+  return (
+    <div>
+      <div className={`relative mb-4 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r ${m.gradient} p-5`}>
+        {art?.image && <img src={art.image} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-60" />}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-slate-950/10" />
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="mt-1 rounded-xl border border-white/20 bg-white/10 p-2 backdrop-blur"><Icon name={m.icon} className="h-7 w-7 text-white" /></div>
+            <div><h1 className="text-[28px] font-bold leading-tight tracking-tight text-white">{m.name}</h1><p className="mt-1 max-w-2xl text-sm text-slate-200">{m.tagline}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2"><NarrationButton src={art?.audio} /><Chip>{m.release}</Chip><Chip>{m.state}</Chip>{m.patterns.map((p) => <Chip key={p} className="border-violet-400/30 text-violet-200">{PATTERNS[p].short}</Chip>)}</div></div>
+          </div>
+        </div>
+      </div>
+      <div className="mb-3 flex flex-wrap items-start gap-2 rounded-xl border border-sky-300/15 bg-sky-500/5 p-3 text-xs text-slate-300"><Icon name="ShieldCheck" className="h-4 w-4 text-sky-300" /><span className="flex-1"><b className="text-white">Data honesty:</b> {m.honest}</span></div>
+      <W />
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        <Glass className="p-4">
+          <div className="h-title mb-2">Kernel patterns reused</div>
+          <ul className="space-y-1.5 text-xs">{m.patterns.map((p) => <li key={p}><b className="text-violet-200">{PATTERNS[p].name}</b><div className="text-slate-400">{PATTERNS[p].description}</div></li>)}</ul>
+        </Glass>
+        <Glass className="p-4">
+          <div className="h-title mb-2">Datasets</div>
+          {ds.length ? <ul className="space-y-1.5 text-xs">{ds.map((d) => <li key={d.id} className="flex items-start justify-between gap-2"><span><a href={d.url || undefined} target="_blank" rel="noreferrer" className="text-slate-100 hover:text-sky-300">{d.name}</a><div className="text-slate-500">{d.note}</div></span><StatusBadge status={d.status} /></li>)}</ul> : <p className="text-xs text-slate-500">No external dataset connected. Sample data only.</p>}
+        </Glass>
+        <Glass className="p-4">
+          <div className="h-title mb-2">Challenges & prototypes</div>
+          {m.challenges.length ? <ul className="space-y-1 text-xs">{m.challenges.map((n) => { const c = CHALLENGES.find((x) => x.n === n)!; return <li key={n} className="flex items-center justify-between"><span className="text-slate-200">#{n} {c.name}</span><button className="text-sky-300 hover:underline" onClick={() => setProto(c.file)}>open prototype</button></li>; })}</ul> : <p className="text-xs text-slate-500">No Space Apps challenge maps here yet (ORBIT sector PRD only).</p>}
+          <div className="mt-3 flex flex-wrap gap-1">{m.sdgs.map((n) => <button key={n} onClick={() => nav('/sdgs')} className="rounded px-1.5 py-0.5 text-[10px] font-bold" style={{ background: SDGS[n].color }}>SDG {n}</button>)}</div>
+        </Glass>
+      </div>
+      {proto && (
+        <Glass className="mt-3 overflow-hidden p-0">
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-2 text-xs"><span className="flex items-center gap-2"><StatusBadge status="sample" />Embedded prototype · {proto}</span><span className="flex gap-3"><a className="text-sky-300" href={`/prototypes/${proto}`} target="_blank" rel="noreferrer">open in tab</a><button onClick={() => setProto(null)}>close</button></span></div>
+          <iframe title={proto} src={`/prototypes/${proto}`} className="h-[640px] w-full bg-white" />
+        </Glass>
+      )}
+    </div>
+  );
+}

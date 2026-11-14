@@ -1,0 +1,166 @@
+{
+  "collected_at": "2026-11-14T13:06:51.131Z",
+  "collector": "orbit-os-data-collector",
+  "version": "1.0.0",
+  "output_dir": "/workspace/orbit/data-collector/out",
+  "sources": [
+    {
+      "id": "eonet",
+      "file": "eonet.json",
+      "status": "ok",
+      "record_count": 8109,
+      "time_range": {
+        "start": "2002-01-04T00:00:00Z",
+        "end": "2026-11-12T12:00:00Z"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [],
+      "notes": [
+        "recent_30d: 904 events from https://eonet.gsfc.nasa.gov/api/v3/events?status=all&days=30",
+        "open: 7244 events from https://eonet.gsfc.nasa.gov/api/v3/events?status=open",
+        "Merged unique events: 8109 (open=7244, recent_30d=904)"
+      ]
+    },
+    {
+      "id": "usgs",
+      "file": "usgs-earthquakes.json",
+      "status": "ok",
+      "record_count": 2002,
+      "time_range": {
+        "start": "2026-10-15T13:06:51.887Z",
+        "end": "2026-11-14T12:08:46.140Z"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [],
+      "notes": [
+        "Feed: USGS Magnitude 2.5+ Earthquakes, Past Month (FDSN GeoJSON).",
+        "API metadata count: 2002"
+      ]
+    },
+    {
+      "id": "nasa-power",
+      "file": "nasa-power.json",
+      "status": "ok",
+      "record_count": 25578,
+      "time_range": {
+        "start": "2021-11-14",
+        "end": "2026-11-14"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [],
+      "notes": [
+        "NASA POWER daily point API, community=RE, parameters=T2M,PRECTOTCORR,ALLSKY_SFC_SW_DWN.",
+        "Requested window 2021-11-14 to 2026-11-14 (5 years, inclusive of today; fill values of -999 stored as null).",
+        "Times are local solar time (LST) dates from POWER, not UTC instants.",
+        "Points: 4 Norwegian sites + 10 global climate/disaster hotspots (14 total).",
+        "Oslo: 1827 daily rows 20211114–20261114",
+        "Tromsø: 1827 daily rows 20211114–20261114",
+        "Svalbard (Longyearbyen): 1827 daily rows 20211114–20261114",
+        "Bergen: 1827 daily rows 20211114–20261114",
+        "Amazon (Manaus): 1827 daily rows 20211114–20261114",
+        "California (Los Angeles): 1827 daily rows 20211114–20261114",
+        "Horn of Africa (Addis Ababa): 1827 daily rows 20211114–20261114",
+        "South Asia (Dhaka): 1827 daily rows 20211114–20261114",
+        "Siberia (Yakutsk): 1827 daily rows 20211114–20261114",
+        "Greenland Summit: 1827 daily rows 20211114–20261114",
+        "Australian Outback (Alice Springs): 1827 daily rows 20211114–20261114",
+        "Great Barrier Reef: 1827 daily rows 20211114–20261114",
+        "Sahel (Niamey): 1827 daily rows 20211114–20261114",
+        "Congo Basin (Kisangani): 1827 daily rows 20211114–20261114"
+      ]
+    },
+    {
+      "id": "firms",
+      "file": "firms.json",
+      "status": "ok",
+      "record_count": 123889,
+      "time_range": {
+        "start": "2026-11-13T00:00:00Z",
+        "end": "2026-11-14T10:55:00Z"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [],
+      "notes": [
+        "NASA FIRMS keyless public 24-hour NRT CSVs (no MAP_KEY).",
+        "The MAP_KEY API (https://firms.modaps.eosdis.nasa.gov/api/area/) is not required for these global 24h dumps.",
+        "modis_c6_1_global_24h: 11404 detections",
+        "viirs_n20_global_24h: 54100 detections",
+        "viirs_n21_global_24h: 58385 detections",
+        "viirs_snpp_global_24h: HTTP 200 but CSV had no data rows (header only or empty)."
+      ]
+    },
+    {
+      "id": "swpc",
+      "file": "swpc.json",
+      "status": "ok",
+      "record_count": 1896,
+      "time_range": {
+        "start": "2026-11-07T00:00:00",
+        "end": "2026-11-14T13:04:00"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [],
+      "notes": [
+        "NOAA SWPC JSON feeds: official 3-hour planetary Kp, 1-minute estimated Kp, and RTSW solar-wind plasma + magnetometer.",
+        "The older /products/solar-wind/plasma-7-day.json path returns 404 as of this collector; RTSW 1-minute JSON is used instead.",
+        "Solar-wind plasma and magnetometer series are stored at 5-minute cadence (real observations where the clock minute is divisible by 5), plus the latest sample of each feed.",
+        "Kp 3-hour: 60 records",
+        "Kp 1-minute estimated: 359 records",
+        "Solar wind RTSW: kept 743 of 3694 1-minute samples (5-min cadence + latest)",
+        "IMF RTSW mag: kept 734 of 3670 1-minute samples (5-min cadence + latest)"
+      ]
+    },
+    {
+      "id": "celestrak",
+      "file": "celestrak.json",
+      "status": "ok",
+      "record_count": 300,
+      "time_range": {
+        "start": "2026-10-15T15:56:16.054944Z",
+        "end": "2026-11-14T08:00:01.999872Z"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [],
+      "notes": [
+        "Celestrak active satellite GP (JSON) catalog count: 16895.",
+        "Stored a deterministic sample of 300 objects (priority NORAD IDs when present, plus a stride sample). The full catalog is not written."
+      ]
+    },
+    {
+      "id": "donki",
+      "file": "donki.json",
+      "status": "partial",
+      "record_count": 86,
+      "time_range": {
+        "start": "2026-10-15T20:24Z",
+        "end": "2026-11-13T21:24Z"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [
+        "DONKI FLR failed: HTTP 404 for https://api.nasa.gov/DONKI/FLR?startDate=2026-10-15&endDate=2026-11-14&api_key=DEMO_KEY: {\"timestamp\":\"2026-11-14T13:07:06.818Z\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/DONKI-API/get/FLR/\"}"
+      ],
+      "notes": [
+        "NASA DONKI via api.nasa.gov using DEMO_KEY for the last 30 days (2026-10-15 to 2026-11-14).",
+        "CME: 86 events",
+        "The official api.nasa.gov/DONKI/FLR endpoint returned an error. Flares were not fabricated. CME records (if any) are still included. Set NASA_API_KEY for a higher rate limit; it does not restore a missing FLR route."
+      ]
+    },
+    {
+      "id": "gibs",
+      "file": "gibs-layers.json",
+      "status": "ok",
+      "record_count": 13,
+      "time_range": {
+        "start": "2025-09-01",
+        "end": "2026-11-14"
+      },
+      "retrieved_at": "2026-11-14T13:06:51.131Z",
+      "errors": [],
+      "notes": [
+        "NASA GIBS WMTS GetCapabilities (EPSG:3857 / Web Mercator 'best' endpoint): https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml",
+        "This file is a layer manifest for the globe, not a set of observations. Each record is one useful imagery layer.",
+        "Parsed 1330 layers from GetCapabilities; selected 13 for the globe."
+      ]
+    }
+  ]
+}

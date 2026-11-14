@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Earth Sound Jukebox</title>
+<meta name="description" content="Sonifies a synthetic 12-month Earth data grid: each latitude band is a pitch, each value is a loudness, and a playhead moves across the frame in sync with the sound.">
+<style>
+:root{
+  --bg:#f4f6fb;--ink:#141a2e;--muted:#4c5576;--card:#ffffff;--line:#d3dae9;
+  --accent:#1f6feb;--accent-ink:#ffffff;--gold:#b87a00;--warn-bg:#fff4d6;--warn-ink:#4f3b00;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0f1d;--ink:#e6ebf8;--muted:#a2acce;--card:#151b30;--line:#2a3354;
+    --accent:#7aa7ff;--accent-ink:#0b0f1d;--gold:#f0b85a;--warn-bg:#2a2410;--warn-ink:#f3e0a6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0f1d;--ink:#e6ebf8;--muted:#a2acce;--card:#151b30;--line:#2a3354;
+  --accent:#7aa7ff;--accent-ink:#0b0f1d;--gold:#f0b85a;--warn-bg:#2a2410;--warn-ink:#f3e0a6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:800px;margin:0 auto;padding:0 16px}
+header{padding:20px 0 6px}
+h1{font-size:1.7rem;line-height:1.2;margin:.1rem 0 .3rem}
+h2{font-size:1.1rem;margin:0 0 .4rem}
+p{margin:.4rem 0}
+.kicker{color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}
+.banner{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--gold);border-radius:10px;padding:9px 12px;font-size:.9rem;margin:12px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+button,select,input{font:inherit;color:inherit}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:10px 20px;font-weight:700;cursor:pointer;min-width:120px}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:7px 12px;cursor:pointer;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.controls{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:620px){.controls{grid-template-columns:repeat(3,1fr)}}
+.ctl{display:flex;flex-direction:column;gap:6px}
+.ctl label,.ctl .lbl{font-size:.85rem;color:var(--muted)}
+select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stage{position:relative;width:100%}
+canvas{display:block;width:100%;height:auto;border-radius:10px;background:var(--bg);cursor:pointer;touch-action:manipulation}
+.readout{font-variant-numeric:tabular-nums;font-size:.95rem;min-height:1.5em;margin:8px 0 2px}
+.legend{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);margin-top:8px}
+.bar{flex:1;height:12px;border-radius:6px;border:1px solid var(--line)}
+.hint{font-size:.85rem;color:var(--muted)}
+.panel ul{padding-left:1.1rem;margin:.3rem 0}
+.panel li{margin:.25rem 0}
+footer{color:var(--muted);font-size:.85rem;padding:4px 0 28px}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="kicker">NASA Space Apps 2026 &middot; Challenge 14 prototype</div>
+  <h1>Earth Sound Jukebox</h1>
+  <p>Each column of the grid is one month, each row is a latitude band. The playhead reads the grid left to right. Each row plays a pitch, and each value sets how loud that pitch sounds.</p>
+  <div class="banner"><strong>Sample data only.</strong> The grid is synthetic and generated in the page. It is labelled as illustrative, not observed Earth data, and is not a NASA Earth Information Center frame.</div>
+</header>
+
+<main class="wrap">
+  <section class="card" aria-label="Sonification frame">
+    <div class="stage">
+      <canvas id="cv" tabindex="0" role="img" aria-label="Grid of 12 months by 12 latitude bands. Click or use arrow keys to move the playhead."></canvas>
+    </div>
+    <div class="readout" id="readout" aria-live="polite">Press Play to start sound. Audio begins only after your click.</div>
+    <div class="legend"><span id="legMin">lower</span><div class="bar" id="legBar"></div><span id="legMax">higher</span></div>
+    <p class="hint">Tip: click a column to move the playhead there. Left and right arrow keys also move it.</p>
+  </section>
+
+  <section class="card" aria-label="Controls">
+    <div class="row" style="justify-content:space-between">
+      <button class="btn" id="play" aria-pressed="false">Play</button>
+      <span class="hint" id="status">Stopped</span>
+    </div>
+    <div class="controls" style="margin-top:12px">
+      <div class="ctl">
+        <label for="tempo">Tempo: <span id="tempoVal">110</span> BPM (one column per beat)</label>
+        <input type="range" id="tempo" min="60" max="180" step="1" value="110">
+      </div>
+      <div class="ctl">
+        <span class="lbl">Scale (row to pitch)</span>
+        <div class="seg" role="group" aria-label="Scale">
+          <button type="button" id="scPent" aria-pressed="true" data-scale="pent">Pentatonic</button>
+          <button type="button" id="scMajor" aria-pressed="false" data-scale="major">Major</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <label for="variable">Variable mapped to loudness</label>
+        <select id="variable">
+          <option value="temp">Synthetic temperature anomaly</option>
+          <option value="precip">Synthetic precipitation anomaly</option>
+          <option value="veg">Synthetic vegetation greenness</option>
+        </select>
+      </div>
+      <div class="ctl">
+        <label for="palette">Colour palette</label>
+        <select id="palette">
+          <option value="diverging">Blue-white-red</option>
+          <option value="viridis">Viridis-like</option>
+          <option value="sunset">Sunset</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="card panel" aria-label="Next steps">
+    <h2>Next steps to use real data</h2>
+    <ul>
+      <li>Replace the synthetic grid with real gridded data, such as the NASA GISTEMP surface temperature anomaly product, or a NASA Earthdata product, read in a server or preprocessing step.</li>
+      <li>Use the NASA Earth Information Center's own visualization frames as the visual track, and check their usage terms.</li>
+      <li>Add a sound-mapping key for listeners, and test with students whether they can tell high from low values.</li>
+      <li>Consider a colour-blind-safe palette and a non-audio text description of each frame.</li>
+    </ul>
+    <p class="hint">No external requests are made. All data is generated in the page.</p>
+  </section>
+</main>
+
+<footer class="wrap">Prototype. Synthetic illustrative data. Sound is generated with the Web Audio API.</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var N_ROWS = 12, N_COLS = 12;
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  var SCALES = {
+    pent: { label: "Pentatonic", steps: [0, 2, 4, 7, 9] },
+    major: { label: "Major", steps: [0, 2, 4, 5, 7, 9, 11] }
+  };
+  var PALETTES = {
+    diverging: { label: "Blue-white-red", stops: [[38, 84, 160], [245, 245, 245], [190, 38, 38]] },
+    viridis: { label: "Viridis-like", stops: [[68, 1, 84], [59, 82, 139], [33, 145, 140], [94, 201, 98], [253, 231, 37]] },
+    sunset: { label: "Sunset", stops: [[30, 20, 60], [150, 40, 90], [240, 120, 60], [255, 230, 140]] }
+  };
+
+  // ---- Synthetic data (deterministic, illustrative only) ----
+  function lat(r) { return -82.5 + 15 * r; }
+  var RAW_FN = {
+    temp: function (r, m) {
+      var la = lat(r), a = Math.abs(la) / 90, sgn = la >= 0 ? 1 : -1;
+      var base = 0.3 + 1.6 * Math.pow(a, 1.2);
+      var season = 0.9 * a * Math.sin(2 * Math.PI * (m - 3) / 12) * sgn;
+      var noise = 0.15 * Math.sin(r * 1.7 + m * 0.9) * Math.cos(m * 2.3 + r * 0.4);
+      return base + season + noise;
+    },
+    precip: function (r, m) {
+      var la = lat(r) * Math.PI / 180;
+      return 0.8 * Math.sin(3 * la) + 0.6 * Math.sin(2 * Math.PI * m / 12 + la) + 0.2 * Math.sin(r * 2.1 + m * 1.3);
+    },
+    veg: function (r, m) {
+      var la = lat(r), sgn = la >= 0 ? 1 : -1;
+      var g = Math.cos(la * Math.PI / 180) * (0.6 + 0.4 * Math.sin(2 * Math.PI * (m - 2) / 12 * sgn));
+      return g + 0.05 * Math.sin(r * 3.1 + m * 0.7);
+    }
+  };
+  var UNITS = { temp: "deg C anomaly (synthetic)", precip: "index (synthetic)", veg: "greenness index (synthetic)" };
+  var DATA = {};
+  Object.keys(RAW_FN).forEach(function (key) {
+    var raw = [], min = Infinity, max = -Infinity, r, m;
+    for (r = 0; r < N_ROWS; r++) {
+      raw.push([]);
+      for (m = 0; m < N_COLS; m++) {
+        var v = RAW_FN[key](r, m);
+        raw[r].push(v);
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+    }
+    var norm = raw.map(function (row) {
+      return row.map(function (v) { return (v - min) / (max - min); });
+    });
+    DATA[key] = { raw: raw, norm: norm, min: min, max: max };
+  });
+
+  // ---- State ----
+  var state = { variable: "temp", palette: "diverging", scale: "pent", tempo: 110, col: 0, playing: false };
+  var canvas = document.getElementById("cv");
+  var g2 = canvas.getContext("2d");
+  var layout = null;
+  var hitCol = -1, hitAt = 0;
+  var queue = [];
+  var audio = null; // { ctx, master, timer, nextTime, nextCol }
+
+  function $(id) { return document.getElementById(id); }
+  function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888"; }
+
+  function interp(stops, t) {
+    t = Math.max(0, Math.min(1, t));
+    var n = stops.length, s = t * (n - 1), i = Math.floor(s);
+    if (i >= n - 1) return stops[n - 1];
+    var f = s - i, a = stops[i], b = stops[i + 1];
+    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+  }
+  function colourFor(t) {
+    var c = interp(PALETTES[state.palette].stops, t);
+    return "rgb(" + Math.round(c[0]) + "," + Math.round(c[1]) + "," + Math.round(c[2]) + ")";
+  }
+  function midiFor(r) {
+    var steps = SCALES[state.scale].steps;
+    var oct = Math.floor(r / steps.length), deg = r % steps.length;
+    return 48 + 12 * oct + steps[deg];
+  }
+  function freqFor(r) { return 440 * Math.pow(2, (midiFor(r) - 69) / 12); }
+  function noteName(r) {
+    var m = midiFor(r);
+    return NOTE_NAMES[m % 12] + (Math.floor(m / 12) - 1);
+  }
+  function beatSeconds() { return 60 / state.tempo; }
+
+  // ---- Audio ----
+  function ensureAudio() {
+    if (audio) return audio;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    var ctx = new AC();
+    var master = ctx.createGain();
+    master.gain.value = 0.5;
+    master.connect(ctx.destination);
+    audio = { ctx: ctx, master: master, timer: null, nextTime: 0, nextCol: 0 };
+    return audio;
+  }
+
+  function playColumn(col, t) {
+    var a = audio, ctx = a.ctx, beat = beatSeconds(), key = state.variable;
+    for (var r = 0; r < N_ROWS; r++) {
+      var v = DATA[key].norm[r][col];
+      if (v < 0.02) continue;
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      var peak = (0.03 + 0.22 * v) / 4;
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freqFor(r), t);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(peak, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + beat * 0.95);
+      osc.connect(gain);
+      gain.connect(a.master);
+      osc.start(t);
+      osc.stop(t + beat);
+    }
+  }
+
+  function schedule() {
+    var a = audio;
+    if (!a || !state.playing) return;
+    var ctx = a.ctx;
+    while (a.nextTime < ctx.currentTime + 0.15) {
+      playColumn(a.nextCol, a.nextTime);
+      queue.push({ col: a.nextCol, t: a.nextTime });
+      a.nextTime += beatSeconds();
+      a.nextCol = (a.nextCol + 1) % N_COLS;
+    }
+  }
+
+  function setPlaying(on) {
+    var btn = $("play");
+    if (on) {
+      var a = ensureAudio();
+      if (!a) {
+        $("status").textContent = "Web Audio is not available in this browser. The grid still works.";
+        return;
+      }
+      if (a.ctx.state === "suspended") a.ctx.resume();
+      a.master.gain.cancelScheduledValues(a.ctx.currentTime);
+      a.master.gain.setValueAtTime(0.5, a.ctx.currentTime);
+      a.nextTime = a.ctx.currentTime + 0.05;
+      a.nextCol = state.col;
+      queue = [];
+      state.playing = true;
+      a.timer = setInterval(schedule, 25);
+      schedule();
+      btn.textContent = "Stop";
+      btn.setAttribute("aria-pressed", "true");
+      $("status").textContent = "Playing. " + SCALES[state.scale].label + " scale, " + state.tempo + " BPM.";
+    } else {
+      state.playing = false;
+      if (audio) {
+        clearInterval(audio.timer);
+        audio.timer = null;
+        audio.master.gain.cancelScheduledValues(audio.ctx.currentTime);
+        audio.master.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.03);
+      }
+      queue = [];
+      btn.textContent = "Play";
+      btn.setAttribute("aria-pressed", "false");
+      $("status").textContent = "Stopped";
+    }
+  }
+
+  $("play").addEventListener("click", function () { setPlaying(!state.playing); });
+
+  // ---- Playhead advance, synced to audio clock ----
+  function advanceVisual() {
+    if (!audio || !state.playing) return;
+    var now = audio.ctx.currentTime;
+    var changed = false;
+    while (queue.length && queue[0].t <= now) {
+      var h = queue.shift();
+      state.col = h.col;
+      hitCol = h.col;
+      hitAt = performance.now();
+      changed = true;
+    }
+    if (changed) updateReadout();
+  }
+
+  // ---- Drawing ----
+  function draw() {
+    var dpr = window.devicePixelRatio || 1;
+    var W = canvas.clientWidth || 360;
+    var H = Math.round(Math.max(230, Math.min(330, W * 0.66)));
+    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+    }
+    g2.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g2.clearRect(0, 0, W, H);
+    var padL = 40, padR = 46, padT = 8, padB = 24;
+    var gw = W - padL - padR, gh = H - padT - padB;
+    var cw = gw / N_COLS, ch = gh / N_ROWS;
+    layout = { padL: padL, padT: padT, cw: cw, ch: ch, gw: gw, gh: gh };
+    var key = state.variable, r, c;
+    var accent = cssVar("--accent"), ink = cssVar("--ink"), muted = cssVar("--muted");
+    g2.font = "11px system-ui, sans-serif";
+    g2.textBaseline = "middle";
+    for (r = 0; r < N_ROWS; r++) {
+      var y = padT + (N_ROWS - 1 - r) * ch;
+      for (c = 0; c < N_COLS; c++) {
+        var x = padL + c * cw;
+        g2.fillStyle = colourFor(DATA[key].norm[r][c]);
+        g2.fillRect(x + 0.5, y + 0.5, cw - 1, ch - 1);
+      }
+      g2.fillStyle = muted;
+      g2.textAlign = "right";
+      var la = lat(r);
+      g2.fillText(Math.abs(la).toFixed(1) + (la >= 0 ? "N" : "S"), padL - 5, y + ch / 2);
+      g2.textAlign = "left";
+      g2.fillText(noteName(r), padL + gw + 5, y + ch / 2);
+    }
+    // flash for the column currently sounding
+    var age = performance.now() - hitAt;
+    if (hitCol >= 0 && age < 350 && state.playing) {
+      g2.fillStyle = "rgba(255,255,255," + (0.35 * (1 - age / 350)).toFixed(3) + ")";
+      g2.fillRect(padL + hitCol * cw, padT, cw, gh);
+    }
+    // playhead
+    var px = padL + state.col * cw;
+    g2.strokeStyle = accent;
+    g2.lineWidth = 3;
+    g2.strokeRect(px + 1.5, padT + 1.5, cw - 3, gh - 3);
+    g2.fillStyle = muted;
+    g2.textAlign = "center";
+    g2.textBaseline = "top";
+    for (c = 0; c < N_COLS; c++) {
+      g2.fillStyle = c === state.col ? ink : muted;
+      g2.fillText(MONTHS[c], padL + c * cw + cw / 2, padT + gh + 6);
+    }
+    g2.textBaseline = "middle";
+  }
+
+  function updateReadout() {
+    var key = state.variable, r = 0;
+    var v = DATA[key].raw;
+    // show the band that is loudest in this column, to describe the frame
+    var best = 0, bestV = -Infinity;
+    for (r = 0; r < N_ROWS; r++) if (DATA[key].norm[r][state.col] > bestV) { bestV = DATA[key].norm[r][state.col]; best = r; }
+    $("readout").textContent =
+      MONTHS[state.col] + " · loudest band " + Math.abs(lat(best)).toFixed(1) + (lat(best) >= 0 ? "N" : "S") +
+      " (" + noteName(best) + ", value " + v[best][state.col].toFixed(2) + " " + UNITS[key] + ")";
+  }
+
+  // ---- Legend ----
+  function updateLegend() {
+    var stops = PALETTES[state.palette].stops, parts = [];
+    for (var i = 0; i <= 10; i++) parts.push(colourFor(i / 10) + " " + (i * 10) + "%");
+    $("legBar").style.background = "linear-gradient(to right," + parts.join(",") + ")";
+    $("legMin").textContent = "lower";
+    $("legMax").textContent = "higher";
+  }
+
+  // ---- Controls ----
+  $("tempo").addEventListener("input", function (e) {
+    state.tempo = parseInt(e.target.value, 10);
+    $("tempoVal").textContent = state.tempo;
+    if (state.playing) $("status").textContent = "Playing. " + SCALES[state.scale].label + " scale, " + state.tempo + " BPM.";
+  });
+  document.querySelectorAll("[data-scale]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.scale = b.getAttribute("data-scale");
+      document.querySelectorAll("[data-scale]").forEach(function (x) {
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      if (state.playing) $("status").textContent = "Playing. " + SCALES[state.scale].label + " scale, " + state.tempo + " BPM.";
+    });
+  });
+  $("variable").addEventListener("change", function (e) {
+    state.variable = e.target.value;
+    updateReadout();
+  });
+  $("palette").addEventListener("change", function (e) {
+    state.palette = e.target.value;
+    updateLegend();
+  });
+
+  // ---- Seek by click or arrow keys ----
+  function seek(col) {
+    state.col = Math.max(0, Math.min(N_COLS - 1, col));
+    if (audio && state.playing) {
+      queue = [];
+      audio.nextCol = state.col;
+      audio.nextTime = audio.ctx.currentTime + 0.02;
+    }
+    updateReadout();
+  }
+  canvas.addEventListener("click", function (e) {
+    if (!layout) return;
+    var rect = canvas.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var c = Math.floor((x - layout.padL) / layout.cw);
+    if (c >= 0 && c < N_COLS) seek(c);
+  });
+  canvas.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { seek(state.col + 1); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { seek(state.col - 1); e.preventDefault(); }
+  });
+
+  window.addEventListener("resize", draw);
+
+  function frame() {
+    advanceVisual();
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  updateLegend();
+  updateReadout();
+  requestAnimationFrame(frame);
+})();
+</script>
+<nav aria-label="Connected challenges" style="max-width:880px;margin:24px auto 0;padding:16px;border:1px solid #8884;border-radius:12px;font:14px system-ui,sans-serif;line-height:1.5">
+<strong style="display:block;margin-bottom:8px">Connected challenges</strong>
+<a href="https://claude.ai/artifact/4QzTZ3ND3BnxvqqSvd1iUf" target="_blank" rel="noopener">Open the live disaster globe hub</a>
+<ul style="margin:8px 0 0;padding-left:18px">
+<li><a href="https://claude.ai/artifact/2rPJsWqmQjY4EAMN3xVneN" target="_blank" rel="noopener">Earth trend detective</a></li>
+<li><a href="https://claude.ai/artifact/FesRU3ceQ7XqtUdJTySyrs" target="_blank" rel="noopener">Sky change viewer</a></li>
+</ul>
+</nav>
+</body>
+</html>

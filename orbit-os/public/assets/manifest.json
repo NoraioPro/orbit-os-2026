@@ -1,0 +1,18 @@
+{
+  "_comment": "Placeholder. Run `npm run assets` to copy ../assets (with its manifest.json) here. Paths are relative to /assets/. Missing files are simply not shown.",
+  "logo": null,
+  "hero": null,
+  "intro_audio": null,
+  "modules": {
+    "earth": { "image": null, "audio": null },
+    "disaster": { "image": null, "audio": null },
+    "agri": { "image": null, "audio": null },
+    "ocean": { "image": null, "audio": null },
+    "infrastructure": { "image": null, "audio": null },
+    "gnss": { "image": null, "audio": null },
+    "autonomy": { "image": null, "audio": null },
+    "explorer": { "image": null, "audio": null },
+    "academy": { "image": null, "audio": null },
+    "human": { "image": null, "audio": null }
+  }
+}
