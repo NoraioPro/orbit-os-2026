@@ -35,6 +35,7 @@ const TOP = [
   { to: '/missions', label: 'Missions', icon: 'Rocket' },
   { to: '/solutions', label: 'Solutions', icon: 'Puzzle' },
   { to: '/twin', label: 'Digital Twin', icon: 'Globe2' },
+  { to: '/earthdata', label: 'Earthdata', icon: 'Earth' },
   { to: '/sdgs', label: 'SDGs', icon: 'Target' },
   { to: '/reports', label: 'Reports', icon: 'FileText' },
 ];
