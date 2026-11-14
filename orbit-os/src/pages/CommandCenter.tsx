@@ -1,7 +1,7 @@
-﻿import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LiveBadge, OsloClock } from '../components/Layout';
-import { OrbitGlobe, type GlobeFocus } from '../components/OrbitGlobe';
+import type { GlobeFocus } from '../components/OrbitGlobe';
 import { QuickInvestigation } from '../components/QuickInvestigation';
 import { Glass, Icon, StatusBadge } from '../components/ui';
 import { DATASETS } from '../data/datasets';
@@ -15,6 +15,8 @@ import { useStore } from '../state/store';
 import { useAssets } from '../data/assets';
 import { NarrationButton } from '../components/Narration';
 import { IntroVideo, introSeen } from '../components/IntroVideo';
+
+const OrbitGlobe = lazy(() => import('../components/OrbitGlobe').then((m) => ({ default: m.OrbitGlobe })));
 
 interface Insight { id: string; icon: string; color: string; title: string; line: string; status: DataStatus; note?: string; lat: number; lng: number; pack: EvidencePack }
 
@@ -129,7 +131,7 @@ export default function CommandCenter() {
           </div>
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(56,189,248,.28),rgba(59,130,246,.10)_55%,transparent_70%)] blur-2xl" />
           <SatelliteArt />
-          <div className="absolute inset-0"><OrbitGlobe db={db} focus={focus} autoRotate /></div>
+          <div className="absolute inset-0"><Suspense fallback={<div className="h-full animate-pulse bg-slate-950/30" aria-label="Loading globe" />}><OrbitGlobe db={db} focus={focus} autoRotate /></Suspense></div>
           <div className="pointer-events-none absolute inset-y-0 left-0 flex flex-col justify-around py-10"><div className="pointer-events-auto flex flex-col gap-10">{left.map((i, k) => <div key={i.id} style={{ marginLeft: k === 1 ? 0 : 36 }}><Callout i={i} side="l" onClick={() => open(i)} /></div>)}</div></div>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex flex-col justify-around py-10"><div className="pointer-events-auto flex flex-col items-end gap-10">{right.map((i, k) => <div key={i.id} style={{ marginRight: k === 1 ? 0 : 30 }}><Callout i={i} side="r" onClick={() => open(i)} /></div>)}</div></div>
           {!db && <div className="absolute inset-x-0 bottom-4 text-center text-xs text-slate-400">Loading 17,186 snapshot records…</div>}

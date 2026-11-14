@@ -15,4 +15,5 @@ export const GUIDES: Record<ModuleId, ModuleGuide> = {
   academy: { focus: [], howto: ['Set a mass budget', 'Choose outpost modules', 'See the mission-value trade-off'] },
   human: { focus: [], howto: ['Review the HR anomaly trace', 'Read the concept notes', 'Keep ISS combustion separate'] },
   sar: { focus: [], howto: ['Pick a study area', 'Swipe before/after and set the threshold', 'Check displacement and cross-links'] },
+  defense: { focus: [], howto: ['Watch the live satellite swarm', 'Read the real-time situation panels', 'Review the free data sources behind it'] },
 };

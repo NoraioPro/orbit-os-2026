@@ -57,6 +57,16 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), orbitLlm(env)],
     server: { port: 5173, host: true },
-    build: { chunkSizeWarningLimit: 2500 },
+    build: {
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('/node_modules/three/')) return 'three-vendor';
+            if (/\/node_modules\/(react-globe\.gl|globe\.gl|three-globe|three-render-objects|3d-tiles-renderer)\//.test(id)) return 'globe-vendor';
+          },
+        },
+      },
+    },
   };
 });

@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { OrbitGlobe } from '../components/OrbitGlobe';
+const OrbitGlobe = lazy(() => import('../components/OrbitGlobe').then((m) => ({ default: m.OrbitGlobe })));
 import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
 import { DATASETS } from '../data/datasets';
 import { eventEvidence, isoMin, TYPE_META } from '../data/events';
@@ -19,7 +19,7 @@ export function Explore() {
     <div className="flex h-full flex-col">
       <PageHeader icon="Compass" title="Explore" subtitle={`${db?.events.length.toLocaleString('en-US') ?? '…'} event records + FIRMS fire cells on NASA GIBS imagery`} right={db ? <StatusBadge status={db.status} note={db.label} /> : undefined} />
       <div className="grid min-h-[620px] flex-1 grid-cols-[minmax(0,1fr)_340px] gap-3">
-        <Glass className="relative overflow-hidden"><OrbitGlobe db={db} types={types} autoRotate defaultLayer="VIIRS_NOAA20_CorrectedReflectance_TrueColor" initial={{ lat: 20, lng: -40, altitude: 2.3 }} /></Glass>
+        <Glass className="relative overflow-hidden"><Suspense fallback={<div className="grid h-full min-h-80 place-items-center text-xs text-slate-500">Loading globe…</div>}><OrbitGlobe db={db} types={types} autoRotate defaultLayer="VIIRS_NOAA20_CorrectedReflectance_TrueColor" initial={{ lat: 20, lng: -40, altitude: 2.3 }} /></Suspense></Glass>
         <Glass className="flex min-h-0 flex-col p-3">
           <div className="flex flex-wrap gap-1">{Object.entries(TYPE_META).map(([k, v]) => <button key={k} onClick={() => setTypes((t) => (t.includes(k) ? t.filter((x) => x !== k) : [...t, k]))} className={`rounded-full border px-2 py-0.5 text-[11px] ${types.includes(k) ? 'border-white/20 text-white' : 'border-transparent text-slate-500'}`}><span className="mr-1 inline-block h-2 w-2 rounded-full" style={{ background: v.color }} />{v.label}</button>)}</div>
           <input className="input mt-2" placeholder="Filter by title…" value={q} onChange={(e) => setQ(e.target.value)} />

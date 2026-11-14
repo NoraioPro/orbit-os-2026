@@ -116,6 +116,10 @@
       "audio": "audio/ai-agents.mp3",
       "script": "audio/ai-agents.md",
       "audio_duration_s": 21.29
+    },
+    "sar": {
+      "name": "SAR Earth Observatory",
+      "audio": "audio/sar-earth-observatory.mp3"
     }
   },
   "concepts": {

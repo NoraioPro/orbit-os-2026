@@ -18,7 +18,7 @@ export const CHALLENGES: Challenge[] = [
   { n: 14, name: 'Earth Sound Jukebox', file: 'solution-14-earth-jukebox.html' },
 ];
 
-export type ModuleId = 'earth' | 'disaster' | 'agri' | 'ocean' | 'infrastructure' | 'gnss' | 'autonomy' | 'explorer' | 'academy' | 'human' | 'sar';
+export type ModuleId = 'earth' | 'disaster' | 'agri' | 'ocean' | 'infrastructure' | 'gnss' | 'autonomy' | 'explorer' | 'academy' | 'human' | 'sar' | 'defense';
 export interface OrbitModule {
   id: ModuleId; name: string; icon: string; tagline: string; release: 'P0' | 'P1' | 'P2' | 'P3';
   state: 'demo' | 'concept'; challenges: number[]; patterns: PatternId[]; datasets: string[]; sdgs: number[];
@@ -37,6 +37,7 @@ export const MODULES: OrbitModule[] = [
   { id: 'academy', name: 'Mission Academy', icon: 'Gamepad2', tagline: 'Learn by designing missions under mass, power and budget limits.', release: 'P2', state: 'demo', challenges: [13, 3, 1], patterns: ['planning', 'transfer'], datasets: [], sdgs: [4], gradient: 'from-amber-400/50 via-yellow-700/30 to-stone-900/30', question: 'Design a Mars outpost with 1000 kg', honest: 'Educational SAMPLE values. Not engineering data.' },
   { id: 'human', name: 'Human Space Lab', icon: 'HeartPulse', tagline: 'Crew health and ISS combustion science, kept separate from Earth fire data on purpose.', release: 'P3', state: 'concept', challenges: [4, 7], patterns: ['anomaly', 'review'], datasets: [], sdgs: [3], gradient: 'from-slate-300/30 via-slate-600/30 to-slate-900/30', question: 'Show astronaut health anomalies', honest: 'Concept only, SAMPLE data. No medical or flight-safety claims. Challenge 7 (ISS microgravity combustion) is NOT merged with Earth wildfire data.' },
   { id: 'sar', name: 'SAR Earth Observatory', icon: 'Radio', tagline: 'See the invisible: radar reveals surface change that optical imagery misses.', release: 'P0', state: 'demo', challenges: [5], patterns: ['change', 'anomaly', 'fusion', 'review'], datasets: ['nisar', 'hls'], sdgs: [13, 15, 11], gradient: 'from-teal-500/40 via-emerald-700/30 to-slate-900/30', question: 'What changed between two radar passes over this region?', honest: 'Backscatter change, InSAR displacement and coherence over analysis-ready rasters (SAMPLE in the interactive demo). Real NISAR/Sentinel-1 discovery runs through the ASF connector; downloads need an Earthdata login. Raw SLC interferometry is not performed in-browser.' },
+  { id: 'defense', name: 'Defense & Crisis', icon: 'Target', tagline: 'Live Earth situation room: every satellite, every crisis, every sensor — one real-time picture.', release: 'P1', state: 'demo', challenges: [], patterns: ['anomaly', 'fusion', 'review'], datasets: ['usgs', 'eonet', 'firms', 'swpc', 'celestrak', 'norge'], sdgs: [16, 9], gradient: 'from-rose-500/40 via-red-700/30 to-slate-900/30', question: 'What is happening on Earth right now?', honest: 'Satellite positions are approximate Keplerian propagation of CelesTrak TLEs (no J2/drag). Events, fires and space weather are real USGS / NASA EONET / FIRMS / NOAA SWPC harvests. A situational-awareness view, not a warning or defense-grading system.' },
 ];
 
 export const moduleById = (id: string) => MODULES.find((m) => m.id === id);

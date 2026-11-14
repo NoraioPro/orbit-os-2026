@@ -59,4 +59,7 @@ a:hover > svg, button:hover > svg { transform: scale(1.15); }
 @keyframes glow-pulse { 0%, 100% { filter: drop-shadow(0 0 2px rgba(56,189,248,.35)) } 50% { filter: drop-shadow(0 0 8px rgba(56,189,248,.75)) } }
 .glow-pulse { animation: glow-pulse 2.4s ease-in-out infinite; }
 
+/* guided-tour spotlight */
+.tour-spot { position: relative; z-index: 45; border-radius: 12px; outline: 2px solid rgba(56,189,248,.9); box-shadow: 0 0 0 4px rgba(56,189,248,.25), 0 0 40px rgba(56,189,248,.45); }
+
 @media (prefers-reduced-motion: reduce) { .page-in, .drawer-in, .fade-in, .eq, .live-dot, .float, .spin-slow, .glow-pulse { animation: none !important; } .lift:hover { transform: none; } a:hover > svg, button:hover > svg { transform: none; } }

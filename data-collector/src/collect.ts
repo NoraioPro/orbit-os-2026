@@ -8,6 +8,7 @@ import { collectEonet } from "./sources/eonet.ts";
 import { collectEpic } from "./sources/epic.ts";
 import { collectFirms } from "./sources/firms.ts";
 import { collectGibs } from "./sources/gibs.ts";
+import { collectNorge } from "./sources/norge.ts";
 import { collectOpenMeteo } from "./sources/openmeteo.ts";
 import { collectPower } from "./sources/power.ts";
 import { collectSwpc } from "./sources/swpc.ts";
@@ -34,6 +35,7 @@ const COLLECTORS: { id: string; run: Collector }[] = [
   { id: "donki", run: collectDonki },
   { id: "epic", run: collectEpic },
   { id: "gibs", run: collectGibs },
+  { id: "norge", run: collectNorge },
   { id: "yr", run: collectYr },
   { id: "openmeteo", run: collectOpenMeteo },
   { id: "copernicus", run: collectCopernicus },

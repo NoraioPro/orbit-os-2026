@@ -1,26 +1,40 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState, type ComponentType } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
+import { GuidedTour } from '../components/GuidedTour';
 import { DATASETS } from '../data/datasets';
 import { CHALLENGES, moduleById, SDGS } from '../data/modules';
 import { PATTERNS } from '../kernel';
 import { EarthPulse } from '../modules/EarthPulse';
 import { AcademyWidget, AgriWidget, AutonomyWidget, DisasterWidget, ExplorerWidget, HumanWidget, InfraWidget, OceanWidget } from '../modules/widgets';
-import { GnssGuardian } from '../modules/GnssGuardian';
-import { SarObservatory } from '../modules/SarObservatory';
+const GnssGuardian = lazy(() => import('../modules/GnssGuardian').then((m) => ({ default: m.GnssGuardian })));
+const SarObservatory = lazy(() => import('../modules/SarObservatory').then((m) => ({ default: m.SarObservatory })));
 import { QuickInvestigation } from '../components/QuickInvestigation';
 import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
 import { NarrationButton } from '../components/Narration';
-import { StoryGlobe } from '../components/StoryGlobe';
+const StoryGlobe = lazy(() => import('../components/StoryGlobe').then((m) => ({ default: m.StoryGlobe })));
 import { TodayEarth } from '../components/TodayEarth';
 import { WeatherNow, WEATHER_SITES } from '../components/WeatherNow';
 import { STORIES } from '../data/stories';
 import { GUIDES } from '../data/guides';
+import { TOURS } from '../data/tours';
 import { useStore } from '../state/store';
 
-const WIDGET: Record<string, () => JSX.Element> = {
-  earth: () => (
+const HumanLab = lazy(() => import('../modules/HumanLab').then((m) => ({ default: m.HumanLab })));
+const MartianRoutes = lazy(() => import('../modules/MartianRoutes').then((m) => ({ default: m.MartianRoutes })));
+const MissionAcademyPro = lazy(() => import('../modules/MissionAcademyPro').then((m) => ({ default: m.MissionAcademyPro })));
+const SituationRoom = lazy(() => import('../modules/SituationRoom').then((m) => ({ default: m.SituationRoom })));
+const EarthTrendDetective = lazy(() => import('../modules/EarthTrendDetective').then((m) => ({ default: m.EarthTrendDetective })));
+const EarthJukebox = lazy(() => import('../modules/EarthJukebox').then((m) => ({ default: m.EarthJukebox })));
+const CropWatch = lazy(() => import('../modules/CropWatch').then((m) => ({ default: m.CropWatch })));
+const FireCalendar = lazy(() => import('../modules/FireCalendar').then((m) => ({ default: m.FireCalendar })));
+const SarChampion = lazy(() => import('../modules/SarChampion').then((m) => ({ default: m.SarChampion })));
+const SkyChangeViewer = lazy(() => import('../modules/SkyChangeViewer').then((m) => ({ default: m.SkyChangeViewer })));
+const SpaceExplorerPro = lazy(() => import('../modules/SpaceExplorerPro').then((m) => ({ default: m.SpaceExplorerPro })));
+
+const EarthSuite: ComponentType = () => (
+  <div className="space-y-3">
     <div className="grid grid-cols-[minmax(0,1fr)_300px] gap-3">
       <div className="space-y-3"><EarthPulse /><HarvestPulse /></div>
       <div className="space-y-3">
@@ -28,17 +42,24 @@ const WIDGET: Record<string, () => JSX.Element> = {
         <Glass className="p-4 text-xs text-slate-300"><div className="h-title mb-1">Earth Pulse bundle</div>Challenges 2 (trend), 5 (radar change), 6 (field shift), 8 (fire calendar) and 14 (sonification) share one change engine. Challenge 7 (ISS combustion) is deliberately <b>not</b> merged with Earth fire data.</Glass>
       </div>
     </div>
-  ),
-  disaster: DisasterWidget, agri: AgriWidget, ocean: OceanWidget, infrastructure: InfraWidget,  gnss: GnssGuardian,
-  sar: SarObservatory,
-  autonomy: AutonomyWidget, explorer: () => <div className="space-y-3"><SpaceWeather /><ExplorerWidget /></div>, academy: AcademyWidget, human: HumanWidget,
-};
+    <EarthTrendDetective />
+    <EarthJukebox />
+  </div>
+);
+const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterWidget /><FireCalendar /></div>;
+const SarSuite: ComponentType = () => <div className="space-y-3"><SarObservatory /><SarChampion /></div>;
+const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
 
+const WIDGET: Record<string, ComponentType> = {
+  earth: EarthSuite, disaster: DisasterSuite, agri: CropWatch, ocean: OceanWidget, infrastructure: InfraWidget, gnss: GnssGuardian,
+  sar: SarSuite, autonomy: MartianRoutes, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanLab, defense: SituationRoom,
+};
 export default function ModulePage() {
   const { id = '' } = useParams();
   const m = moduleById(id);
   const nav = useNavigate();
   const [proto, setProto] = useState<string | null>(null);
+  const [tour, setTour] = useState(false);
   const assets = useAssets();
   const { db } = useStore();
   if (!m) return <p>Unknown module.</p>;
@@ -47,22 +68,22 @@ export default function ModulePage() {
   const ds = m.datasets.map((d) => DATASETS.find((x) => x.id === d)!).filter(Boolean);
   return (
     <div>
-      <div className={`relative mb-4 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r ${m.gradient} p-5`}>
+      <div data-tour="hero" className={`relative mb-4 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r ${m.gradient} p-5`}>
         {art?.image && <img src={art.image} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-60" />}
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-slate-950/10" />
         <div className="relative flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-1 rounded-xl border border-white/20 bg-white/10 p-2 backdrop-blur"><Icon name={m.icon} className="h-7 w-7 text-white" /></div>
             <div><h1 className="text-[28px] font-bold leading-tight tracking-tight text-white">{m.name}</h1><p className="mt-1 max-w-2xl text-sm text-slate-200">{m.tagline}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2"><NarrationButton src={art?.audio} /><Chip>{m.release}</Chip><Chip>{m.state}</Chip>{m.patterns.map((p) => <Chip key={p} className="border-violet-400/30 text-violet-200">{PATTERNS[p].short}</Chip>)}</div></div>
+              <div className="mt-3 flex flex-wrap items-center gap-2"><NarrationButton src={art?.audio} /><button className="btn-ghost !py-1.5 text-xs" onClick={() => setTour(true)}><Icon name="Compass" className="h-4 w-4" />Take a tour</button><Chip>{m.release}</Chip><Chip>{m.state}</Chip>{m.patterns.map((p) => <Chip key={p} className="border-violet-400/30 text-violet-200">{PATTERNS[p].short}</Chip>)}</div></div>
           </div>
         </div>
       </div>
-      <div className="mb-3 flex flex-wrap items-start gap-2 rounded-xl border border-sky-300/15 bg-sky-500/5 p-3 text-xs text-slate-300"><Icon name="ShieldCheck" className="h-4 w-4 text-sky-300" /><span className="flex-1"><b className="text-white">Data honesty:</b> {m.honest}</span></div>
-      {m.id === 'earth' && <div className="mb-3"><TodayEarth /></div>}
-      {WEATHER_SITES[m.id] && <div className="mb-3"><WeatherNow {...WEATHER_SITES[m.id]} /></div>}
+      <div data-tour="honesty" className="mb-3 flex flex-wrap items-start gap-2 rounded-xl border border-sky-300/15 bg-sky-500/5 p-3 text-xs text-slate-300"><Icon name="ShieldCheck" className="h-4 w-4 text-sky-300" /><span className="flex-1"><b className="text-white">Data honesty:</b> {m.honest}</span></div>
+      {m.id === 'earth' && <div data-tour="live" className="mb-3"><TodayEarth /></div>}
+      {WEATHER_SITES[m.id] && <div data-tour="live" className="mb-3"><WeatherNow {...WEATHER_SITES[m.id]} /></div>}
       {GUIDES[m.id] && (
-        <Glass className="mb-3 p-3">
+        <Glass data-tour="guide" className="mb-3 p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs font-semibold text-white"><Icon name="Sparkles" className="h-4 w-4 text-sky-300" />How to use this</div>
             <button className="btn-primary !py-1 text-xs" onClick={() => nav(`/analysis?q=${encodeURIComponent(m.question)}`)}><Icon name="Zap" />Run demo</button>
@@ -72,9 +93,9 @@ export default function ModulePage() {
           </ol>
         </Glass>
       )}
-      {STORIES[m.id] && <StoryGlobe beats={STORIES[m.id].beats} db={db} types={GUIDES[m.id]?.focus} />}
-      <W />
-      <div className="mt-3 grid grid-cols-3 gap-3">
+      {STORIES[m.id] && <div data-tour="story"><Suspense fallback={<div className="mb-3 grid h-[400px] place-items-center text-xs text-slate-500">Loading story globe…</div>}><StoryGlobe beats={STORIES[m.id].beats} db={db} types={GUIDES[m.id]?.focus} /></Suspense></div>}
+      <div data-tour="main"><Suspense fallback={<div role="status" className="grid min-h-48 place-items-center text-sm text-slate-400">Loading module…</div>}><W /></Suspense></div>
+      <div data-tour="sources" className="mt-3 grid grid-cols-3 gap-3">
         <Glass className="p-4">
           <div className="h-title mb-2">Kernel patterns reused</div>
           <ul className="space-y-1.5 text-xs">{m.patterns.map((p) => <li key={p}><b className="text-violet-200">{PATTERNS[p].name}</b><div className="text-slate-400">{PATTERNS[p].description}</div></li>)}</ul>
@@ -95,6 +116,7 @@ export default function ModulePage() {
           <iframe title={proto} src={`/prototypes/${proto}`} className="h-[640px] w-full bg-white" />
         </Glass>
       )}
+      {tour && TOURS[m.id] && <GuidedTour steps={TOURS[m.id]} onDone={() => setTour(false)} />}
     </div>
   );
 }

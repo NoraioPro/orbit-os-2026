@@ -89,6 +89,8 @@ write('events.json', { meta: { snapshot_utc: collected, label, records: rows.len
   write('space.json', { label, swpc: { retrieved_at: s.retrieved_at, kp3h: kp, kp_latest_est: est.length ? [est[est.length - 1].time, est[est.length - 1].values.kp ?? est[est.length - 1].values.estimated_kp ?? null] : null, wind, imf, sample_keys: { wind: Object.keys(s.records.find((r) => r.type === 'solar-wind')?.values ?? {}), imf: Object.keys(s.records.find((r) => r.type === 'solar-wind-imf')?.values ?? {}) } },
     donki: { retrieved_at: d.retrieved_at, cmes, errors: manifest.sources.find((x) => x.id === 'donki')?.errors ?? [] },
     celestrak: { retrieved_at: c.retrieved_at, catalog_count: c.extra?.catalog_count ?? null, sample: sats } });
+  // Full propagation elements for the Defense & Crisis situation room (fallback when the live catalog is rate-limited).
+  write('satellites.json', { label, retrieved_at: c.retrieved_at, catalog_count: c.extra?.catalog_count ?? null, sample: c.records.map((r) => ({ name: r.values.object_name, norad: r.values.norad_cat_id, epoch: r.values.epoch, mean_motion: r.values.mean_motion, eccentricity: r.values.eccentricity, inclination: r.values.inclination, raan: r.values.ra_of_asc_node, arg_perigee: r.values.arg_of_pericenter, mean_anomaly: r.values.mean_anomaly })) });
 }
 
 // 5. GIBS layer manifest (descriptors only)
