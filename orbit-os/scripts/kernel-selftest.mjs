@@ -21,4 +21,43 @@ const fu = k.fuse([{ name: 'a', signal: 0.9, quality: 1, status: 'live' }, { nam
 assert.equal(fu.agreement, 1, 'fusion: agreement');
 const cold = k.analogScore({ tempC: -20, precipMmDay: 0.1, solarMJ: 10 }, k.WORLDS[0]).score, wet = k.analogScore({ tempC: 27, precipMmDay: 6, solarMJ: 15 }, k.WORLDS[0]).score;
 assert.ok(cold > wet, 'transfer: cold desert beats tropics as Mars analog');
-console.log('kernel self-test: all 6 patterns OK');
+// predict (pattern 7)
+const seas = Array.from({ length: 48 }, (_, i) => ({ x: i / 12, y: 10 + 0.25 * i + 6 * Math.sin((i % 12) / 12 * 2 * Math.PI) }));
+const fc = k.forecastSeries(seas, { horizon: 12, period: 12 });
+assert.ok(fc.ok, 'predict: seasonal forecast runs');
+assert.equal(fc.forecast.length, 12, 'predict: horizon length');
+assert.ok(Math.abs(fc.slopePerStep - 0.25) < 0.05, 'predict: recovers trend slope');
+assert.ok(fc.forecast.every((f) => f.hi >= f.y && f.y >= f.lo), 'predict: CI ordering');
+const lin = Array.from({ length: 20 }, (_, i) => ({ x: i, y: 2 * i }));
+const linSpike = [...lin.slice(0, -1), { x: 19, y: 2 * 19 + 12 }];
+const fd = k.forecastSeries(linSpike, { horizon: 5, period: 1 });
+assert.ok(fd.ok && fd.divergence.level !== 'normal', 'predict: flags divergence');
+const pf = k.poissonForecast([5, 6, 5, 4, 6, 5, 5, 6, 4, 5], { horizon: 3 });
+assert.ok(pf.ok && Math.abs(pf.lambda - 5.1) < 0.5, 'predict: poisson rate');
+assert.ok(!pf.alert, 'predict: no false alarm on stable counts');
+assert.ok(k.poissonForecast([5, 6, 5, 4, 6, 5, 5, 6, 4, 5, 30], { horizon: 3 }).alert, 'predict: flags burst');
+// GNSS Guardian
+const csv = 'Raw,ElapsedRealtimeMillis,Svid,ConstellationType,Cn0DbHz\nRaw,1000,G1,1,42\nRaw,1000,G8,1,40\nRaw,1000,R3,3,39\nRaw,5000,G1,1,43\nRaw,5000,G8,1,41\nRaw,5000,R3,3,38\n';
+const pg = k.parseGnssLogger(csv);
+assert.equal(pg.measurements.length, 6, 'gnss: parse GnssLogger');
+assert.equal(pg.measurements[0].constellation, 'GPS', 'gnss: constellation map');
+const openInt = k.gnssIntegrity(k.simulateGnss('open-sky').measurements);
+assert.ok(openInt.ok && openInt.classification === 'normal', 'gnss: open-sky is normal');
+assert.equal(k.gnssIntegrity(k.simulateGnss('low-signal').measurements).classification, 'potential interference', 'gnss: low-signal -> interference');
+assert.equal(k.gnssIntegrity(k.simulateGnss('position-jump').measurements).classification, 'suspicious inconsistency', 'gnss: position jump -> suspicious');
+const simA = k.simulateGnss('mixed', { seed: 7 }), simB = k.simulateGnss('mixed', { seed: 7 });
+assert.equal(simA.measurements[0].cn0, simB.measurements[0].cn0, 'gnss: seeded simulation reproducible');
+const gnssEv = k.evaluateDetector();
+assert.ok(gnssEv.f1 >= 0.8, 'gnss: evaluation F1 on 8 scenarios');
+// SAR Earth Observatory
+const pair = k.simulateSarPair('flood', { seed: 2 });
+const chg = k.backscatterChange(pair.before, pair.after, { thresholdDb: 3 });
+assert.ok(chg.changedCells > 0 && chg.areaKm2 > 0, 'sar: backscatter change detected');
+const phase = { width: 2, height: 2, extent: [0, 0, 1, 1], values: [Math.PI, Math.PI, Math.PI, Math.PI], quantity: 'phase-rad', unit: 'rad', label: 'p' };
+const disp = k.phaseToDisplacement(phase, 0.24);
+assert.ok(Math.abs(disp.values[0] + 0.06) < 1e-6, 'sar: phase -> LOS displacement');
+assert.equal(k.relateEvents(0, 0, 200, [{ type: 'earthquake', title: 'M6', lat: 0.5, lon: 0.5, t: 0 }]).length, 1, 'sar: relate nearby event');
+assert.equal(k.relateEvents(0, 0, 200, [{ type: 'earthquake', title: 'far', lat: 50, lon: 50, t: 0 }]).length, 0, 'sar: exclude far event');
+const pA = k.simulateSarPair('flood', { seed: 9 }), pB = k.simulateSarPair('flood', { seed: 9 });
+assert.equal(pA.before.values[0], pB.before.values[0], 'sar: seeded simulation reproducible');
+console.log('kernel self-test: 7 patterns + GNSS + SAR OK');

@@ -48,4 +48,15 @@ body {
 .fade-in { animation: fade-in .25s ease-out both; }
 .lift { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .lift:hover { transform: translateY(-2px); }
-@media (prefers-reduced-motion: reduce) { .page-in, .drawer-in, .fade-in, .eq, .live-dot { animation: none !important; } .lift:hover { transform: none; } }
+
+/* icon life: scale on hover of their button/link */
+svg { transition: transform .18s ease; }
+a:hover > svg, button:hover > svg { transform: scale(1.15); }
+@keyframes float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+.float { animation: float 3.2s ease-in-out infinite; }
+@keyframes spin-slow { to { transform: rotate(360deg) } }
+.spin-slow { animation: spin-slow 14s linear infinite; }
+@keyframes glow-pulse { 0%, 100% { filter: drop-shadow(0 0 2px rgba(56,189,248,.35)) } 50% { filter: drop-shadow(0 0 8px rgba(56,189,248,.75)) } }
+.glow-pulse { animation: glow-pulse 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) { .page-in, .drawer-in, .fade-in, .eq, .live-dot, .float, .spin-slow, .glow-pulse { animation: none !important; } .lift:hover { transform: none; } a:hover > svg, button:hover > svg { transform: none; } }

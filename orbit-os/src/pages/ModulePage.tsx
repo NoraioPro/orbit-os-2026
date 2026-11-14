@@ -5,11 +5,19 @@ import { DATASETS } from '../data/datasets';
 import { CHALLENGES, moduleById, SDGS } from '../data/modules';
 import { PATTERNS } from '../kernel';
 import { EarthPulse } from '../modules/EarthPulse';
-import { AcademyWidget, AgriWidget, AutonomyWidget, DisasterWidget, ExplorerWidget, GnssWidget, HumanWidget, InfraWidget, OceanWidget } from '../modules/widgets';
+import { AcademyWidget, AgriWidget, AutonomyWidget, DisasterWidget, ExplorerWidget, HumanWidget, InfraWidget, OceanWidget } from '../modules/widgets';
+import { GnssGuardian } from '../modules/GnssGuardian';
+import { SarObservatory } from '../modules/SarObservatory';
 import { QuickInvestigation } from '../components/QuickInvestigation';
 import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
 import { NarrationButton } from '../components/Narration';
+import { StoryGlobe } from '../components/StoryGlobe';
+import { TodayEarth } from '../components/TodayEarth';
+import { WeatherNow, WEATHER_SITES } from '../components/WeatherNow';
+import { STORIES } from '../data/stories';
+import { GUIDES } from '../data/guides';
+import { useStore } from '../state/store';
 
 const WIDGET: Record<string, () => JSX.Element> = {
   earth: () => (
@@ -21,7 +29,8 @@ const WIDGET: Record<string, () => JSX.Element> = {
       </div>
     </div>
   ),
-  disaster: DisasterWidget, agri: AgriWidget, ocean: OceanWidget, infrastructure: InfraWidget, gnss: () => <div className="grid grid-cols-2 gap-3"><GnssWidget /><SpaceWeather compact /></div>,
+  disaster: DisasterWidget, agri: AgriWidget, ocean: OceanWidget, infrastructure: InfraWidget,  gnss: GnssGuardian,
+  sar: SarObservatory,
   autonomy: AutonomyWidget, explorer: () => <div className="space-y-3"><SpaceWeather /><ExplorerWidget /></div>, academy: AcademyWidget, human: HumanWidget,
 };
 
@@ -31,6 +40,7 @@ export default function ModulePage() {
   const nav = useNavigate();
   const [proto, setProto] = useState<string | null>(null);
   const assets = useAssets();
+  const { db } = useStore();
   if (!m) return <p>Unknown module.</p>;
   const art = assets.modules[m.id];
   const W = WIDGET[m.id];
@@ -49,6 +59,20 @@ export default function ModulePage() {
         </div>
       </div>
       <div className="mb-3 flex flex-wrap items-start gap-2 rounded-xl border border-sky-300/15 bg-sky-500/5 p-3 text-xs text-slate-300"><Icon name="ShieldCheck" className="h-4 w-4 text-sky-300" /><span className="flex-1"><b className="text-white">Data honesty:</b> {m.honest}</span></div>
+      {m.id === 'earth' && <div className="mb-3"><TodayEarth /></div>}
+      {WEATHER_SITES[m.id] && <div className="mb-3"><WeatherNow {...WEATHER_SITES[m.id]} /></div>}
+      {GUIDES[m.id] && (
+        <Glass className="mb-3 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-xs font-semibold text-white"><Icon name="Sparkles" className="h-4 w-4 text-sky-300" />How to use this</div>
+            <button className="btn-primary !py-1 text-xs" onClick={() => nav(`/analysis?q=${encodeURIComponent(m.question)}`)}><Icon name="Zap" />Run demo</button>
+          </div>
+          <ol className="mt-1.5 grid gap-x-4 gap-y-1 sm:grid-cols-3">
+            {GUIDES[m.id].howto.map((s, i) => <li key={i} className="flex gap-1.5 text-[11px] text-slate-300"><span className="font-bold text-sky-300">{i + 1}.</span><span>{s}</span></li>)}
+          </ol>
+        </Glass>
+      )}
+      {STORIES[m.id] && <StoryGlobe beats={STORIES[m.id].beats} db={db} types={GUIDES[m.id]?.focus} />}
       <W />
       <div className="mt-3 grid grid-cols-3 gap-3">
         <Glass className="p-4">

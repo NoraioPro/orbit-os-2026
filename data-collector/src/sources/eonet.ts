@@ -11,6 +11,11 @@ import type { JsonValue, LiveRecord, SourceResult } from "../types.ts";
 
 const OPEN_URL = "https://eonet.gsfc.nasa.gov/api/v3/events?status=open";
 const RECENT_URL = "https://eonet.gsfc.nasa.gov/api/v3/events?status=all&days=30";
+// Short-lived categories (floods/storms/volcanoes/ice) close quickly, so "open" alone under-represents them.
+// Pull their full history so the catalogue is rich, not just currently-ongoing events.
+const HISTORICAL_CATEGORIES = ["floods", "severeStorms", "volcanoes", "seaLakeIce"];
+const historyUrl = (cat: string) =>
+  `https://eonet.gsfc.nasa.gov/api/v3/events?status=all&category=${cat}&start=2002-01-01&end=${isoNow().slice(0, 10)}&limit=2000`;
 
 interface EonetGeometry {
   magnitudeValue?: number | null;
@@ -64,9 +69,10 @@ export async function collectEonet(): Promise<SourceResult> {
     }
   }
 
-  const [openCount, recentCount] = await Promise.all([
+  const [openCount, recentCount, ...histCounts] = await Promise.all([
     pull("open", OPEN_URL),
     pull("recent_30d", RECENT_URL),
+    ...HISTORICAL_CATEGORIES.map((c) => pull(`hist_${c}`, historyUrl(c))),
   ]);
 
   if (byId.size === 0) {
@@ -118,7 +124,8 @@ export async function collectEonet(): Promise<SourceResult> {
     );
   }
 
-  notes.push(`Merged unique events: ${records.length} (open=${openCount}, recent_30d=${recentCount})`);
+  const histSummary = HISTORICAL_CATEGORIES.map((c, i) => `${c}=${histCounts[i] ?? 0}`).join(", ");
+  notes.push(`Merged unique events: ${records.length} (open=${openCount}, recent_30d=${recentCount}; historical ${histSummary})`);
   const status = errors.length > 0 ? "partial" : "ok";
   return {
     id: "eonet",

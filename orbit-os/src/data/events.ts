@@ -31,7 +31,7 @@ export const getEventSource = () => current;
 export function loadEvents(source: EventSource = current): Promise<EventsDB> {
   if (!cache[source]) {
     const url = source === 'harvest' ? '/data/live/events.json' : '/data/events.json';
-    cache[source] = fetch(url)
+    cache[source] = fetch(url, { cache: 'no-store' })
       .then((r) => { if (!r.ok) throw new Error(`${url} HTTP ${r.status}`); return r.json(); })
       .then((j: { meta: EventsMeta; cols: string[]; rows: any[][] }) => {
         const harvest = source === 'harvest';

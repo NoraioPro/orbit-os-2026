@@ -5,6 +5,7 @@ import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
 import { DATASETS } from '../data/datasets';
 import { eventEvidence, isoMin, TYPE_META } from '../data/events';
 import { AGENTS, CHALLENGES, MODULES, SDGS } from '../data/modules';
+import { CHALLENGE_META } from '../data/challenges';
 import { PATTERNS, type PatternId } from '../kernel';
 import { useStore } from '../state/store';
 import { HarvestManifestTable } from '../modules/harvestWidgets';
@@ -53,18 +54,17 @@ export function Missions() {
 
 export function Solutions() {
   const nav = useNavigate();
-  const [open, setOpen] = useState<string | null>(null);
   return (
     <div>
-      <PageHeader icon="Puzzle" title="Solutions" subtitle="14 challenge prototypes mapped to ORBIT modules. Prototypes use synthetic data (sample)." />
-      <div className="grid grid-cols-4 gap-3">{CHALLENGES.map((c) => { const mods = MODULES.filter((m) => m.challenges.includes(c.n)); return (
-        <Glass key={c.n} className="p-3">
+      <PageHeader icon="Puzzle" title="Solutions" subtitle="14 challenge prototypes, each mapped to the ORBIT module that implements it. Prototypes use synthetic sample data." />
+      <div className="grid grid-cols-4 gap-3">{CHALLENGES.map((c) => { const mods = MODULES.filter((m) => m.challenges.includes(c.n)); const meta = CHALLENGE_META[c.n]; return (
+        <Glass key={c.n} onClick={() => nav(`/solution/${c.n}`)} className="flex flex-col p-3">
           <div className="flex items-center justify-between"><span className="text-[11px] text-slate-500">Challenge {c.n}</span><StatusBadge status="sample" /></div>
           <div className="font-semibold text-white">{c.name}</div>
-          <div className="mt-1 flex flex-wrap gap-1">{mods.map((m) => <button key={m.id} onClick={() => nav(`/module/${m.id}`)}><Chip className="hover:border-sky-300/40">{m.name}</Chip></button>)}{[2, 5, 6, 8, 14].includes(c.n) && <Chip className="border-sky-400/40 text-sky-200">Earth Pulse</Chip>}</div>
-          <button className="mt-2 text-xs text-sky-300 hover:underline" onClick={() => setOpen(c.file)}>Preview prototype →</button>
+          {meta?.difficulty && <div className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-500">{meta.difficulty}</div>}
+          <div className="mt-2 flex flex-wrap gap-1">{mods.map((m) => <Chip key={m.id} className="border-sky-400/30 text-sky-200">{m.name}</Chip>)}{!mods.length && <Chip>prototype only</Chip>}</div>
+          <div className="mt-auto pt-2 text-xs text-sky-300">Open in ORBIT →</div>
         </Glass>); })}</div>
-      {open && <Glass className="mt-3 overflow-hidden p-0"><div className="flex justify-between px-4 py-2 text-xs"><span>{open}</span><button onClick={() => setOpen(null)}>close</button></div><iframe title={open} src={`/prototypes/${open}`} className="h-[640px] w-full bg-white" /></Glass>}
     </div>
   );
 }
@@ -131,7 +131,7 @@ export function SettingsPage() {
       <Glass className="max-w-2xl space-y-4 p-4 text-sm">
         <label className="flex items-center justify-between gap-4"><span><b className="text-white">Use live keyless APIs</b><div className="text-xs text-slate-400">NASA POWER, NASA EONET, USGS FDSN. Off = offline snapshot mode. Currently: {live ? 'reachable' : 'not reachable / off'}.</div></span><input type="checkbox" checked={settings.preferLive} onChange={(e) => setSettings({ ...settings, preferLive: e.target.checked })} /></label>
         <label className="flex items-center justify-between gap-4"><span><b className="text-white">Use LLM planner/narrator when configured</b><div className="text-xs text-slate-400">{llm.configured ? `Configured on the dev server: ${llm.model}` : 'Not configured. Set ORBIT_LLM_API_KEY in .env (see .env.example). The deterministic planner is used.'}</div></span><input type="checkbox" checked={settings.useLlm} onChange={(e) => setSettings({ ...settings, useLlm: e.target.checked })} /></label>
-        <label className="flex items-center justify-between gap-4"><span><b className="text-white">Event data source</b><div className="text-xs text-slate-400">Collector harvest = live (harvested 14 Nov 2026 14:06 Oslo), 10k EONET + USGS M2.5+ records. Shards = 17k all-magnitude snapshot from 11:39 UTC.</div></span><select className="input !w-auto" value={settings.dataSource} onChange={(e) => setSettings({ ...settings, dataSource: e.target.value as 'harvest' | 'shards' })}><option value="harvest">Collector harvest</option><option value="shards">86 data shards</option></select></label>
+        <label className="flex items-center justify-between gap-4"><span><b className="text-white">Event data source</b><div className="text-xs text-slate-400">Collector harvest = live, 14k events across every type (floods, storms, volcanoes, fires, ice, quakes). Shards = 17k quake/fire-heavy snapshot (11:39 UTC, few floods/storms).</div></span><select className="input !w-auto" value={settings.dataSource} onChange={(e) => setSettings({ ...settings, dataSource: e.target.value as 'harvest' | 'shards' })}><option value="harvest">Collector harvest</option><option value="shards">86 data shards</option></select></label>
         <button className="btn-ghost" onClick={() => { ['orbit.history.v1', 'orbit.reports.v1', 'orbit.review.v1'].forEach((k) => localStorage.removeItem(k)); location.reload(); }}><Icon name="X" />Clear local history, reports and reviews</button>
       </Glass>
     </div>

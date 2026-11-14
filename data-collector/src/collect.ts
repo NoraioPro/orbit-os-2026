@@ -1,13 +1,18 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { collectCelestrak } from "./sources/celestrak.ts";
+import { collectAsf } from "./sources/asf.ts";
+import { collectCopernicus } from "./sources/copernicus.ts";
 import { collectDonki } from "./sources/donki.ts";
 import { collectEonet } from "./sources/eonet.ts";
+import { collectEpic } from "./sources/epic.ts";
 import { collectFirms } from "./sources/firms.ts";
 import { collectGibs } from "./sources/gibs.ts";
+import { collectOpenMeteo } from "./sources/openmeteo.ts";
 import { collectPower } from "./sources/power.ts";
 import { collectSwpc } from "./sources/swpc.ts";
 import { collectUsgs } from "./sources/usgs.ts";
+import { collectYr } from "./sources/yr.ts";
 import {
   COLLECTOR_NAME,
   COLLECTOR_VERSION,
@@ -27,7 +32,12 @@ const COLLECTORS: { id: string; run: Collector }[] = [
   { id: "swpc", run: collectSwpc },
   { id: "celestrak", run: collectCelestrak },
   { id: "donki", run: collectDonki },
+  { id: "epic", run: collectEpic },
   { id: "gibs", run: collectGibs },
+  { id: "yr", run: collectYr },
+  { id: "openmeteo", run: collectOpenMeteo },
+  { id: "copernicus", run: collectCopernicus },
+  { id: "asf", run: collectAsf },
 ];
 
 function formatResult(result: SourceResult): string {

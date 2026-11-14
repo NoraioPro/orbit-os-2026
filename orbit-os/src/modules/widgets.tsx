@@ -5,7 +5,7 @@ import { Glass, Icon, StatusBadge } from '../components/ui';
 import { eventEvidence, flagEvidence, isoDay, nearestPlaceName, TYPE_META } from '../data/events';
 import { eonetEvents } from '../data/live';
 import { PLACES, loadPowerSnapshot } from '../data/power';
-import { allocate, analogScore, fuse, haversineKm, routePlan, WORLDS, zScoreOutliers, type EvidencePack, type SeriesPoint } from '../kernel';
+import { allocate, analogScore, fuse, haversineKm, poissonForecast, routePlan, WORLDS, zScoreOutliers, type EvidencePack, type SeriesPoint } from '../kernel';
 import { useStore } from '../state/store';
 import { EarthPulse } from './EarthPulse';
 import { rng } from './rng';
@@ -25,6 +25,7 @@ export function DisasterWidget() {
   const DAY = 86400000;
   const pts: SeriesPoint[] = Array.from({ length: 30 }, (_, i) => { const end = db.refTime - (29 - i) * DAY; return { x: i - 29, y: db.events.filter((e) => (type === 'all' || e.type === type) && e.t <= end && e.t > end - DAY).length }; });
   const big = db.events.filter((e) => e.type === 'earthquake' && (e.mag ?? 0) >= 5.5).slice(0, 8);
+  const pf = poissonForecast(pts.map((p) => p.y as number), { horizon: 7, window: 14 });
   return (
     <div className="grid grid-cols-2 gap-3">
       <Glass className="col-span-2 p-4">
@@ -41,7 +42,7 @@ export function DisasterWidget() {
               {!flags.length && <tr><td colSpan={7} className="p-3 text-slate-500">No cell meets the rule for this type.</td></tr>}</tbody></table>
         </div>
       </Glass>
-      <Glass className="p-4"><div className="flex items-center justify-between"><div className="h-title">Daily records, last 30 days</div>{db && <StatusBadge status={db.status} note={db.label} />}</div><LineChart points={pts} unit="records/day" bars color="#f97316" xLabel={(x) => (x === 0 ? isoDay(db.refTime) : `${x} d`)} /></Glass>
+      <Glass className="p-4"><div className="flex items-center justify-between"><div className="h-title">Daily records, last 30 days</div>{db && <StatusBadge status={db.status} note={db.label} />}</div><LineChart points={pts} unit="records/day" bars color="#f97316" xLabel={(x) => (x === 0 ? isoDay(db.refTime) : `${x} d`)} />{pf.ok && <p className={`mt-1 text-[11px] ${pf.alert ? 'text-amber-300' : 'text-slate-500'}`}>Rate forecast (7 d): λ≈{pf.lambda.toFixed(1)}/day · 95% upper {pf.upper.toFixed(1)} · {pf.alert ? 'recent burst above expected — review' : 'within expected'}</p>}</Glass>
       <Glass className="p-4">
         <div className="flex items-center justify-between"><div className="h-title">M5.5+ earthquakes</div>{db && <StatusBadge status={db.status} note={db.label} />}</div>
         <ul className="mt-2 space-y-1 text-xs">{big.map((e) => <li key={e.id}><button onClick={() => openEvidence(eventEvidence(db, e))} className="text-left text-slate-200 hover:text-sky-300">{e.title} <span className="text-slate-500">· {isoDay(e.t)}</span></button></li>)}</ul>

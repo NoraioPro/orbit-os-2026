@@ -185,7 +185,7 @@ export default function CommandCenter() {
 
 function SatelliteArt() {
   return (
-    <svg viewBox="0 0 120 60" className="pointer-events-none absolute right-[18%] top-0 z-[1] h-12 w-24 opacity-90 drop-shadow-[0_0_8px_rgba(56,189,248,.6)]">
+    <svg viewBox="0 0 120 60" className="pointer-events-none absolute right-[18%] top-0 z-[1] h-12 w-24 opacity-90 drop-shadow-[0_0_8px_rgba(56,189,248,.6)] float">
       <g transform="rotate(-18 60 30)">
         <rect x="4" y="22" width="40" height="16" fill="#1e3a8a" stroke="#93c5fd" strokeWidth="1" />
         <path d="M14 22v16M24 22v16M34 22v16" stroke="#60a5fa" strokeWidth=".8" />

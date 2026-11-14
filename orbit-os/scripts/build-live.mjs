@@ -36,7 +36,7 @@ for (const id of ['eonet', 'usgs']) {
 }
 rows.sort((a, b) => b[5] - a[5]);
 const byType = {}; for (const r of rows) byType[r[1]] = (byType[r[1]] ?? 0) + 1;
-write('events.json', { meta: { snapshot_utc: collected, label, records: rows.length, shards: 0, by_type: byType, sources: ['NASA EONET v3 (open + last 30 d)', 'USGS M2.5+ past month'], notes: 'Harvested by orbit-os-data-collector. EONET wildfire rows are events (latest geometry), not detections.' }, cols, rows });
+write('events.json', { meta: { snapshot_utc: collected, label, records: rows.length, shards: 0, by_type: byType, sources: ['NASA EONET v3 (open + 30 d + historical floods/storms/volcanoes/ice)', 'USGS M2.5+ past month'], notes: 'Harvested by orbit-os-data-collector. EONET wildfire rows are events (latest geometry), not detections; floods/storms/volcanoes/ice include full closed history since 2002.' }, cols, rows });
 
 // 2. FIRMS: aggregate to 1° cells + hottest 400 detections
 {

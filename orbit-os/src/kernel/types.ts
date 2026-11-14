@@ -1,7 +1,7 @@
 /** Data status. Every figure in ORBIT OS carries one of these (PRD DATA-01). */
 export type DataStatus = 'sample' | 'snapshot' | 'live';
 
-export type PatternId = 'change' | 'anomaly' | 'planning' | 'fusion' | 'review' | 'transfer';
+export type PatternId = 'change' | 'anomaly' | 'planning' | 'fusion' | 'review' | 'transfer' | 'predict';
 
 export interface SourceRef {
   name: string;
@@ -45,4 +45,5 @@ export const PATTERNS: Record<PatternId, { name: string; short: string; descript
   fusion: { name: 'Sensor fusion', short: 'Fusion', description: 'Combine independent indicators into one confidence with agreement and coverage weighting.' },
   review: { name: 'Human review', short: 'Review', description: 'Every flag lands in a review queue: confirm, dismiss or escalate, with a note. Nothing auto-publishes.' },
   transfer: { name: 'Earth analog → Moon/Mars', short: 'Transfer', description: 'Score Earth sites against a target world profile, then reuse the same Earth-tested pipeline off-world.' },
+  predict: { name: 'Prediction / early warning', short: 'Predict', description: 'Seasonal-trend extrapolation with a widening 95% band and divergence early-warning; Poisson rate for event counts. Statistical only — never an official alert.' },
 };

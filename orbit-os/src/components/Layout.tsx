@@ -33,6 +33,7 @@ const TOP = [
   { to: '/analysis', label: 'Analysis', icon: 'ChartColumn' },
   { to: '/missions', label: 'Missions', icon: 'Rocket' },
   { to: '/solutions', label: 'Solutions', icon: 'Puzzle' },
+  { to: '/twin', label: 'Digital Twin', icon: 'Globe2' },
   { to: '/sdgs', label: 'SDGs', icon: 'Target' },
   { to: '/reports', label: 'Reports', icon: 'FileText' },
 ];
@@ -75,7 +76,7 @@ function Sidebar() {
       <Icon name={icon} className={`h-4 w-4 ${color}`} />{label}
     </NavLink>
   );
-  const colors: Record<string, string> = { earth: 'text-sky-300', disaster: 'text-orange-400', agri: 'text-lime-400', ocean: 'text-cyan-300', infrastructure: 'text-blue-300', gnss: 'text-violet-300', autonomy: 'text-fuchsia-300', explorer: 'text-indigo-300', academy: 'text-amber-300', human: 'text-slate-200' };
+  const colors: Record<string, string> = { earth: 'text-sky-300', disaster: 'text-orange-400', agri: 'text-lime-400', ocean: 'text-cyan-300', infrastructure: 'text-blue-300', gnss: 'text-violet-300', autonomy: 'text-fuchsia-300', explorer: 'text-indigo-300', academy: 'text-amber-300', human: 'text-slate-200', sar: 'text-teal-300' };
   return (
     <aside className="glass relative z-10 flex w-[230px] shrink-0 flex-col overflow-hidden p-3">
       <div className="space-y-0.5">

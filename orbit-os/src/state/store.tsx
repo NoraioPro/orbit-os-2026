@@ -23,7 +23,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [dbError, setDbError] = useState<string | null>(null);
   const [live, setLive] = useState<boolean | null>(null);
   const [llm, setLlm] = useState({ configured: false, model: null as string | null });
-  const [settings, setSettingsS] = useState<Settings>(() => ({ dataSource: 'harvest' as EventSource, ...load('orbit.settings.v1', { preferLive: true, useLlm: true }) }));
+  const [settings, setSettingsS] = useState<Settings>(() => ({ dataSource: 'harvest' as EventSource, ...load('orbit.settings.v2', { preferLive: true, useLlm: true }) }));
   const [evidence, openEvidence] = useState<EvidencePack | null>(null);
   const [history, setHistory] = useState<InvestigationResult[]>(() => load('orbit.history.v1', []));
   const [reviews, setReviews] = useState(loadReviews());
@@ -34,7 +34,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => { llmStatus().then(setLlm); }, []);
   useEffect(() => { const h = () => setReviews(loadReviews()); window.addEventListener('orbit-review', h); return () => window.removeEventListener('orbit-review', h); }, []);
 
-  const setSettings = useCallback((s: Settings) => { setSettingsS(s); localStorage.setItem('orbit.settings.v1', JSON.stringify(s)); }, []);
+  const setSettings = useCallback((s: Settings) => { setSettingsS(s); localStorage.setItem('orbit.settings.v2', JSON.stringify(s)); }, []);
   const addResult = useCallback((r: InvestigationResult) => setHistory((h) => { const n = [r, ...h].slice(0, 30); localStorage.setItem('orbit.history.v1', JSON.stringify(n)); return n; }), []);
   const saveReport = useCallback((e: EvidencePack) => setReports((h) => { const n = [e, ...h.filter((x) => x.id !== e.id)].slice(0, 50); localStorage.setItem('orbit.reports.v1', JSON.stringify(n)); return n; }), []);
 
