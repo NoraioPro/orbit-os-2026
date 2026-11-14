@@ -1,18 +1,145 @@
 {
-  "_comment": "Placeholder. Run `npm run assets` to copy ../assets (with its manifest.json) here. Paths are relative to /assets/. Missing files are simply not shown.",
-  "logo": null,
-  "hero": null,
-  "intro_audio": null,
+  "title": "ORBIT OS visual and audio asset pack",
+  "product": "ORBIT OS \u2014 Space Intelligence Platform",
+  "created_at": "2026-11-14T13:21:58Z",
+  "style": "Dark navy and black space UI, glassy panels, neon blue / violet / teal accents, photoreal Earth, satellites, cinematic lighting. Style-matched to the Command Center mockup. No NASA logos or official insignia. No baked-in text except the logo wordmark.",
+  "voice": {
+    "engine": "edge-tts",
+    "voice": "en-US-GuyNeural",
+    "rate": "-8%",
+    "pitch": "-2Hz"
+  },
+  "logo": {
+    "image": "images/logo.png",
+    "image_webp": "images/logo.webp",
+    "image_dark": "images/logo-dark.webp",
+    "note": "Transparent PNG/WEBP plus a dark-background WEBP."
+  },
+  "heroes": {
+    "command-center": "images/command-center-hero.webp",
+    "earth-pulse": "images/earth-pulse.webp",
+    "change-engine": "images/change-engine.webp"
+  },
   "modules": {
-    "earth": { "image": null, "audio": null },
-    "disaster": { "image": null, "audio": null },
-    "agri": { "image": null, "audio": null },
-    "ocean": { "image": null, "audio": null },
-    "infrastructure": { "image": null, "audio": null },
-    "gnss": { "image": null, "audio": null },
-    "autonomy": { "image": null, "audio": null },
-    "explorer": { "image": null, "audio": null },
-    "academy": { "image": null, "audio": null },
-    "human": { "image": null, "audio": null }
-  }
+    "earth": {
+      "name": "Earth Intelligence",
+      "image": "images/earth-intelligence.webp",
+      "image_png": "images/earth-intelligence.png",
+      "audio": "audio/earth-intelligence.mp3",
+      "script": "audio/earth-intelligence.md",
+      "audio_duration_s": 20.06
+    },
+    "disaster": {
+      "name": "Disaster Watch",
+      "image": "images/disaster-watch.webp",
+      "image_png": "images/disaster-watch.png",
+      "audio": "audio/disaster-watch.mp3",
+      "script": "audio/disaster-watch.md",
+      "audio_duration_s": 20.66
+    },
+    "agri": {
+      "name": "Agri Intelligence",
+      "image": "images/agri-intelligence.webp",
+      "image_png": "images/agri-intelligence.png",
+      "audio": "audio/agri-intelligence.mp3",
+      "script": "audio/agri-intelligence.md",
+      "audio_duration_s": 18.98
+    },
+    "ocean": {
+      "name": "Ocean Intelligence",
+      "image": "images/ocean-intelligence.webp",
+      "image_png": "images/ocean-intelligence.png",
+      "audio": "audio/ocean-intelligence.mp3",
+      "script": "audio/ocean-intelligence.md",
+      "audio_duration_s": 18.17
+    },
+    "infrastructure": {
+      "name": "Infrastructure",
+      "image": "images/infrastructure.webp",
+      "image_png": "images/infrastructure.png",
+      "audio": "audio/infrastructure.mp3",
+      "script": "audio/infrastructure.md",
+      "audio_duration_s": 18.67
+    },
+    "gnss": {
+      "name": "GNSS Guardian",
+      "image": "images/gnss-guardian.webp",
+      "image_png": "images/gnss-guardian.png",
+      "audio": "audio/gnss-guardian.mp3",
+      "script": "audio/gnss-guardian.md",
+      "audio_duration_s": 21.31
+    },
+    "autonomy": {
+      "name": "Autonomy Lab",
+      "image": "images/autonomy-lab.webp",
+      "image_png": "images/autonomy-lab.png",
+      "audio": "audio/autonomy-lab.mp3",
+      "script": "audio/autonomy-lab.md",
+      "audio_duration_s": 16.54
+    },
+    "explorer": {
+      "name": "Space Explorer",
+      "image": "images/space-explorer.webp",
+      "image_png": "images/space-explorer.png",
+      "audio": "audio/space-explorer.mp3",
+      "script": "audio/space-explorer.md",
+      "audio_duration_s": 19.9
+    },
+    "academy": {
+      "name": "Mission Academy",
+      "image": "images/mission-academy.webp",
+      "image_png": "images/mission-academy.png",
+      "audio": "audio/mission-academy.mp3",
+      "script": "audio/mission-academy.md",
+      "audio_duration_s": 18.17
+    },
+    "human": {
+      "name": "Human Space Lab",
+      "image": "images/human-space-lab.webp",
+      "image_png": "images/human-space-lab.png",
+      "audio": "audio/human-space-lab.mp3",
+      "script": "audio/human-space-lab.md",
+      "audio_duration_s": 16.8
+    },
+    "data": {
+      "name": "Data Hub",
+      "image": "images/data-hub.webp",
+      "image_png": "images/data-hub.png",
+      "audio": "audio/data-hub.mp3",
+      "script": "audio/data-hub.md",
+      "audio_duration_s": 21.0
+    },
+    "agents": {
+      "name": "AI Agents",
+      "image": "images/ai-agents.webp",
+      "image_png": "images/ai-agents.png",
+      "audio": "audio/ai-agents.mp3",
+      "script": "audio/ai-agents.md",
+      "audio_duration_s": 21.29
+    }
+  },
+  "concepts": {
+    "earth-pulse": {
+      "name": "ORBIT Earth Pulse",
+      "image": "images/earth-pulse.webp",
+      "image_png": "images/earth-pulse.png"
+    },
+    "change-engine": {
+      "name": "One Change Engine, Many Worlds",
+      "image": "images/change-engine.webp",
+      "image_png": "images/change-engine.png"
+    }
+  },
+  "video": {
+    "intro": "video/orbit-os-intro.mp4",
+    "duration_s": 10.05,
+    "resolution": "1920x1080",
+    "note": "10-second cinematic push-in on Earth with an orbit ring and satellites."
+  },
+  "intro_audio": {
+    "audio": "audio/intro.mp3",
+    "script": "audio/intro.md",
+    "duration_s": 79.25
+  },
+  "data_numbers_source": "/workspace/orbit/data-collector/out/manifest.json"
 }
