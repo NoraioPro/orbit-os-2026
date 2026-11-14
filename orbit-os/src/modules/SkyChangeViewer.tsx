@@ -207,6 +207,9 @@ function render(ctx: CanvasRenderingContext2D, stars: Star[], band: number, pass
 
 const PASSES = [1, 2, 3, 4];
 
+/** What a wavelength band primarily reveals (honest, illustrative). */
+const bandNote = (wl: number) => (wl < 1.0 ? 'near-infrared · stars & planets' : wl < 2.0 ? 'near-infrared · stars & hot dust' : wl < 3.5 ? 'mid-infrared · warm dust & gas' : 'mid-infrared · cool dust, ices & PAHs');
+
 export function SkyChangeViewer() {
   const [images, setImages] = useState<SkyImage[]>([]);
   const [idx, setIdx] = useState(0);
@@ -291,8 +294,21 @@ export function SkyChangeViewer() {
     return () => cancelAnimationFrame(raf);
   }, [stars]);
 
+  // Auto-play the survey phases: advance the band while playing, and cycle passes.
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => {
+      setBand((b) => {
+        if (b >= BANDS) { setPass((p) => (p + 1) % 4); return 1; }
+        return b + 1;
+      });
+    }, 1400);
+    return () => clearInterval(id);
+  }, [playing]);
+
   const current = images[idx];
   const wavelength = 0.75 + ((band - 1) / (BANDS - 1)) * 4.25;
+  const progress = ((pass * BANDS + band) / (4 * BANDS)) * 100;
 
   return (
     <div className="space-y-3">
@@ -366,6 +382,13 @@ export function SkyChangeViewer() {
             Infrared band: <b className="text-white">{band}</b> <span className="text-slate-500">· ~{wavelength.toFixed(2)} µm (approximate; bands are not uniformly spaced)</span>
             <input type="range" min={1} max={BANDS} value={band} onChange={(e) => setBand(+e.target.value)} className="mt-1 w-full" />
           </label>
+          <div className="relative mt-1.5 h-2 w-full rounded-full" style={{ background: 'linear-gradient(90deg,#3b82f6,#22d3ee,#34d399,#fbbf24,#f87171)' }}>
+            <div className="absolute -top-1 h-4 w-1 rounded-full bg-white shadow" style={{ left: `${((band - 1) / (BANDS - 1)) * 100}%` }} />
+          </div>
+          <div className="mt-1 flex items-center justify-between text-[10px]">
+            <span className="text-slate-400">{bandNote(wavelength)}</span>
+            <span className="tabular-nums text-slate-500">survey {progress.toFixed(0)}% complete</span>
+          </div>
 
           <div className="mt-2 flex items-center justify-between text-xs">
             <span className="text-slate-300">Survey pass</span>

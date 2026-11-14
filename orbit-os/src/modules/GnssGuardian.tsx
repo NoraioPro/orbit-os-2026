@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { LineChart } from '../components/LineChart';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { evaluateDetector, gnssIntegrity, GNSS_SCENARIOS, parseGnssLogger, parseNmea, simulateGnss, type GnssEvaluation, type GnssIntegrity, type GnssMeasurement, type GnssScenario } from '../kernel';
@@ -75,6 +76,7 @@ export function GnssGuardian() {
           <input ref={fileRef} type="file" accept=".csv,.txt,.log,.nmea,.nmea0183" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ''; }} />
           <button className="btn-primary !py-1.5 text-xs" onClick={() => fileRef.current?.click()}><Icon name="Database" />Load GnssLogger / NMEA</button>
           <button className="btn-ghost !py-1.5 text-xs" onClick={() => { setMeasurements(simulateGnss('open-sky').measurements); setSource('Bundled sample · open-sky (synthetic)'); setStatus('sample'); setParseErr(null); }}>Reset sample</button>
+          <Link to="/arctic" className="btn-ghost !py-1.5 text-xs"><Icon name="Globe2" />Arctic Intel Watch</Link>
         </div>
       </div>
       {parseErr && <div className="rounded-lg border border-rose-400/30 bg-rose-500/10 p-2 text-xs text-rose-200">{parseErr}</div>}
