@@ -19,3 +19,4 @@ dist/
 
 # raw asset pack (synced into orbit-os/public/assets)
 /assets/
+orbit-os/.cache/
