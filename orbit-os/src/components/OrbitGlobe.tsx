@@ -8,7 +8,9 @@ import { useStore } from '../state/store';
 interface Pt { kind: 'event' | 'firms'; lat: number; lng: number; type: string; count: number; sample?: OrbitEvent; cell?: FirmsGrid['cells'][number] }
 export interface GlobeFocus { lat: number; lng: number; altitude?: number }
 
-export function OrbitGlobe({ db, focus, types, height, autoRotate = false, initial = { lat: 30, lng: 12, altitude: 2.15 }, layerSelector = true, defaultLayer = 'bluemarble', showFirms = true }: { db: EventsDB | null; focus?: GlobeFocus | null; types?: string[]; height?: number; autoRotate?: boolean; initial?: GlobeFocus; layerSelector?: boolean; defaultLayer?: string; showFirms?: boolean }) {
+export type GlobeProject = (lat: number, lng: number) => { x: number; y: number } | null;
+
+export function OrbitGlobe({ db, focus, types, height, autoRotate = false, initial = { lat: 30, lng: 12, altitude: 2.15 }, layerSelector = true, defaultLayer = 'bluemarble', showFirms = true, onProject }: { db: EventsDB | null; focus?: GlobeFocus | null; types?: string[]; height?: number; autoRotate?: boolean; initial?: GlobeFocus; layerSelector?: boolean; defaultLayer?: string; showFirms?: boolean; onProject?: (project: GlobeProject | null) => void }) {
   const ref = useRef<GlobeMethods | undefined>(undefined);
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -52,6 +54,30 @@ export function OrbitGlobe({ db, focus, types, height, autoRotate = false, initi
     const c = g.controls() as any;
     c.autoRotate = autoRotate; c.autoRotateSpeed = 0.35; c.enableZoom = true;
   }, [size.w > 0]);
+  // hand the caller a lat/lng -> canvas-pixel projector so overlays can follow the globe
+  useEffect(() => {
+    if (!onProject) return;
+    let cancelled = false;
+    const tick = () => {
+      const g = ref.current;
+      if (!g || cancelled) return;
+      onProject((lat: number, lng: number) => {
+        try {
+          const c = g.getScreenCoords(lat, lng, 0);
+          return c && Number.isFinite(c.x) && Number.isFinite(c.y) ? { x: c.x, y: c.y } : null;
+        } catch {
+          return null;
+        }
+      });
+      cancelled = true;
+    };
+    const t = window.setTimeout(tick, 900);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, [onProject]);
+
   useEffect(() => { if (focus && ref.current) { (ref.current.controls() as any).autoRotate = false; ref.current.pointOfView({ altitude: 1.8, ...focus }, 1200); } }, [focus]);
 
   const color = (d: Pt) => (d.kind === 'firms' ? (d.count > 200 ? '#fde047' : d.count > 40 ? '#fb923c' : '#f87171') : TYPE_META[d.type]?.color ?? '#fff');

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T00:32:05.700Z",
+  "generated_at": "2026-11-15T09:19:25.983Z",
   "source": "scripts/build-domains.mjs",
   "note": "Domain-organized data layer. Each file carries its own provenance block; panels read these files instead of hard-coded numbers.",
   "domains": [

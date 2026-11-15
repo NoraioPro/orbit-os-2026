@@ -32,7 +32,7 @@ const FILL = -999;
 
 const powerUrl = ({ lat, lon, community }) =>
   `https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=${PARAMS.join(',')}&community=${community}` +
-  `&longitude=${lon}&latitude=${lat}&start=2025&end=2026&format=JSON`;
+  `&longitude=${lon}&latitude=${lat}&start=2024&end=2026&format=JSON`;
 
 async function fetchPower(aoi) {
   const url = powerUrl(aoi);
@@ -78,14 +78,31 @@ function last(rows, n) {
 function series(rows, key, label, unit, note) {
   const vals = rows.map((r) => r[key]);
   const have = vals.filter((v) => v !== null);
+  // least-squares slope over the valid points (real regression, not a guess)
+  const pts = vals.map((v, i) => (v === null ? null : [i, v])).filter(Boolean);
+  let slope = null;
+  if (pts.length > 2) {
+    const n = pts.length;
+    const sx = pts.reduce((a, p) => a + p[0], 0);
+    const sy = pts.reduce((a, p) => a + p[1], 0);
+    const sxx = pts.reduce((a, p) => a + p[0] * p[0], 0);
+    const sxy = pts.reduce((a, p) => a + p[0] * p[1], 0);
+    const denom = n * sxx - sx * sx;
+    if (denom !== 0) slope = (n * sxy - sx * sy) / denom;
+  }
+  // same-month anomaly: value minus the same month one year earlier
+  const yoy = vals.map((v, i) => (v === null || i < 12 || vals[i - 12] === null ? null : Number((v - vals[i - 12]).toFixed(4))));
   return {
     id: key.toLowerCase(),
     label,
     unit,
     months: rows.map((r) => r.label),
+    ym: rows.map((r) => r.ym),
     values: vals,
+    yoy,
     latest: have.length ? have[have.length - 1] : null,
     mean: have.length ? Number((have.reduce((a, b) => a + b, 0) / have.length).toFixed(3)) : null,
+    trendPerMonth: slope === null ? null : Number(slope.toFixed(4)),
     note,
   };
 }
@@ -176,8 +193,8 @@ async function main() {
   const [agriP, oceanP, nordicP] = await Promise.all([fetchPower(AOI.agri), fetchPower(AOI.ocean), fetchPower(AOI.agriNordic)]);
   const generatedAt = new Date().toISOString();
 
-  const agriRows = last(agriP.rows, 6);
-  const oceanRows = last(oceanP.rows, 6);
+  const agriRows = last(agriP.rows, 24);
+  const oceanRows = last(oceanP.rows, 24);
   const coverage = {
     start: agriP.rows[0]?.ym ? `${agriP.rows[0].ym.slice(0, 4)}-${agriP.rows[0].ym.slice(4)}` : null,
     end: agriP.rows.at(-1)?.ym ? `${agriP.rows.at(-1).ym.slice(0, 4)}-${agriP.rows.at(-1).ym.slice(4)}` : null,
@@ -223,7 +240,12 @@ async function main() {
       { id: 'wind', label: 'Wind', unit: 'm/s', value: agriRows.at(-1)?.WS2M ?? null },
       { id: 'clouds', label: 'Clouds', unit: '%', value: agriRows.at(-1)?.CLOUD_AMT ?? null },
     ],
-    coverage: { ...coverage, window: `${agriRows[0]?.label ?? '?'}–${agriRows.at(-1)?.label ?? '?'} ${agriRows.at(-1)?.ym?.slice(0, 4) ?? ''}` },
+    coverage: {
+      ...coverage,
+      window: `${agriRows[0]?.label ?? '?'}–${agriRows.at(-1)?.label ?? '?'} ${agriRows.at(-1)?.ym?.slice(0, 4) ?? ''}`,
+      months_available: agriRows.filter((r) => r.T2M !== null).length,
+      windows: [6, 12, 24].filter((n) => agriRows.length >= n),
+    },
   };
 
   const ocean = {
@@ -266,10 +288,15 @@ async function main() {
       { id: 'wind', label: 'Wind', unit: 'm/s', value: oceanRows.at(-1)?.WS2M ?? null },
       { id: 'clouds', label: 'Clouds', unit: '%', value: oceanRows.at(-1)?.CLOUD_AMT ?? null },
     ],
-    coverage: { ...coverage, window: `${oceanRows[0]?.label ?? '?'}–${oceanRows.at(-1)?.label ?? '?'} ${oceanRows.at(-1)?.ym?.slice(0, 4) ?? ''}` },
+    coverage: {
+      ...coverage,
+      window: `${oceanRows[0]?.label ?? '?'}–${oceanRows.at(-1)?.label ?? '?'} ${oceanRows.at(-1)?.ym?.slice(0, 4) ?? ''}`,
+      months_available: oceanRows.filter((r) => r.T2M !== null).length,
+      windows: [6, 12, 24].filter((n) => oceanRows.length >= n),
+    },
   };
 
-  const nordicRows = last(nordicP.rows, 6);
+  const nordicRows = last(nordicP.rows, 24);
   const nordic = {
     domain: 'agri-ostfold',
     title: 'Agri Intelligence',

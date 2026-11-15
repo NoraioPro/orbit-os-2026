@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T09:07:54.874Z",
+  "generated_at": "2026-11-15T09:24:38.665Z",
   "app": "ORBIT OS · Space Intelligence Platform",
   "base_url": "http://localhost:5173/",
   "capture": {
@@ -22,8 +22,8 @@
       "title": "Unified Geospatial (Agri × Ocean)",
       "route": "/unified",
       "file": "pages/unified-earth.jpg",
-      "bytes": 251136,
-      "captured_at": "2026-11-15T08:57:38.025Z"
+      "bytes": 258516,
+      "captured_at": "2026-11-15T09:24:38.410Z"
     },
     {
       "slug": "explore",

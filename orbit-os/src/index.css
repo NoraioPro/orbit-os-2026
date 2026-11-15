@@ -63,3 +63,13 @@ a:hover > svg, button:hover > svg { transform: scale(1.15); }
 .tour-spot { position: relative; z-index: 45; border-radius: 12px; outline: 2px solid rgba(56,189,248,.9); box-shadow: 0 0 0 4px rgba(56,189,248,.25), 0 0 40px rgba(56,189,248,.45); }
 
 @media (prefers-reduced-motion: reduce) { .page-in, .drawer-in, .fade-in, .eq, .live-dot, .float, .spin-slow, .glow-pulse { animation: none !important; } .lift:hover { transform: none; } a:hover > svg, button:hover > svg { transform: none; } }
+
+
+/* AOI connector lines + pin pulse (Unified Geospatial) */
+@keyframes orbit-dash { to { stroke-dashoffset: -90; } }
+.connector-flow { stroke-dasharray: 5 5; animation: orbit-dash 3.2s linear infinite; }
+@keyframes orbit-pulse { 0% { r: 5; opacity: .55 } 70% { r: 13; opacity: 0 } 100% { r: 13; opacity: 0 } }
+.connector-pulse { animation: orbit-pulse 2.6s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .connector-flow, .connector-pulse { animation: none; }
+}
