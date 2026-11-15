@@ -129,10 +129,14 @@ function shortTitle(name: string, max = 26) {
 }
 
 /** challenges deliberately kept out of the rail (module removed) */
-const HIDDEN_CHALLENGES = new Set<number>([7]);
+function isHiddenChallenge(n: number): boolean {
+  // a hoisted function, not a const Set: challengeItem() runs while moduleItems is
+  // being built at import time, before any later const exists (TDZ blank page).
+  return n === 7;
+}
 
 function challengeItem(n: number, group: NavGroupId): NavItem | null {
-  if (HIDDEN_CHALLENGES.has(n)) return null;
+  if (isHiddenChallenge(n)) return null;
   const c = CHALLENGES.find((x) => x.n === n);
   if (!c) return null;
   const meta = CHALLENGE_META[c.n];
