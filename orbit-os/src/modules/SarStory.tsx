@@ -168,7 +168,7 @@ export function SarStory() {
     ];
   }, [cat, fault, live]);
 
-  const film = useAutoPlay(steps.length, 7000, 0);
+  const film = useAutoPlay(steps.length, 7000, 0, true);
   const step = steps[Math.min(film.index, steps.length - 1)];
   const spoken = step ? `${step.title}. ${step.body}` : '';
 

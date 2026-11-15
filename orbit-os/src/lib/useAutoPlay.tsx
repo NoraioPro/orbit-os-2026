@@ -7,9 +7,16 @@ import { useEffect, useRef, useState } from 'react';
  * the ice-chart archive): the frames advance on a timer so the change is visible
  * without clicking, and any manual pick pauses it so you can study one frame.
  */
-export function useAutoPlay(count: number, intervalMs = 1500, startIndex = 0) {
+export function useAutoPlay(count: number, intervalMs = 1500, startIndex = 0, autoStart = false) {
   const [index, setIndex] = useState(startIndex);
   const [playing, setPlaying] = useState(false);
+  // slide-show behaviour: sequences start on their own unless the caller opts out
+  const startedRef = useRef(false);
+  useEffect(() => {
+    if (!autoStart || startedRef.current || count < 2) return;
+    startedRef.current = true;
+    setPlaying(true);
+  }, [autoStart, count]);
   const [tick, setTick] = useState(0);
   const timer = useRef<number | null>(null);
 
