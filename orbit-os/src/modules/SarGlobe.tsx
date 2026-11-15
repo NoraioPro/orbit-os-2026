@@ -5,6 +5,7 @@ import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { NarrationButton } from '../components/Narration';
 import { backscatterChange, simulateSarPair } from '../kernel';
 import { ConnectorLines, useGlobeConnectors } from '../components/ConnectorLines';
+import { SarSiteIntel } from './SarSiteIntel';
 import type { GlobeProject } from '../components/OrbitGlobe';
 
 /* ------------------------------------------------------------------ *
@@ -124,13 +125,14 @@ export function SarGlobe() {
   const material = useMemo(() => new MeshPhongMaterial({ color: new Color('#ffffff'), emissive: new Color('#0b2a6b'), emissiveIntensity: 0.6, shininess: 12 }), []);
 
   return (
+    <>
     <Glass className="p-0 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
         <div className="flex items-center gap-2"><Icon name="Radio" className="h-5 w-5 text-teal-300" /><span className="h-title">SAR Earth Atlas</span><StatusBadge status="live" note="ASF acquisitions · live" /><NarrationButton src="/assets/audio/sar-atlas.mp3" label="Listen" /></div>
         <span className="text-[11px] text-slate-500">8 study areas · ranked by detected radar change · click any marker</span>
       </div>
 
-      <div ref={gridRef} className="relative grid grid-cols-[minmax(0,1fr)_260px]">
+      <div ref={gridRef} className="relative grid grid-cols-[minmax(0,1fr)_280px]">
         <div ref={wrap} className="relative h-[460px]">
           {size.w > 0 && (
             <Globe
@@ -190,12 +192,13 @@ export function SarGlobe() {
               <div className="rounded-md border border-white/10 bg-white/[.03] p-2"><div className="text-slate-400">Changed cells</div><div className="text-lg font-bold text-white">{current.changedCells}</div></div>
               <div className="rounded-md border border-white/10 bg-white/[.03] p-2"><div className="text-slate-400">Affected area</div><div className="text-lg font-bold text-white">{current.areaKm2.toFixed(0)} km²</div></div>
             </div>
-            <div className="mt-2 border-t border-white/10 pt-2 text-[11px]">
-              <div className="flex items-center justify-between"><span className="text-slate-400">ASF acquisitions (1° box)</span><StatusBadge status={asfState === 'ok' ? 'live' : asfState === 'loading' ? 'live' : 'not connected'} note={asfState === 'loading' ? 'querying…' : undefined} /></div>
-              {asfState === 'loading' && <div className="mt-1 text-slate-500">Querying ASF…</div>}
-              {asfState === 'ok' && asf && <div className="mt-1"><b className="text-white">{asf.n}</b> NISAR + Sentinel-1 granules<span className="block text-slate-500">latest {asf.latest?.slice(0, 16).replace('T', ' ')} UTC</span></div>}
-              {asfState === 'err' && <div className="mt-1 text-slate-500">No acquisitions returned for this box.</div>}
+            <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2 text-[11px]">
+              <span className="text-slate-400">ASF acquisitions (1° box)</span>
+              <span className="text-slate-300">
+                {asfState === 'loading' ? 'querying…' : asfState === 'ok' && asf ? <><b className="text-white">{asf.n}</b> granules · latest {asf.latest?.slice(0, 10)}</> : 'none'}
+              </span>
             </div>
+
             <p className="mt-2 text-[10px] text-slate-500">Change % is from the SAMPLE synthetic before/after pairs (seeded, reproducible) — the acquisition counts and times are live ASF.</p>
           </Glass>
         </div>
@@ -204,6 +207,11 @@ export function SarGlobe() {
         <ConnectorLines pins={pins} anchors={anchors} />
       </div>
     </Glass>
+
+    <div className="mt-3">
+      <SarSiteIntel site={{ id: current.id, name: current.name, region: current.region, lat: current.lat, lon: current.lon }} />
+    </div>
+    </>
   );
 }
 
