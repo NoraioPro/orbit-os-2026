@@ -32,6 +32,7 @@ interface Granule {
   sizeMB: number | null;
   footprint: string | null;
   thumbnail: string | null;
+  quicklook?: string | null;
   downloadUrl: string | null;
   insarGrouping: string | null;
 }
@@ -41,6 +42,7 @@ interface FaultFile {
   event: { id: string; label: string; timeUtc: string };
   provenance: { provider: string; url: string; access: string; honesty: string; note: string };
   pair: { before: Granule | null; after: Granule | null };
+  quicklooks?: { before: Granule | null; after: Granule | null };
   nisarCurrent: Granule | null;
   queries: { before: string; after: string; nisar: string };
 }
@@ -61,18 +63,24 @@ function parseFootprint(wkt?: string | null): [number, number][] {
     .filter((p) => p.length === 2 && p.every((n) => Number.isFinite(n))) as [number, number][];
 }
 
-function FaultMap({ pair }: { pair: FaultFile['pair'] }) {
+function FaultMap({ pair, quicklooks }: { pair: FaultFile['pair']; quicklooks?: FaultFile['quicklooks'] }) {
   const W = 800;
   const H = 440;
+  const [layer, setLayer] = useState<'after' | 'before'>('after');
+  const [imgFailed, setImgFailed] = useState(false);
   const before = useMemo(() => parseFootprint(pair.before?.footprint), [pair.before]);
   const after = useMemo(() => parseFootprint(pair.after?.footprint), [pair.after]);
+  const qk = quicklooks?.[layer] ?? null;
+  const qkPoly = useMemo(() => parseFootprint(qk?.footprint), [qk]);
 
   const project = useMemo(() => {
-    const all = [...before, ...after];
+    // frame the selected quicklook: it is the image the user is looking at, so
+    // it should fill the panel instead of floating in a dark corner
+    const all = qkPoly.length > 2 ? qkPoly : [...before, ...after];
     if (all.length < 3) return null;
     const lons = all.map((p) => p[0]);
     const lats = all.map((p) => p[1]);
-    const pad = 0.25;
+    const pad = (Math.max(...lons) - Math.min(...lons)) * 0.04;
     const minLon = Math.min(...lons) - pad;
     const maxLon = Math.max(...lons) + pad;
     const minLat = Math.min(...lats) - pad;
@@ -80,11 +88,11 @@ function FaultMap({ pair }: { pair: FaultFile['pair'] }) {
     // keep aspect ratio honest: scale by the larger span
     const spanLon = maxLon - minLon;
     const spanLat = maxLat - minLat;
-    const scale = Math.min((W - 40) / spanLon, (H - 60) / spanLat);
+    const scale = Math.min((W - 24) / spanLon, (H - 44) / spanLat);
     const cx = (minLon + maxLon) / 2;
     const cy = (minLat + maxLat) / 2;
     return (lon: number, lat: number): [number, number] => [W / 2 + (lon - cx) * scale, H / 2 - (lat - cy) * scale];
-  }, [before, after]);
+  }, [before, after, qkPoly, layer]);
 
   const poly = (pts: [number, number][]) => (project ? pts.map((p) => project(p[0], p[1])).map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ') : '');
   const aoiPt = project ? project(AOI.lon, AOI.lat) : [W / 2, H / 2];
@@ -94,14 +102,49 @@ function FaultMap({ pair }: { pair: FaultFile['pair'] }) {
 
   return (
     <div className="relative">
-      <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" role="img" aria-label="Real Sentinel-1 footprints over the East Anatolian Fault">
+      <div className="absolute right-2 top-2 z-10 flex gap-1">
+        {(['after', 'before'] as const).map((k) => {
+          const q = quicklooks?.[k];
+          const on = layer === k;
+          return (
+            <button
+              key={k}
+              onClick={() => { setLayer(k); setImgFailed(false); }}
+              title={q?.quicklook ? `${q.platform ?? 'Sentinel-1'} GRD quicklook · ${fmt(q.startTime)}` : 'no quicklook'}
+              className={`rounded border px-1.5 py-[1px] text-[9px] font-semibold uppercase transition ${on ? 'border-teal-400/60 bg-teal-500/20 text-teal-100' : 'border-white/10 bg-slate-950/70 text-slate-400 hover:text-white'}`}
+            >
+              SAR {k} {q?.startTime ? `· ${fmt(q.startTime).slice(0, 10)}` : ''}
+            </button>
+          );
+        })}
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" role="img" aria-label="Real Sentinel-1 quicklook with footprints over the East Anatolian Fault">
         <defs>
           <pattern id="sfl-grid" width="40" height="40" patternUnits="userSpaceOnUse">
             <path d="M40 0L0 0 0 40" fill="none" stroke="#16202b" strokeWidth="1" />
           </pattern>
         </defs>
         <rect width={W} height={H} fill="#0a1018" />
-        <rect width={W} height={H} fill="url(#sfl-grid)" />
+        {/* real Sentinel-1 GRD quicklook, clipped to its own footprint */}
+        {qk?.quicklook && qkPoly.length > 2 && !imgFailed && (
+          <>
+            <clipPath id="qk-clip">
+              <polygon points={poly(qkPoly)} />
+            </clipPath>
+            <image
+              href={qk.quicklook}
+              x={Math.min(...qkPoly.map((p) => project!(p[0], p[1])[0]))}
+              y={Math.min(...qkPoly.map((p) => project!(p[0], p[1])[1]))}
+              width={Math.max(...qkPoly.map((p) => project!(p[0], p[1])[0])) - Math.min(...qkPoly.map((p) => project!(p[0], p[1])[0]))}
+              height={Math.max(...qkPoly.map((p) => project!(p[0], p[1])[1])) - Math.min(...qkPoly.map((p) => project!(p[0], p[1])[1]))}
+              preserveAspectRatio="none"
+              clipPath="url(#qk-clip)"
+              opacity="0.92"
+              onError={() => setImgFailed(true)}
+            />
+          </>
+        )}
+        <rect width={W} height={H} fill="url(#sfl-grid)" opacity={qk?.quicklook && !imgFailed ? 0.15 : 1} />
 
         {/* fault trace (schematic, not a mapped geometry) */}
         <path d="M250 70 L360 160 L440 240 L520 330 L600 390" stroke="#93c5fd" strokeWidth="2" fill="none" strokeDasharray="2 5" opacity="0.75" />
@@ -121,7 +164,12 @@ function FaultMap({ pair }: { pair: FaultFile['pair'] }) {
           Sentinel-1A ascending · after · {fmt(pair.after?.startTime)}
         </text>
         <text x={aoiPt[0] + 12} y={aoiPt[1] - 8} fill="#e2e8f0" fontSize="10">East Anatolian Fault · {AOI.lat}°N {AOI.lon}°E</text>
-        <text x={20} y={H - 16} fill="#94a3b8" fontSize="10">footprints: real ASF WKT · the pair shares one track, so they overlap by design</text>
+        <text x={20} y={H - 16} fill="#94a3b8" fontSize="10">
+          {qk?.quicklook && !imgFailed
+            ? `base: real Sentinel-1 GRD quicklook · ASF · ${fmt(qk.startTime)}${pair[layer]?.startTime && Math.abs(new Date(qk.startTime!).getTime() - new Date(pair[layer]!.startTime!).getTime()) < 120000 ? ' · same pass as the pair scene' : ''}`
+            : 'footprints: real ASF WKT · the pair shares one track, so they overlap by design'}
+        </text>
+        <text x={20} y={H - 4} fill="#64748b" fontSize="9">fault trace: schematic · quicklook is a browse image, not an analysis product</text>
         <g transform={`translate(${W - 150},${H - 34})`}>
           <line x1="0" y1="0" x2={scalePx} y2="0" stroke="#94a3b8" strokeWidth="2" />
           <line x1="0" y1="-4" x2="0" y2="4" stroke="#94a3b8" strokeWidth="2" />
@@ -274,7 +322,7 @@ export function SarFaultLab() {
         </Glass>
 
         <Glass className="overflow-hidden p-0">
-          <FaultMap pair={file?.pair ?? { before: null, after: null }} />
+          <FaultMap pair={file?.pair ?? { before: null, after: null }} quicklooks={file?.quicklooks} />
         </Glass>
       </div>
 

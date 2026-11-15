@@ -214,7 +214,9 @@ async function asfQuery(params) {
     insarGrouping: g.insarGrouping ?? null,
     insarStackSize: g.insarStackSize ?? null,
     footprint: g.stringFootprint ?? null,
-    thumbnail: g.thumbnailUrl ?? (Array.isArray(g.browse) ? g.browse[0] : null) ?? null,
+    thumbnail: g.thumbnailUrl ?? null,
+    // ASF returns browse as a full-size JPEG quicklook URL (string), not an array
+    quicklook: typeof g.browse === 'string' && g.browse.startsWith('http') ? g.browse : Array.isArray(g.browse) ? g.browse[0] ?? null : null,
     downloadUrl: g.downloadUrl ?? null,
   }));
   return { url, status: 'live', granules };
@@ -226,6 +228,9 @@ async function fetchFaultPair() {
   const before = await asfQuery({ platform: 'SENTINEL-1', flightDirection: 'ASCENDING', processingLevel: 'SLC', start: '2023-01-01', end: '2023-02-05', maxResults: '8', ...point });
   const after = await asfQuery({ platform: 'SENTINEL-1', flightDirection: 'ASCENDING', processingLevel: 'SLC', start: '2023-02-08', end: '2023-03-25', maxResults: '8', ...point });
   const nisar = await asfQuery({ platform: 'NISAR', maxResults: '6', ...point });
+  // Sentinel-1 GRD products carry a full-size quicklook JPEG — real radar imagery
+  const gBefore = await asfQuery({ platform: 'SENTINEL-1', processingLevel: 'GRD_HD', flightDirection: 'ASCENDING', start: '2023-01-01', end: '2023-02-05', maxResults: '8', ...point });
+  const gAfter = await asfQuery({ platform: 'SENTINEL-1', processingLevel: 'GRD_HD', flightDirection: 'ASCENDING', start: '2023-02-08', end: '2023-03-25', maxResults: '8', ...point });
 
   // InSAR needs the SAME relative orbit + frame: pick the latest pre-event scene and
   // the earliest post-event scene that share them.
@@ -237,7 +242,22 @@ async function fetchFaultPair() {
     (pre && [...after.granules].filter((g) => g.startTime && new Date(g.startTime) > eventTime && g.relativeOrbit === pre.relativeOrbit && g.frame === pre.frame).sort(byTime)[0]) ??
     after.granules[after.granules.length - 1] ??
     null;
-  return { before: pre, after: post, nisar: nisar.granules[0] ?? null, queries: { before: before.url, after: after.url, nisar: nisar.url } };
+  // pick the GRD quicklook whose acquisition is closest to the SLC scene used in
+  // the pair, so the image and the interferometric pair are the same pass
+  const pickQuick = (list, target) => {
+    const withQuick = list.filter((g) => g.quicklook && g.startTime);
+    if (!withQuick.length) return null;
+    const t = target?.startTime ? new Date(target.startTime).getTime() : null;
+    if (!t) return withQuick[0];
+    return withQuick.sort((a, b) => Math.abs(new Date(a.startTime).getTime() - t) - Math.abs(new Date(b.startTime).getTime() - t))[0];
+  };
+  return {
+    before: pre,
+    after: post,
+    nisar: nisar.granules[0] ?? null,
+    quicklooks: { before: pickQuick(gBefore.granules, pre), after: pickQuick(gAfter.granules, post) },
+    queries: { before: before.url, after: after.url, nisar: nisar.url, quicklooks: [gBefore.url, gAfter.url] },
+  };
 }
 
 async function main() {
@@ -469,6 +489,7 @@ async function main() {
         note: 'Both scenes are real ASF records on the same relative orbit and frame, so they form an interferometric pair. No interferogram has been processed in this build; amplitude/fringe imagery in the UI is labelled sample.',
       },
       pair: { before: fault.before, after: fault.after },
+      quicklooks: fault.quicklooks,
       nisarCurrent: fault.nisar,
       queries: fault.queries,
     };
