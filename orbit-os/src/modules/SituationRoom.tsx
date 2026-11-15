@@ -30,6 +30,82 @@ const FREE_SOURCES: { name: string; provider: string; note: string }[] = [
   { name: 'Data.norge.no', provider: 'Digdir (FDK)', note: 'Norwegian open-data catalog — NVE flood/landslide hazards, DSB preparedness (server-side harvest)' },
 ];
 
+
+/** Earth radius used for every altitude conversion on this board (km). */
+const EARTH_R_KM = 6371;
+
+/** Named shells, in km above the surface — the reference the ladder draws. */
+const SHELLS = [
+  { key: 'starlink', label: 'Starlink', km: 550, color: '#38bdf8' },
+  { key: 'leo', label: 'LEO / ISS', km: 420, color: '#34d399' },
+  { key: 'meo', label: 'GPS MEO', km: 20200, color: '#a78bfa' },
+  { key: 'geo', label: 'GEO', km: 35786, color: '#f472b6' },
+];
+
+/**
+ * Altitude ladder: Earth drawn at radius R, then each shell at (R + altitude) / R.
+ * It is the legend the globe cannot provide on its own — at true scale LEO is a
+ * 1.5 % ring above the surface and GEO is 5.6 radii out, and you cannot read that
+ * from a sphere alone.
+ */
+function ScaleLadder({
+  scaleMode,
+  setScaleMode,
+  filter,
+  counts,
+}: {
+  scaleMode: 'true' | 'x4';
+  setScaleMode: (m: 'true' | 'x4') => void;
+  filter: string;
+  counts: Record<string, number>;
+}) {
+  const maxR = (EARTH_R_KM + 35786) / EARTH_R_KM; // 6.62 R⊕ to the GEO shell
+  const cx = 74;
+  const cy = 74;
+  const unit = 58 / maxR; // px per Earth radius
+  return (
+    <div className="rounded-lg border border-white/10 bg-slate-950/75 px-2 py-1.5 backdrop-blur">
+      <div className="flex items-center gap-1">
+        {(['true', 'x4'] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => setScaleMode(m)}
+            className={`rounded border px-1.5 py-0.5 text-[9px] ${scaleMode === m ? 'border-sky-300/50 bg-sky-500/20 text-white' : 'border-white/10 text-slate-400 hover:text-slate-200'}`}
+            title={m === 'true' ? 'altitudes exactly to scale' : 'every shell lifted ×4, ordering preserved'}
+          >
+            {m === 'true' ? 'true scale' : '×4 lifted'}
+          </button>
+        ))}
+      </div>
+      <svg width="150" height="150" viewBox="0 0 150 150" className="mt-1">
+        <circle cx={cx} cy={cy} r={unit} fill="#0b2a6b" fillOpacity="0.55" stroke="#38bdf8" strokeOpacity="0.5" strokeWidth="1" />
+        <text x={cx} y={cy + 3} textAnchor="middle" fontSize="7" fill="#93c5fd">Earth R</text>
+        {SHELLS.map((sh) => {
+          const r = unit * ((EARTH_R_KM + sh.km) / EARTH_R_KM);
+          const on = filter === 'all' || filter === sh.key;
+          return (
+            <g key={sh.key} opacity={on ? 1 : 0.28}>
+              <circle cx={cx} cy={cy} r={r} fill="none" stroke={sh.color} strokeWidth={on ? 1.1 : 0.7} strokeDasharray={sh.key === 'geo' ? '0' : '2 2'} />
+              <text x={cx} y={cy - r - 2} textAnchor="middle" fontSize="6.5" fill={sh.color}>
+                {sh.label} {(sh.km / EARTH_R_KM).toFixed(2)}R⊕
+              </text>
+            </g>
+          );
+        })}
+        <text x={2} y={146} fontSize="6" fill="#475569">1 R⊕ = 6,371 km</text>
+      </svg>
+      <div className="flex flex-wrap gap-x-2 text-[8px] text-slate-400">
+        {SHELLS.map((sh) => (
+          <span key={sh.key}>
+            <span className="mr-0.5 inline-block h-1.5 w-1.5 rounded-full align-middle" style={{ background: sh.color }} />
+            {sh.km.toLocaleString('en-US')} km{counts[sh.key] != null ? ` · ${counts[sh.key]}` : ''}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function SituationRoom() {
   const [sats, setSats] = useState<Sat[] | null>(null);
   const [satErr, setSatErr] = useState<string | null>(null);
@@ -43,6 +119,7 @@ export function SituationRoom() {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [rows, setRows] = useState<GpRow[] | null>(null);
+  const [scaleMode, setScaleMode] = useState<'true' | 'x4'>('true');
   const [simSpeed, setSimSpeed] = useState(60);
   const baseRef = useRef(Date.now());
 
@@ -84,7 +161,7 @@ export function SituationRoom() {
   useEffect(() => { const el = wrap.current; if (!el) return; const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight })); ro.observe(el); return () => ro.disconnect(); }, []);
   useEffect(() => {
     const g = globeRef.current; if (!g || !size.w) return;
-    g.pointOfView({ lat: 15, lng: 0, altitude: 3.2 }, 0);
+    g.pointOfView({ lat: 15, lng: 0, altitude: 9.5 }, 0);
     const c = g.controls() as any;
     c.autoRotate = true; c.autoRotateSpeed = 0.25; c.enableZoom = true;
   }, [size.w > 0]);
@@ -135,8 +212,14 @@ export function SituationRoom() {
                 pointLat="lat"
                 pointLng="lng"
                 pointColor={(d: any) => ORBIT_CLASSES[d.cls]?.color ?? '#94a3b8'}
-                pointAltitude={(d: any) => Math.max(0.06, d.altKm / 6371)}
-                pointRadius={(d: any) => (d.cls === 'geo' ? 0.22 : 0.14)}
+                pointAltitude={(d: any) => {
+                  // globe.gl altitude is in Earth radii, so the honest value is alt / R_earth.
+                  // 'x4' lifts every shell by the same factor, which keeps the ordering true
+                  // while making LEO visible at the same time as GEO — the caption says so.
+                  const r = d.altKm / EARTH_R_KM;
+                  return scaleMode === 'x4' ? Math.max(0.02, r * 4) : r;
+                }}
+                pointRadius={(d: any) => (d.cls === 'geo' ? 0.2 : 0.13)}
                 pointsMerge={false}
                 pointLabel={(d: any) => `<div style="background:#0b1229ee;border:1px solid #38bdf855;padding:5px 8px;border-radius:8px;font:12px Inter,sans-serif;color:#e2e8f0"><b>${d.name}</b><br/>NORAD ${d.norad} · ${ORBIT_CLASSES[d.cls]?.label ?? d.cls}<br/><span style="color:#94a3b8">${d.altKm.toFixed(0)} km · ${d.lat.toFixed(1)}°, ${d.lng.toFixed(1)}°</span></div>`}
               />
@@ -155,7 +238,13 @@ export function SituationRoom() {
               <button key={s} onClick={() => { baseRef.current = Date.now(); setSimSpeed(s); }} className={`rounded-full border px-2 py-0.5 text-[10px] ${simSpeed === s ? 'border-sky-300/50 bg-sky-500/20 text-white' : 'border-white/10 bg-slate-950/60 text-slate-400 hover:text-slate-200'}`}>{s}×</button>
             ))}
           </div>
-          <div className="absolute bottom-3 left-3 right-3 text-[9px] text-slate-500">altitude is real (LEO ≈ 400–2,000 km hugs Earth, GEO ≈ 35,786 km sits ~5.6 Earth-radii out) · drag/zoom to explore</div>
+          <div className="absolute bottom-2 left-2 right-2 flex items-end justify-between gap-2">
+            <ScaleLadder scaleMode={scaleMode} setScaleMode={setScaleMode} filter={filter} counts={counts} />
+            <div className="max-w-[46%] text-right text-[9px] leading-snug text-slate-500">
+              Every dot sits at its true altitude in Earth radii: LEO ≈ 0.09 R⊕, GPS MEO ≈ 3.17 R⊕, GEO ≈ 5.62 R⊕.
+              Drag to rotate, scroll to zoom.
+            </div>
+          </div>
           <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-2 text-[10px]">
             {Object.entries(ORBIT_CLASSES).map(([k, v]) => <span key={k} className="flex items-center gap-1 rounded bg-slate-950/70 px-1.5 py-0.5 text-slate-300"><span className="h-2 w-2 rounded-full" style={{ background: v.color }} />{v.label}</span>)}
           </div>
