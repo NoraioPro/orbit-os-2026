@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LineChart } from '../components/LineChart';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
+import { NorwayLive } from './NorwayLive';
 import { evaluateDetector, gnssIntegrity, GNSS_SCENARIOS, parseGnssLogger, parseNmea, simulateGnss, type GnssEvaluation, type GnssIntegrity, type GnssMeasurement, type GnssScenario } from '../kernel';
 
 type Tab = 'overview' | 'monitor' | 'integrity' | 'lab' | 'evaluation' | 'evidence';
@@ -24,8 +25,8 @@ const CLASS_STYLE: Record<string, string> = {
 const sev = (s: string) => (s === 'alert' ? 'border-rose-400/40 bg-rose-500/10 text-rose-200' : s === 'watch' ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-sky-400/30 bg-sky-500/10 text-sky-200');
 
 export function GnssGuardian() {
-  const [measurements, setMeasurements] = useState<GnssMeasurement[]>(() => simulateGnss('open-sky').measurements);
-  const [source, setSource] = useState('Bundled sample · open-sky (synthetic)');
+  const [measurements, setMeasurements] = useState<GnssMeasurement[]>([]);
+  const [source, setSource] = useState('no recording loaded');
   const [status, setStatus] = useState<'sample' | 'live'>('sample');
   const [tab, setTab] = useState<Tab>('overview');
   const [scenario, setScenario] = useState<GnssScenario>(() => simulateGnss('low-signal'));
@@ -75,7 +76,7 @@ export function GnssGuardian() {
         <div className="flex items-center gap-2">
           <input ref={fileRef} type="file" accept=".csv,.txt,.log,.nmea,.nmea0183" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ''; }} />
           <button className="btn-primary !py-1.5 text-xs" onClick={() => fileRef.current?.click()}><Icon name="Database" />Load GnssLogger / NMEA</button>
-          <button className="btn-ghost !py-1.5 text-xs" onClick={() => { setMeasurements(simulateGnss('open-sky').measurements); setSource('Bundled sample · open-sky (synthetic)'); setStatus('sample'); setParseErr(null); }}>Reset sample</button>
+          <button className="btn-ghost !py-1.5 text-xs" onClick={() => { setMeasurements([]); setSource('no recording loaded'); setStatus('live'); setParseErr(null); }}>Clear recording</button>
           <Link to="/arctic" className="btn-ghost !py-1.5 text-xs"><Icon name="Globe2" />Arctic Intel Watch</Link>
         </div>
       </div>
