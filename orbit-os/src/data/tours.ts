@@ -6,7 +6,7 @@ const s = (selector: string, title: string, text: string): TourStep => ({ select
 export const TOURS: Record<string, TourStep[]> = {
   earth: [
     s('[data-tour="hero"]', 'Earth Intelligence — the lead module', 'This is the flagship: ORBIT Earth Pulse. It asks one question about any place on Earth — is it changing, and how sure are we?'),
-    s('[data-tour="live"]', 'Live eyes on Earth right now', 'A real full-disk image from NASA\u2019s EPIC camera on DSCOVR, and live weather from MET Norway. This is not a static demo — it\u2019s today.'),
+    s('[data-tour="live"]', 'Live eyes on Earth right now', 'Live weather from MET Norway for the module\u2019s own coordinates. This is not a static demo — it\u2019s today.'),
     s('[data-tour="honesty"]', 'Data honesty first', 'Every number is labeled live, snapshot or sample. What\u2019s not connected is said out loud — GISTEMP, SMAP and NISAR are marked "not connected", never faked.'),
     s('[data-tour="main"]', 'The trend detective in action', 'Pick a place and a climate variable. You\u2019ll see the slope, its statistical significance, and a 10-year forecast with a widening confidence band.'),
     s('[data-tour="sources"]', 'Provenance & challenges', 'Kernel patterns, the datasets behind each figure, and the five NASA Space Apps challenges this one module answers.'),
@@ -74,6 +74,6 @@ export const TOURS: Record<string, TourStep[]> = {
     s('[data-tour="hero"]', 'Earth Situation Room', 'A real-time picture of Earth for situational awareness — the live satellite population, active crises, and every free sensor feeding it.'),
     s('[data-tour="main"]', 'The satellite swarm', 'Every active satellite orbiting Earth, propagated in real time from CelesTrak TLEs. Filter by LEO, MEO, GEO or Starlink, and hover any point for its orbit.'),
     s('[data-tour="honesty"]', 'What is real vs approximate', 'Satellite positions are approximate Keplerian propagation. Events, fires and space weather are real harvests — and this is a situational view, not a warning system.'),
-    s('[data-tour="sources"]', 'Free data sources', 'Twelve keyless sources power it: CelesTrak, USGS, NASA EONET/FIRMS/POWER/EPIC/GIBS/DONKI, NOAA SWPC, MET Norway, Open-Meteo and ASF.'),
+    s('[data-tour="sources"]', 'Free data sources', 'Twelve keyless sources power it: CelesTrak, USGS, NASA EONET/FIRMS/POWER/GIBS/DONKI, NOAA SWPC, MET Norway, Open-Meteo and ASF.'),
   ],
 };

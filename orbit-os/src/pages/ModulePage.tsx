@@ -22,7 +22,6 @@ import { NarrationButton } from '../components/Narration';
 import { NorwayLive } from '../modules/NorwayLive';
 import { RealQuakeCase } from '../modules/RealQuakeCase';
 const StoryGlobe = lazy(() => import('../components/StoryGlobe').then((m) => ({ default: m.StoryGlobe })));
-import { TodayEarth } from '../components/TodayEarth';
 import { WeatherNow, WEATHER_SITES } from '../components/WeatherNow';
 import { STORIES } from '../data/stories';
 import { GUIDES } from '../data/guides';
@@ -165,8 +164,6 @@ export default function ModulePage() {
           <div className="mt-1">
             {WEATHER_SITES[m.id] ? (
               <WeatherNow {...WEATHER_SITES[m.id]} compact />
-            ) : m.id === 'earth' ? (
-              <TodayEarth />
             ) : (
               <p className="text-[10px] leading-snug text-slate-400">
                 No dedicated feed for this board. The panels below query their own source directly — every figure prints its provider and fetch time underneath.

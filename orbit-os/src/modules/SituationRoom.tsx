@@ -23,7 +23,6 @@ const FREE_SOURCES: { name: string; provider: string; note: string }[] = [
   { name: 'NASA POWER', provider: 'NASA LaRC', note: 'MERRA-2 climate (temperature, soil wetness)' },
   { name: 'MET Norway Yr', provider: 'MET Norway', note: '7-day weather forecast, keyless' },
   { name: 'Open-Meteo archive', provider: 'Open-Meteo', note: '26-year daily weather history' },
-  { name: 'NASA EPIC / DSCOVR', provider: 'NASA', note: 'daily full-disk Earth image' },
   { name: 'NASA GIBS', provider: 'NASA', note: 'satellite imagery tiles (MODIS/VIIRS true colour)' },
   { name: 'NASA DONKI', provider: 'NASA CCMC', note: 'coronal mass ejections' },
   { name: 'ASF SAR catalog', provider: 'NASA ASF DAAC', note: 'NISAR / Sentinel-1 metadata (downloads need Earthdata)' },

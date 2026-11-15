@@ -11,7 +11,6 @@ import {
 type PowerSnapshot = Awaited<ReturnType<typeof loadPowerSnapshot>>;
 
 interface MeteoOverlay { temp: SeriesPoint[]; precip: SeriesPoint[]; years: number[]; url: string }
-interface EpicImg { image: string; date: string; caption?: string }
 
 const pval = (p: number) => (!Number.isFinite(p) ? '–' : p < 0.001 ? p.toExponential(2) : p.toFixed(4));
 const perDecade = (slopePerYear: number) => signed(slopePerYear * 10, 2);
@@ -30,7 +29,7 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
  * Earth System Trend Detective — NASA Space Apps 2026 challenge #2.
  * Self-contained: real NASA POWER (bundled snapshot, 2001–2025) for the climate series,
  * a live Open-Meteo archive overlay (2000–2026) as an independent check, a live NASA POWER
- * collector harvest (5 yr daily→monthly) where available, and a live NASA EPIC thumbnail.
+ * collector harvest (5 yr daily→monthly) where available.
  * Every figure is labelled live/snapshot/sample; nothing is ever invented.
  */
 export function EarthTrendDetective() {
@@ -42,8 +41,6 @@ export function EarthTrendDetective() {
   const [harvest, setHarvest] = useState<PowerHarvest | null>(null);
   const [meteo, setMeteo] = useState<MeteoOverlay | null>(null);
   const [meteoErr, setMeteoErr] = useState<string | null>(null);
-  const [epic, setEpic] = useState<EpicImg | null>(null);
-  const [epicErr, setEpicErr] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -90,15 +87,6 @@ export function EarthTrendDetective() {
       .finally(() => { clearTimeout(timer); });
     return () => { alive = false; clearTimeout(timer); };
   }, [placeId]);
-
-  useEffect(() => {
-    let alive = true;
-    fetch('https://epic.gsfc.nasa.gov/api/natural')
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((d: EpicImg[]) => { if (alive && d.length) setEpic(d[0]); })
-      .catch((e) => { if (alive) setEpicErr(String(e?.message || e)); });
-    return () => { alive = false; };
-  }, []);
 
   const place = PLACES.find((p) => p.id === placeId) ?? PLACES[0];
   const vmeta = POWER_VARS[variable];
@@ -163,11 +151,6 @@ export function EarthTrendDetective() {
     return `${y}-${String(Math.min(12, m)).padStart(2, '0')}`;
   };
 
-  const epicUrl = useMemo(() => {
-    if (!epic) return null;
-    const [y, m, d] = (epic.date.split(' ')[0] ?? '').split('-');
-    return { thumb: `https://epic.gsfc.nasa.gov/archive/natural/${y}/${m}/${d}/thumbs/${epic.image}.jpg`, full: `https://epic.gsfc.nasa.gov/archive/natural/${y}/${m}/${d}/png/${epic.image}.png`, date: epic.date };
-  }, [epic]);
 
   const metrics: { label: string; value: string; hint?: string }[] = tr
     ? [
@@ -293,21 +276,6 @@ export function EarthTrendDetective() {
 
         {/* RIGHT — live thumbnail + fusion + honesty */}
         <div className="space-y-3">
-          <Glass className="overflow-hidden p-0">
-            <div className="flex items-center justify-between px-3 py-2 text-xs">
-              <span className="font-semibold text-white">Today's Earth · NASA EPIC / DSCOVR</span>
-              <StatusBadge status={epic ? 'live' : 'not connected'} note={epic ? epic.date : 'unavailable'} />
-            </div>
-            {epic && epicUrl ? (
-              <>
-                <a href={epicUrl.full} target="_blank" rel="noreferrer" title="Open full-resolution image"><img src={epicUrl.thumb} alt="Full-disk Earth from DSCOVR EPIC" className="h-40 w-full object-cover" loading="lazy" /></a>
-                <div className="px-3 py-2 text-[11px] text-slate-400">{epic?.caption ?? 'NASA EPIC camera onboard NOAA DSCOVR'} · captured {epic?.date ?? 'today'}</div>
-              </>
-            ) : (
-              <div className="grid h-32 place-items-center px-3 text-[11px] text-slate-500">{epicErr ? `EPIC image unavailable (${epicErr}).` : 'Loading today\u2019s full-disk Earth…'}</div>
-            )}
-          </Glass>
-
           {fuseRes && (
             <Glass className="p-3">
               <div className="h-title mb-2">Two-source agreement</div>
@@ -334,7 +302,7 @@ export function EarthTrendDetective() {
 
           <Glass className="p-3 text-[11px] leading-relaxed text-slate-400">
             <div className="mb-1 flex items-center gap-2 text-xs font-semibold text-white"><Icon name="ShieldCheck" className="h-4 w-4 text-sky-300" />Data honesty</div>
-            NASA POWER trend &amp; forecast use the bundled 2001–2025 snapshot (real MERRA-2/CERES values, retrieved {power?.retrieved.slice(0, 10) ?? '—'}). The Open-Meteo overlay and the EPIC image are fetched live; if either fails, the figure is labelled unavailable rather than replaced. The 10-year forecast is a statistical extrapolation, not a physical model, and is never an official warning.
+            NASA POWER trend &amp; forecast use the bundled 2001–2025 snapshot (real MERRA-2/CERES values, retrieved {power?.retrieved.slice(0, 10) ?? '—'}). The Open-Meteo overlay is fetched live; if it fails, the figure is labelled unavailable rather than replaced. The 10-year forecast is a statistical extrapolation, not a physical model, and is never an official warning.
           </Glass>
         </div>
       </div>
