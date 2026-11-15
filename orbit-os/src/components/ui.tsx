@@ -31,17 +31,46 @@ export function Chip({ children, className = '' }: { children: ReactNode; classN
   return <span className={`inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-slate-300 ${className}`}>{children}</span>;
 }
 
-export function PageHeader({ title, subtitle, right, icon }: { title: ReactNode; subtitle?: ReactNode; right?: ReactNode; icon?: string }) {
+/**
+ * Compact page header: one card, one row on desktop. The old version spent ~90 px
+ * of height on a 28 px title and a two-line subtitle; this keeps the same content
+ * at roughly half the height and gives the actions room.
+ */
+export function PageHeader({ title, subtitle, right, icon, meta }: { title: ReactNode; subtitle?: ReactNode; right?: ReactNode; icon?: string; meta?: ReactNode }) {
   return (
-    <div className="mb-4 flex items-start justify-between gap-4">
-      <div className="flex items-start gap-3">
-        {icon && <div className="mt-1 rounded-xl border border-sky-300/20 bg-sky-500/10 p-2"><Icon name={icon} className="h-6 w-6 text-sky-300" /></div>}
-        <div>
-          <h1 className="text-[28px] font-bold leading-tight tracking-tight text-white">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm text-slate-300">{subtitle}</p>}
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+      <div className="flex min-w-0 items-center gap-2.5">
+        {icon && (
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-sky-300/20 bg-sky-500/10">
+            <Icon name={icon} className="h-4 w-4 text-sky-300" />
+          </div>
+        )}
+        <div className="min-w-0">
+          <h1 className="truncate text-[17px] font-semibold leading-tight tracking-tight text-white">{title}</h1>
+          {subtitle && <p className="mt-0.5 line-clamp-2 max-w-3xl text-[11px] leading-snug text-slate-400">{subtitle}</p>}
         </div>
       </div>
-      {right}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {meta}
+        {right}
+      </div>
+    </div>
+  );
+}
+
+/** Small labelled figure used in headers and strips: value first, source under it. */
+export function StatCard({ label, value, unit, note, tone = 'text-white', icon }: { label: string; value: ReactNode; unit?: string; note?: ReactNode; tone?: string; icon?: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1.5">
+      <div className="flex items-center gap-1 text-[8px] uppercase tracking-[0.09em] text-slate-500">
+        {icon && <Icon name={icon} className="h-2.5 w-2.5" />}
+        {label}
+      </div>
+      <div className={`text-[15px] font-semibold leading-tight ${tone}`}>
+        {value}
+        {unit && <span className="ml-0.5 text-[9px] font-normal text-slate-400">{unit}</span>}
+      </div>
+      {note && <div className="mt-0.5 text-[8px] leading-snug text-slate-500">{note}</div>}
     </div>
   );
 }

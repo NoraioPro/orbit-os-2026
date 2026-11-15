@@ -105,7 +105,7 @@ export default function CommandCenter() {
       {assets.hero && <img src={assets.hero} alt="" aria-hidden className="pointer-events-none absolute inset-0 -z-0 h-full w-full rounded-2xl object-cover opacity-[.12] mix-blend-screen" />}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[30px] font-bold tracking-tight text-white">ORBIT <span className="font-normal">Command Center</span></h1>
+          <h1 className="text-[20px] font-semibold tracking-tight text-white">ORBIT <span className="font-normal text-slate-300">Command Center</span></h1>
           <p className="text-sm text-slate-300">From Space Data to Real-World Decisions · <span className="text-sky-300">One Change Engine, Many Worlds</span></p>
           {db && <p className="mt-0.5 text-[11px] text-slate-400">Events: <span className={db.status === 'live' ? 'text-emerald-300' : 'text-sky-300'}>{db.label}</span> · {db.events.length.toLocaleString('en-US')} records</p>}
         </div>

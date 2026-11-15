@@ -24,7 +24,7 @@ interface YrRes { properties: { meta: { updated_at: string }; timeseries: YrPoin
 const symbolOf = (t: YrPoint) => t.data.next_1_hours?.summary?.symbol_code ?? t.data.next_6_hours?.summary?.symbol_code ?? '';
 
 /** Live weather from MET Norway Yr (locationforecast/2.0, keyless, CORS-open). */
-export function WeatherNow({ lat, lon, label }: { lat: number; lon: number; label: string }) {
+export function WeatherNow({ lat, lon, label, compact = false }: { lat: number; lon: number; label: string; compact?: boolean }) {
   const [d, setD] = useState<YrRes | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -37,12 +37,40 @@ export function WeatherNow({ lat, lon, label }: { lat: number; lon: number; labe
     return () => { alive = false; };
   }, [lat, lon]);
 
-  if (err) return <Glass className="p-3 text-xs text-slate-500">Live weather unavailable ({err}).</Glass>;
-  if (!d) return <Glass className="p-3 text-xs text-slate-500">Loading live weather…</Glass>;
+  if (err) return <p className="text-[10px] text-slate-500">Live weather unavailable ({err}).</p>;
+  if (!d) return <p className="text-[10px] text-slate-500">Loading live weather…</p>;
 
   const ts = d.properties.timeseries;
   const cur = ts[0].data.instant.details;
   const next = ts.slice(1, 13);
+
+  if (compact) {
+    return (
+      <div>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="text-[15px] font-semibold text-white">{cur.air_temperature.toFixed(1)}°C</span>
+          <span className="text-[9px] text-slate-400">
+            {label} · wind {cur.wind_speed.toFixed(1)} m/s · {cur.relative_humidity.toFixed(0)}% RH
+          </span>
+        </div>
+        <div className="mt-1 flex items-end gap-[3px]">
+          {next.slice(0, 10).map((t, i) => {
+            const v = t.data.instant.details.air_temperature;
+            const h = Math.max(4, Math.min(22, ((v + 20) / 40) * 22));
+            return (
+              <span key={i} className="flex flex-col items-center gap-[1px]" title={`${t.time.slice(11, 16)} · ${v.toFixed(1)}°C`}>
+                <span className="w-[10px] rounded-sm bg-sky-400/70" style={{ height: `${h}px` }} />
+                <span className="text-[7px] text-slate-500">{t.time.slice(11, 13)}</span>
+              </span>
+            );
+          })}
+        </div>
+        <div className="mt-1 text-[8px] text-slate-500">
+          MET Norway Locationforecast 2.0 · updated {d.properties.meta.updated_at.slice(0, 16).replace('T', ' ')} UTC
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Glass className="p-3">
