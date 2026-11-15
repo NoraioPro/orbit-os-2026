@@ -2,12 +2,21 @@ import { useEffect, useState } from 'react';
 import { Glass, StatusBadge } from './ui';
 
 interface NisarScene {
-  sceneName: string;
+  /** ASF returns granuleName for NISAR; older endpoints used sceneName. Both are optional. */
+  sceneName?: string;
+  granuleName?: string;
   startTime?: string;
   absoluteOrbit?: number;
   flightDirection?: string;
-  polarization?: string[];
+  /** ASF sometimes returns a string ("HH+HV") and sometimes an array. */
+  polarization?: string[] | string;
   browse?: string[];
+}
+
+/** ASF field names differ per platform; never assume a single one exists. */
+function sceneLabel(s: NisarScene, i: number) {
+  const raw = s.sceneName ?? s.granuleName ?? `NISAR scene ${i + 1}`;
+  return String(raw).replace(/^NISAR_L1_PR_RSLC_/, 'NISAR ');
 }
 
 /**
@@ -25,7 +34,7 @@ export function RealNisar() {
     const timer = setTimeout(() => ctrl.abort(), 15000);
     fetch('/api/connector/asf/services/search/param?platform=NISAR&output=json&maxResults=6', { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((d: NisarScene[][]) => { if (alive) setScenes(d?.[0] ?? []); })
+      .then((d: NisarScene[][]) => { if (alive) setScenes((d?.[0] ?? []).filter((x) => x && (x.granuleName || x.sceneName))); })
       .catch((e) => { if (alive) setErr(String(e?.message || e)); })
       .finally(() => clearTimeout(timer));
     return () => { alive = false; ctrl.abort(); clearTimeout(timer); };
@@ -47,8 +56,8 @@ export function RealNisar() {
 
       {scenes && scenes.length > 0 ? (
         <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {scenes.map((s) => (
-            <div key={s.sceneName} className="rounded-lg border border-white/10 bg-white/5 p-2 text-[10px]">
+          {scenes.map((s, i) => (
+            <div key={s.granuleName ?? s.sceneName ?? i} className="rounded-lg border border-white/10 bg-white/5 p-2 text-[10px]">
               {s.browse?.[0] ? (
                 <img
                   src={s.browse[0]}
@@ -58,9 +67,9 @@ export function RealNisar() {
                   onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                 />
               ) : null}
-              <div className="truncate font-semibold text-slate-200" title={s.sceneName}>{s.sceneName.replace(/^NISAR_L1_PR_RSLC_/, 'NISAR ')}</div>
+              <div className="truncate font-semibold text-slate-200" title={s.granuleName ?? s.sceneName}>{sceneLabel(s, i)}</div>
               <div className="text-slate-500">
-                orbit {s.absoluteOrbit ?? '—'} · {s.flightDirection ?? '—'} · {s.polarization?.join('+') ?? '—'}
+                orbit {s.absoluteOrbit ?? '—'} · {s.flightDirection ?? '—'} · {Array.isArray(s.polarization) ? s.polarization.join('+') : s.polarization ?? '—'}
               </div>
             </div>
           ))}

@@ -7,6 +7,7 @@ import { EvidenceDrawer } from './EvidenceDrawer';
 import { DataFooter } from './DataFooter';
 import { Logo3D } from './Logo3D';
 import { CommandPalette } from './CommandPalette';
+import { ErrorBoundary } from './ErrorBoundary';
 import { Icon } from './ui';
 
 export function Logo({ compact = false }: { compact?: boolean }) {
@@ -329,7 +330,11 @@ export function Layout() {
         )}
 
         <main className="glass relative min-w-0 flex-1 overflow-hidden">
-          <div key={loc.pathname} className="page-in scroll-thin h-full overflow-y-auto p-5"><Outlet /></div>
+          <div key={loc.pathname} className="page-in scroll-thin h-full overflow-y-auto p-5">
+            <ErrorBoundary label={`This page (${loc.pathname})`}>
+              <Outlet />
+            </ErrorBoundary>
+          </div>
         </main>
       </div>
       <DataFooter />

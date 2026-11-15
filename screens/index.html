@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ORBIT OS — screen map</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #04070f; color: #e6eefb; font: 14px/1.5 "Inter", "Segoe UI", system-ui, sans-serif; }
+  a { color: #7dd3fc; }
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: #94a3b8; margin: 0 0 18px; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 28px; }
+  nav a { font-size: 11px; padding: 4px 8px; border: 1px solid rgba(148,163,184,.25); border-radius: 999px; text-decoration: none; color: #cbd5e1; }
+  nav a:hover { border-color: #38bdf8; color: #e0f2fe; }
+  section { margin: 0 0 44px; scroll-margin-top: 16px; }
+  .uc { border-left: 2px solid rgba(56,189,248,.45); padding-left: 12px; margin-bottom: 14px; }
+  .tag { display: inline-block; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #38bdf8; }
+  h2 { font-size: 19px; margin: 2px 0 4px; }
+  .summary { color: #cbd5e1; margin: 0; max-width: 100ch; }
+  .meta { color: #64748b; font-size: 11px; margin: 4px 0 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(430px, 1fr)); gap: 14px; }
+  figure { margin: 0; background: #0a1120; border: 1px solid rgba(148,163,184,.18); border-radius: 12px; overflow: hidden; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+  .route { color: #7dd3fc; font-family: ui-monospace, monospace; font-size: 11px; }
+  .role { color: #94a3b8; font-size: 11px; }
+  footer { color: #64748b; font-size: 11px; border-top: 1px solid rgba(148,163,184,.15); padding-top: 12px; }
+</style></head>
+<body><div class="wrap">
+  <h1>ORBIT OS — screen map</h1>
+  <p class="sub">43 screens captured from the running app · 15/11/2026, 09:57:30 · 1440 px · organised by problem use case</p>
+  <nav><a href="#platform-start">Start here · Command Center</a><a href="#platform-unified">One Earth · Unified Geospatial</a><a href="#platform-evidence">Earthdata → Evidence · access and verification</a><a href="#platform-data">Data layer · hub, agents, exports</a><a href="#platform-program">Program · missions, solutions, SDGs, reports</a><a href="#platform-beyond">Beyond the 14 · GNSS integrity &amp; situation room</a><a href="#platform-twin">Digital twin · Arctic Watch</a><a href="#challenge-01">C1 · Retired Hardware Story</a><a href="#challenge-02">C2 · Earth System Trend Detective</a><a href="#challenge-03">C3 · Mars Outpost Trainer</a><a href="#challenge-04">C4 · Astronaut Health Monitor</a><a href="#challenge-05">C5 · Radar Surface Change</a><a href="#challenge-06">C6 · Field Shift Rotation Planner</a><a href="#challenge-07">C7 · Microgravity Fire Dashboard (ISS)</a><a href="#challenge-08">C8 · Fire Calendar Harmonizer</a><a href="#challenge-09">C9 · Earth Analog Ranker</a><a href="#challenge-10">C10 · Martian Route Map</a><a href="#challenge-11">C11 · Lunar Site Navigator</a><a href="#challenge-12">C12 · Sky Change Viewer</a><a href="#challenge-13">C13 · Mission Design Game</a><a href="#challenge-14">C14 · Earth Sound Jukebox</a></nav>
+  
+    <section id="platform-start">
+      <header class="uc">
+        <div class="tag">platform</div>
+        <h2>Start here · Command Center</h2>
+        <p class="summary">The one change engine: live counters, quick investigation, the four priority modules and the data-coverage footer.</p>
+        
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/command-center.jpg" target="_blank" rel="noreferrer"><img src="pages/command-center.jpg" alt="Command Center" loading="lazy" /></a>
+          <figcaption>
+            <b>Command Center</b>
+            <span class="route">#/</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="platform-unified">
+      <header class="uc">
+        <div class="tag">platform</div>
+        <h2>One Earth · Unified Geospatial</h2>
+        <p class="summary">Agriculture and ocean indicators side by side on one globe, from one NASA Earthdata path — with not-connected tiles instead of invented ones.</p>
+        
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/unified-earth.jpg" target="_blank" rel="noreferrer"><img src="pages/unified-earth.jpg" alt="Unified Geospatial (Agri × Ocean)" loading="lazy" /></a>
+          <figcaption>
+            <b>Unified Geospatial (Agri × Ocean)</b>
+            <span class="route">#/unified</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/explore.jpg" target="_blank" rel="noreferrer"><img src="pages/explore.jpg" alt="Explore" loading="lazy" /></a>
+          <figcaption>
+            <b>Explore</b>
+            <span class="route">#/explore</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="platform-evidence">
+      <header class="uc">
+        <div class="tag">platform</div>
+        <h2>Earthdata → Evidence · access and verification</h2>
+        <p class="summary">The authentication path, the readiness checklist driven by real probes, and the catalog the harvest actually returned.</p>
+        
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/earthdata-access.jpg" target="_blank" rel="noreferrer"><img src="pages/earthdata-access.jpg" alt="Earthdata access path" loading="lazy" /></a>
+          <figcaption>
+            <b>Earthdata access path</b>
+            <span class="route">#/earthdata</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/earthdata-command.jpg" target="_blank" rel="noreferrer"><img src="pages/earthdata-command.jpg" alt="NASA Earthdata Command" loading="lazy" /></a>
+          <figcaption>
+            <b>NASA Earthdata Command</b>
+            <span class="route">#/command</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/verification.jpg" target="_blank" rel="noreferrer"><img src="pages/verification.jpg" alt="Data access verification" loading="lazy" /></a>
+          <figcaption>
+            <b>Data access verification</b>
+            <span class="route">#/verify</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="platform-data">
+      <header class="uc">
+        <div class="tag">platform</div>
+        <h2>Data layer · hub, agents, exports</h2>
+        <p class="summary">Every dataset with its status and coverage, the seven deterministic agents, the domain files, and the settings that switch live/snapshot.</p>
+        
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/data-hub.jpg" target="_blank" rel="noreferrer"><img src="pages/data-hub.jpg" alt="Data Hub" loading="lazy" /></a>
+          <figcaption>
+            <b>Data Hub</b>
+            <span class="route">#/data</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/ai-agents.jpg" target="_blank" rel="noreferrer"><img src="pages/ai-agents.jpg" alt="AI Agents" loading="lazy" /></a>
+          <figcaption>
+            <b>AI Agents</b>
+            <span class="route">#/agents</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/settings.jpg" target="_blank" rel="noreferrer"><img src="pages/settings.jpg" alt="Settings" loading="lazy" /></a>
+          <figcaption>
+            <b>Settings</b>
+            <span class="route">#/settings</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="platform-program">
+      <header class="uc">
+        <div class="tag">platform</div>
+        <h2>Program · missions, solutions, SDGs, reports</h2>
+        <p class="summary">The challenge catalogue, the 14 prototypes, the UN SDG mapping and the generated evidence reports.</p>
+        
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/missions.jpg" target="_blank" rel="noreferrer"><img src="pages/missions.jpg" alt="Missions" loading="lazy" /></a>
+          <figcaption>
+            <b>Missions</b>
+            <span class="route">#/missions</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/solutions.jpg" target="_blank" rel="noreferrer"><img src="pages/solutions.jpg" alt="Solutions (14 prototypes)" loading="lazy" /></a>
+          <figcaption>
+            <b>Solutions (14 prototypes)</b>
+            <span class="route">#/solutions</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/sdgs.jpg" target="_blank" rel="noreferrer"><img src="pages/sdgs.jpg" alt="SDG map" loading="lazy" /></a>
+          <figcaption>
+            <b>SDG map</b>
+            <span class="route">#/sdgs</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/reports.jpg" target="_blank" rel="noreferrer"><img src="pages/reports.jpg" alt="Reports" loading="lazy" /></a>
+          <figcaption>
+            <b>Reports</b>
+            <span class="route">#/reports</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="platform-beyond">
+      <header class="uc">
+        <div class="tag">platform</div>
+        <h2>Beyond the 14 · GNSS integrity &amp; situation room</h2>
+        <p class="summary">Two ORBIT surfaces that are not tied to a single challenge: GNSS integrity assessment (real GnssLogger/NMEA parsing) and a live Earth situation room.</p>
+        
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/module-gnss.jpg" target="_blank" rel="noreferrer"><img src="pages/module-gnss.jpg" alt="GNSS Guardian" loading="lazy" /></a>
+          <figcaption>
+            <b>GNSS Guardian</b>
+            <span class="route">#/module/gnss</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-defense.jpg" target="_blank" rel="noreferrer"><img src="pages/module-defense.jpg" alt="Defense &amp; Crisis" loading="lazy" /></a>
+          <figcaption>
+            <b>Defense &amp; Crisis</b>
+            <span class="route">#/module/defense</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="platform-twin">
+      <header class="uc">
+        <div class="tag">platform</div>
+        <h2>Digital twin · Arctic Watch</h2>
+        <p class="summary">The 3D Earth twin and the embedded Arctic Watch sibling app.</p>
+        
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/digital-twin.jpg" target="_blank" rel="noreferrer"><img src="pages/digital-twin.jpg" alt="Digital Twin" loading="lazy" /></a>
+          <figcaption>
+            <b>Digital Twin</b>
+            <span class="route">#/twin</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/arctic-watch.jpg" target="_blank" rel="noreferrer"><img src="pages/arctic-watch.jpg" alt="Arctic Watch (embedded)" loading="lazy" /></a>
+          <figcaption>
+            <b>Arctic Watch (embedded)</b>
+            <span class="route">#/arctic</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/analysis.jpg" target="_blank" rel="noreferrer"><img src="pages/analysis.jpg" alt="Analysis" loading="lazy" /></a>
+          <figcaption>
+            <b>Analysis</b>
+            <span class="route">#/analysis</span>
+            <span class="role">platform surface</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-01">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 1 · Retired Hardware Story</h2>
+        <p class="summary">Tell the stories of NASA hardware left on the Moon and Mars — and the science it made possible.</p>
+        <p class="meta">Beginner/Youth · Astrophysics, Planets &amp; Moons, Space Exploration</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-01.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-01.jpg" alt="Challenge 1 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 1 prototype</b>
+            <span class="route">#/solution/1</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-academy.jpg" target="_blank" rel="noreferrer"><img src="pages/module-academy.jpg" alt="Mission Academy" loading="lazy" /></a>
+          <figcaption>
+            <b>Mission Academy</b>
+            <span class="route">#/module/academy</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-02">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 2 · Earth System Trend Detective</h2>
+        <p class="summary">Find NASA variables that are changing, visualize them, and test whether the change is statistically significant.</p>
+        <p class="meta">Advanced · Earth Science, Software</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-02.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-02.jpg" alt="Challenge 2 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 2 prototype</b>
+            <span class="route">#/solution/2</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-earth.jpg" target="_blank" rel="noreferrer"><img src="pages/module-earth.jpg" alt="Earth Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Earth Intelligence</b>
+            <span class="route">#/module/earth</span>
+            <span class="role">implementing module · P0</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-disaster.jpg" target="_blank" rel="noreferrer"><img src="pages/module-disaster.jpg" alt="Disaster Watch" loading="lazy" /></a>
+          <figcaption>
+            <b>Disaster Watch</b>
+            <span class="route">#/module/disaster</span>
+            <span class="role">implementing module · P1</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-agri.jpg" target="_blank" rel="noreferrer"><img src="pages/module-agri.jpg" alt="Agri Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Agri Intelligence</b>
+            <span class="route">#/module/agri</span>
+            <span class="role">implementing module · P1</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-ocean.jpg" target="_blank" rel="noreferrer"><img src="pages/module-ocean.jpg" alt="Ocean Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Ocean Intelligence</b>
+            <span class="route">#/module/ocean</span>
+            <span class="role">implementing module · P1</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-03">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 3 · Mars Outpost Trainer</h2>
+        <p class="summary">A game where students run a lunar or Martian outpost, balancing life support, power and food.</p>
+        <p class="meta">Beginner/Youth · Games, Space Exploration</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-03.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-03.jpg" alt="Challenge 3 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 3 prototype</b>
+            <span class="route">#/solution/3</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-autonomy.jpg" target="_blank" rel="noreferrer"><img src="pages/module-autonomy.jpg" alt="Autonomy Lab" loading="lazy" /></a>
+          <figcaption>
+            <b>Autonomy Lab</b>
+            <span class="route">#/module/autonomy</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-academy.jpg" target="_blank" rel="noreferrer"><img src="pages/module-academy.jpg" alt="Mission Academy" loading="lazy" /></a>
+          <figcaption>
+            <b>Mission Academy</b>
+            <span class="route">#/module/academy</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-04">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 4 · Astronaut Health Monitor</h2>
+        <p class="summary">Health monitoring software that gathers indicators so astronauts can assess their own status.</p>
+        <p class="meta">Intermediate · Human Exploration, Software</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-04.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-04.jpg" alt="Challenge 4 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 4 prototype</b>
+            <span class="route">#/solution/4</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-human.jpg" target="_blank" rel="noreferrer"><img src="pages/module-human.jpg" alt="Human Space Lab" loading="lazy" /></a>
+          <figcaption>
+            <b>Human Space Lab</b>
+            <span class="route">#/module/human</span>
+            <span class="role">implementing module · P3</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-05">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 5 · Radar Surface Change</h2>
+        <p class="summary">Use NISAR radar to track and visualize surface change — the &quot;Dancing with the SARs&quot; challenge.</p>
+        <p class="meta">Advanced · Earth Science, Software</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-05.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-05.jpg" alt="Challenge 5 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 5 prototype</b>
+            <span class="route">#/solution/5</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-earth.jpg" target="_blank" rel="noreferrer"><img src="pages/module-earth.jpg" alt="Earth Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Earth Intelligence</b>
+            <span class="route">#/module/earth</span>
+            <span class="role">implementing module · P0</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-infrastructure.jpg" target="_blank" rel="noreferrer"><img src="pages/module-infrastructure.jpg" alt="Infrastructure" loading="lazy" /></a>
+          <figcaption>
+            <b>Infrastructure</b>
+            <span class="route">#/module/infrastructure</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-sar.jpg" target="_blank" rel="noreferrer"><img src="pages/module-sar.jpg" alt="SAR Earth Observatory" loading="lazy" /></a>
+          <figcaption>
+            <b>SAR Earth Observatory</b>
+            <span class="route">#/module/sar</span>
+            <span class="role">implementing module · P0</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-06">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 6 · Field Shift Rotation Planner</h2>
+        <p class="summary">Help farmers explore crop rotations suited to soil health and a changing climate.</p>
+        <p class="meta">Intermediate · Earth Science, Agriculture</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-06.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-06.jpg" alt="Challenge 6 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 6 prototype</b>
+            <span class="route">#/solution/6</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-earth.jpg" target="_blank" rel="noreferrer"><img src="pages/module-earth.jpg" alt="Earth Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Earth Intelligence</b>
+            <span class="route">#/module/earth</span>
+            <span class="role">implementing module · P0</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-agri.jpg" target="_blank" rel="noreferrer"><img src="pages/module-agri.jpg" alt="Agri Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Agri Intelligence</b>
+            <span class="route">#/module/agri</span>
+            <span class="role">implementing module · P1</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-07">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 7 · Microgravity Fire Dashboard (ISS)</h2>
+        <p class="summary">An AI dashboard that summarizes microgravity combustion experiments for fire safety.</p>
+        <p class="meta">Intermediate · Living in Space, AI</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-07.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-07.jpg" alt="Challenge 7 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 7 prototype</b>
+            <span class="route">#/solution/7</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-human.jpg" target="_blank" rel="noreferrer"><img src="pages/module-human.jpg" alt="Human Space Lab" loading="lazy" /></a>
+          <figcaption>
+            <b>Human Space Lab</b>
+            <span class="route">#/module/human</span>
+            <span class="role">implementing module · P3</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-ignis.jpg" target="_blank" rel="noreferrer"><img src="pages/module-ignis.jpg" alt="IGNIS · Flame in Freefall" loading="lazy" /></a>
+          <figcaption>
+            <b>IGNIS · Flame in Freefall</b>
+            <span class="route">#/module/ignis</span>
+            <span class="role">implementing module · P1</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-08">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 8 · Fire Calendar Harmonizer</h2>
+        <p class="summary">Harmonize MODIS and VIIRS active-fire records into one historical map.</p>
+        <p class="meta">Advanced · Earth Science</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-08.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-08.jpg" alt="Challenge 8 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 8 prototype</b>
+            <span class="route">#/solution/8</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-earth.jpg" target="_blank" rel="noreferrer"><img src="pages/module-earth.jpg" alt="Earth Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Earth Intelligence</b>
+            <span class="route">#/module/earth</span>
+            <span class="role">implementing module · P0</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-disaster.jpg" target="_blank" rel="noreferrer"><img src="pages/module-disaster.jpg" alt="Disaster Watch" loading="lazy" /></a>
+          <figcaption>
+            <b>Disaster Watch</b>
+            <span class="route">#/module/disaster</span>
+            <span class="role">implementing module · P1</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-09">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 9 · Earth Analog Ranker</h2>
+        <p class="summary">Find Earth sites that resemble the Moon and Mars for mission preparation.</p>
+        <p class="meta">Beginner/Youth · Planets &amp; Moons</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-09.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-09.jpg" alt="Challenge 9 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 9 prototype</b>
+            <span class="route">#/solution/9</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-explorer.jpg" target="_blank" rel="noreferrer"><img src="pages/module-explorer.jpg" alt="Space Explorer" loading="lazy" /></a>
+          <figcaption>
+            <b>Space Explorer</b>
+            <span class="route">#/module/explorer</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-10">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 10 · Martian Route Map</h2>
+        <p class="summary">An interactive map for surface routes on Mars.</p>
+        <p class="meta">Intermediate · Space Exploration</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-10.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-10.jpg" alt="Challenge 10 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 10 prototype</b>
+            <span class="route">#/solution/10</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-autonomy.jpg" target="_blank" rel="noreferrer"><img src="pages/module-autonomy.jpg" alt="Autonomy Lab" loading="lazy" /></a>
+          <figcaption>
+            <b>Autonomy Lab</b>
+            <span class="route">#/module/autonomy</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-11">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 11 · Lunar Site Navigator</h2>
+        <p class="summary">Compare lunar south-pole landing sites by Sun and Earth visibility.</p>
+        <p class="meta">Advanced · Space Exploration</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-11.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-11.jpg" alt="Challenge 11 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 11 prototype</b>
+            <span class="route">#/solution/11</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-explorer.jpg" target="_blank" rel="noreferrer"><img src="pages/module-explorer.jpg" alt="Space Explorer" loading="lazy" /></a>
+          <figcaption>
+            <b>Space Explorer</b>
+            <span class="route">#/module/explorer</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-12">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 12 · Sky Change Viewer</h2>
+        <p class="summary">See changes in the infrared sky with SPHEREx data.</p>
+        <p class="meta">Intermediate · Astrophysics</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-12.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-12.jpg" alt="Challenge 12 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 12 prototype</b>
+            <span class="route">#/solution/12</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-explorer.jpg" target="_blank" rel="noreferrer"><img src="pages/module-explorer.jpg" alt="Space Explorer" loading="lazy" /></a>
+          <figcaption>
+            <b>Space Explorer</b>
+            <span class="route">#/module/explorer</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-13">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 13 · Mission Design Game</h2>
+        <p class="summary">A game for designing a complete space mission.</p>
+        <p class="meta">Beginner/Youth · Games</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-13.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-13.jpg" alt="Challenge 13 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 13 prototype</b>
+            <span class="route">#/solution/13</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-academy.jpg" target="_blank" rel="noreferrer"><img src="pages/module-academy.jpg" alt="Mission Academy" loading="lazy" /></a>
+          <figcaption>
+            <b>Mission Academy</b>
+            <span class="route">#/module/academy</span>
+            <span class="role">implementing module · P2</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="challenge-14">
+      <header class="uc">
+        <div class="tag">challenge</div>
+        <h2>Challenge 14 · Earth Sound Jukebox</h2>
+        <p class="summary">Turn Earth observations into sound.</p>
+        <p class="meta">Beginner/Youth · Earth Science</p>
+      </header>
+      <div class="grid">
+        
+        <figure>
+          <a href="pages/solution-14.jpg" target="_blank" rel="noreferrer"><img src="pages/solution-14.jpg" alt="Challenge 14 prototype" loading="lazy" /></a>
+          <figcaption>
+            <b>Challenge 14 prototype</b>
+            <span class="route">#/solution/14</span>
+            <span class="role">challenge prototype (sample data)</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-earth.jpg" target="_blank" rel="noreferrer"><img src="pages/module-earth.jpg" alt="Earth Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Earth Intelligence</b>
+            <span class="route">#/module/earth</span>
+            <span class="role">implementing module · P0</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="pages/module-ocean.jpg" target="_blank" rel="noreferrer"><img src="pages/module-ocean.jpg" alt="Ocean Intelligence" loading="lazy" /></a>
+          <figcaption>
+            <b>Ocean Intelligence</b>
+            <span class="route">#/module/ocean</span>
+            <span class="role">implementing module · P1</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  <footer>Canonical screenshots live in <code>pages/</code>. Rebuild with <code>node scripts/capture-screens.mjs &amp;&amp; node scripts/build-screens-index.mjs</code>. Unfetched products are rendered as “not connected” in the UI rather than fabricated.</footer>
+</div></body></html>

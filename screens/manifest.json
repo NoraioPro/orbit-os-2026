@@ -1,0 +1,1003 @@
+{
+  "generated_at": "2026-11-15T09:06:22.135Z",
+  "app": "ORBIT OS · Space Intelligence Platform",
+  "base_url": "http://localhost:5173/",
+  "capture": {
+    "width": 1440,
+    "viewport_height": 2200,
+    "format": "jpeg q80",
+    "count": 43
+  },
+  "screens": [
+    {
+      "slug": "command-center",
+      "title": "Command Center",
+      "route": "/",
+      "file": "pages/command-center.jpg",
+      "bytes": 289176,
+      "captured_at": "2026-11-15T08:57:30.295Z"
+    },
+    {
+      "slug": "unified-earth",
+      "title": "Unified Geospatial (Agri × Ocean)",
+      "route": "/unified",
+      "file": "pages/unified-earth.jpg",
+      "bytes": 251136,
+      "captured_at": "2026-11-15T08:57:38.025Z"
+    },
+    {
+      "slug": "explore",
+      "title": "Explore",
+      "route": "/explore",
+      "file": "pages/explore.jpg",
+      "bytes": 431043,
+      "captured_at": "2026-11-15T08:57:45.790Z"
+    },
+    {
+      "slug": "analysis",
+      "title": "Analysis",
+      "route": "/analysis",
+      "file": "pages/analysis.jpg",
+      "bytes": 124267,
+      "captured_at": "2026-11-15T08:57:53.142Z"
+    },
+    {
+      "slug": "digital-twin",
+      "title": "Digital Twin",
+      "route": "/twin",
+      "file": "pages/digital-twin.jpg",
+      "bytes": 172881,
+      "captured_at": "2026-11-15T08:58:00.522Z"
+    },
+    {
+      "slug": "data-hub",
+      "title": "Data Hub",
+      "route": "/data",
+      "file": "pages/data-hub.jpg",
+      "bytes": 339745,
+      "captured_at": "2026-11-15T08:58:08.031Z"
+    },
+    {
+      "slug": "earthdata-access",
+      "title": "Earthdata access path",
+      "route": "/earthdata",
+      "file": "pages/earthdata-access.jpg",
+      "bytes": 255124,
+      "captured_at": "2026-11-15T09:05:58.034Z"
+    },
+    {
+      "slug": "earthdata-command",
+      "title": "NASA Earthdata Command",
+      "route": "/command",
+      "file": "pages/earthdata-command.jpg",
+      "bytes": 193176,
+      "captured_at": "2026-11-15T08:58:34.900Z"
+    },
+    {
+      "slug": "verification",
+      "title": "Data access verification",
+      "route": "/verify",
+      "file": "pages/verification.jpg",
+      "bytes": 194277,
+      "captured_at": "2026-11-15T08:58:42.214Z"
+    },
+    {
+      "slug": "missions",
+      "title": "Missions",
+      "route": "/missions",
+      "file": "pages/missions.jpg",
+      "bytes": 265179,
+      "captured_at": "2026-11-15T08:58:49.499Z"
+    },
+    {
+      "slug": "solutions",
+      "title": "Solutions (14 prototypes)",
+      "route": "/solutions",
+      "file": "pages/solutions.jpg",
+      "bytes": 181663,
+      "captured_at": "2026-11-15T08:58:56.759Z"
+    },
+    {
+      "slug": "sdgs",
+      "title": "SDG map",
+      "route": "/sdgs",
+      "file": "pages/sdgs.jpg",
+      "bytes": 148264,
+      "captured_at": "2026-11-15T08:59:03.909Z"
+    },
+    {
+      "slug": "reports",
+      "title": "Reports",
+      "route": "/reports",
+      "file": "pages/reports.jpg",
+      "bytes": 103958,
+      "captured_at": "2026-11-15T08:59:10.983Z"
+    },
+    {
+      "slug": "ai-agents",
+      "title": "AI Agents",
+      "route": "/agents",
+      "file": "pages/ai-agents.jpg",
+      "bytes": 208908,
+      "captured_at": "2026-11-15T08:59:18.172Z"
+    },
+    {
+      "slug": "settings",
+      "title": "Settings",
+      "route": "/settings",
+      "file": "pages/settings.jpg",
+      "bytes": 207401,
+      "captured_at": "2026-11-15T08:59:25.412Z"
+    },
+    {
+      "slug": "arctic-watch",
+      "title": "Arctic Watch (embedded)",
+      "route": "/arctic",
+      "file": "pages/arctic-watch.jpg",
+      "bytes": 278658,
+      "captured_at": "2026-11-15T08:59:32.967Z"
+    },
+    {
+      "slug": "module-earth",
+      "title": "Earth Intelligence",
+      "route": "/module/earth",
+      "file": "pages/module-earth.jpg",
+      "bytes": 310403,
+      "captured_at": "2026-11-15T08:59:40.596Z"
+    },
+    {
+      "slug": "module-disaster",
+      "title": "Disaster Watch",
+      "route": "/module/disaster",
+      "file": "pages/module-disaster.jpg",
+      "bytes": 301569,
+      "captured_at": "2026-11-15T08:59:48.410Z"
+    },
+    {
+      "slug": "module-agri",
+      "title": "Agri Intelligence",
+      "route": "/module/agri",
+      "file": "pages/module-agri.jpg",
+      "bytes": 367852,
+      "captured_at": "2026-11-15T08:59:55.975Z"
+    },
+    {
+      "slug": "module-ocean",
+      "title": "Ocean Intelligence",
+      "route": "/module/ocean",
+      "file": "pages/module-ocean.jpg",
+      "bytes": 292447,
+      "captured_at": "2026-11-15T09:00:03.360Z"
+    },
+    {
+      "slug": "module-infrastructure",
+      "title": "Infrastructure",
+      "route": "/module/infrastructure",
+      "file": "pages/module-infrastructure.jpg",
+      "bytes": 317468,
+      "captured_at": "2026-11-15T09:00:10.773Z"
+    },
+    {
+      "slug": "module-gnss",
+      "title": "GNSS Guardian",
+      "route": "/module/gnss",
+      "file": "pages/module-gnss.jpg",
+      "bytes": 239352,
+      "captured_at": "2026-11-15T09:00:18.265Z"
+    },
+    {
+      "slug": "module-autonomy",
+      "title": "Autonomy Lab",
+      "route": "/module/autonomy",
+      "file": "pages/module-autonomy.jpg",
+      "bytes": 289926,
+      "captured_at": "2026-11-15T09:00:25.556Z"
+    },
+    {
+      "slug": "module-explorer",
+      "title": "Space Explorer",
+      "route": "/module/explorer",
+      "file": "pages/module-explorer.jpg",
+      "bytes": 362574,
+      "captured_at": "2026-11-15T09:00:32.918Z"
+    },
+    {
+      "slug": "module-academy",
+      "title": "Mission Academy",
+      "route": "/module/academy",
+      "file": "pages/module-academy.jpg",
+      "bytes": 358201,
+      "captured_at": "2026-11-15T09:00:40.204Z"
+    },
+    {
+      "slug": "module-human",
+      "title": "Human Space Lab",
+      "route": "/module/human",
+      "file": "pages/module-human.jpg",
+      "bytes": 321144,
+      "captured_at": "2026-11-15T09:00:47.677Z"
+    },
+    {
+      "slug": "module-ignis",
+      "title": "IGNIS · Flame in Freefall",
+      "route": "/module/ignis",
+      "file": "pages/module-ignis.jpg",
+      "bytes": 303194,
+      "captured_at": "2026-11-15T09:00:54.928Z"
+    },
+    {
+      "slug": "module-sar",
+      "title": "SAR Earth Observatory",
+      "route": "/module/sar",
+      "file": "pages/module-sar.jpg",
+      "bytes": 282308,
+      "captured_at": "2026-11-15T09:01:02.139Z"
+    },
+    {
+      "slug": "module-defense",
+      "title": "Defense & Crisis",
+      "route": "/module/defense",
+      "file": "pages/module-defense.jpg",
+      "bytes": 271402,
+      "captured_at": "2026-11-15T09:01:09.666Z"
+    },
+    {
+      "slug": "solution-01",
+      "title": "Challenge 1 prototype",
+      "route": "/solution/1",
+      "file": "pages/solution-01.jpg",
+      "bytes": 201858,
+      "captured_at": "2026-11-15T09:01:16.717Z"
+    },
+    {
+      "slug": "solution-02",
+      "title": "Challenge 2 prototype",
+      "route": "/solution/2",
+      "file": "pages/solution-02.jpg",
+      "bytes": 222697,
+      "captured_at": "2026-11-15T09:01:23.996Z"
+    },
+    {
+      "slug": "solution-03",
+      "title": "Challenge 3 prototype",
+      "route": "/solution/3",
+      "file": "pages/solution-03.jpg",
+      "bytes": 192356,
+      "captured_at": "2026-11-15T09:01:31.112Z"
+    },
+    {
+      "slug": "solution-04",
+      "title": "Challenge 4 prototype",
+      "route": "/solution/4",
+      "file": "pages/solution-04.jpg",
+      "bytes": 205535,
+      "captured_at": "2026-11-15T09:01:38.327Z"
+    },
+    {
+      "slug": "solution-05",
+      "title": "Challenge 5 prototype",
+      "route": "/solution/5",
+      "file": "pages/solution-05.jpg",
+      "bytes": 212719,
+      "captured_at": "2026-11-15T09:01:45.435Z"
+    },
+    {
+      "slug": "solution-06",
+      "title": "Challenge 6 prototype",
+      "route": "/solution/6",
+      "file": "pages/solution-06.jpg",
+      "bytes": 205404,
+      "captured_at": "2026-11-15T09:01:52.505Z"
+    },
+    {
+      "slug": "solution-07",
+      "title": "Challenge 7 prototype",
+      "route": "/solution/7",
+      "file": "pages/solution-07.jpg",
+      "bytes": 202734,
+      "captured_at": "2026-11-15T09:01:59.687Z"
+    },
+    {
+      "slug": "solution-08",
+      "title": "Challenge 8 prototype",
+      "route": "/solution/8",
+      "file": "pages/solution-08.jpg",
+      "bytes": 209130,
+      "captured_at": "2026-11-15T09:02:06.859Z"
+    },
+    {
+      "slug": "solution-09",
+      "title": "Challenge 9 prototype",
+      "route": "/solution/9",
+      "file": "pages/solution-09.jpg",
+      "bytes": 207698,
+      "captured_at": "2026-11-15T09:02:13.984Z"
+    },
+    {
+      "slug": "solution-10",
+      "title": "Challenge 10 prototype",
+      "route": "/solution/10",
+      "file": "pages/solution-10.jpg",
+      "bytes": 232432,
+      "captured_at": "2026-11-15T09:02:21.224Z"
+    },
+    {
+      "slug": "solution-11",
+      "title": "Challenge 11 prototype",
+      "route": "/solution/11",
+      "file": "pages/solution-11.jpg",
+      "bytes": 198734,
+      "captured_at": "2026-11-15T09:02:28.311Z"
+    },
+    {
+      "slug": "solution-12",
+      "title": "Challenge 12 prototype",
+      "route": "/solution/12",
+      "file": "pages/solution-12.jpg",
+      "bytes": 230586,
+      "captured_at": "2026-11-15T09:02:35.387Z"
+    },
+    {
+      "slug": "solution-13",
+      "title": "Challenge 13 prototype",
+      "route": "/solution/13",
+      "file": "pages/solution-13.jpg",
+      "bytes": 191409,
+      "captured_at": "2026-11-15T09:02:42.482Z"
+    },
+    {
+      "slug": "solution-14",
+      "title": "Challenge 14 prototype",
+      "route": "/solution/14",
+      "file": "pages/solution-14.jpg",
+      "bytes": 225978,
+      "captured_at": "2026-11-15T09:02:49.510Z"
+    }
+  ],
+  "useCases": [
+    {
+      "id": "platform-start",
+      "kind": "platform",
+      "title": "Start here · Command Center",
+      "summary": "The one change engine: live counters, quick investigation, the four priority modules and the data-coverage footer.",
+      "screens": [
+        {
+          "slug": "command-center",
+          "title": "Command Center",
+          "route": "/",
+          "file": "pages/command-center.jpg",
+          "role": "platform surface"
+        }
+      ]
+    },
+    {
+      "id": "platform-unified",
+      "kind": "platform",
+      "title": "One Earth · Unified Geospatial",
+      "summary": "Agriculture and ocean indicators side by side on one globe, from one NASA Earthdata path — with not-connected tiles instead of invented ones.",
+      "screens": [
+        {
+          "slug": "unified-earth",
+          "title": "Unified Geospatial (Agri × Ocean)",
+          "route": "/unified",
+          "file": "pages/unified-earth.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "explore",
+          "title": "Explore",
+          "route": "/explore",
+          "file": "pages/explore.jpg",
+          "role": "platform surface"
+        }
+      ]
+    },
+    {
+      "id": "platform-evidence",
+      "kind": "platform",
+      "title": "Earthdata → Evidence · access and verification",
+      "summary": "The authentication path, the readiness checklist driven by real probes, and the catalog the harvest actually returned.",
+      "screens": [
+        {
+          "slug": "earthdata-access",
+          "title": "Earthdata access path",
+          "route": "/earthdata",
+          "file": "pages/earthdata-access.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "earthdata-command",
+          "title": "NASA Earthdata Command",
+          "route": "/command",
+          "file": "pages/earthdata-command.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "verification",
+          "title": "Data access verification",
+          "route": "/verify",
+          "file": "pages/verification.jpg",
+          "role": "platform surface"
+        }
+      ]
+    },
+    {
+      "id": "platform-data",
+      "kind": "platform",
+      "title": "Data layer · hub, agents, exports",
+      "summary": "Every dataset with its status and coverage, the seven deterministic agents, the domain files, and the settings that switch live/snapshot.",
+      "screens": [
+        {
+          "slug": "data-hub",
+          "title": "Data Hub",
+          "route": "/data",
+          "file": "pages/data-hub.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "ai-agents",
+          "title": "AI Agents",
+          "route": "/agents",
+          "file": "pages/ai-agents.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "settings",
+          "title": "Settings",
+          "route": "/settings",
+          "file": "pages/settings.jpg",
+          "role": "platform surface"
+        }
+      ]
+    },
+    {
+      "id": "platform-program",
+      "kind": "platform",
+      "title": "Program · missions, solutions, SDGs, reports",
+      "summary": "The challenge catalogue, the 14 prototypes, the UN SDG mapping and the generated evidence reports.",
+      "screens": [
+        {
+          "slug": "missions",
+          "title": "Missions",
+          "route": "/missions",
+          "file": "pages/missions.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "solutions",
+          "title": "Solutions (14 prototypes)",
+          "route": "/solutions",
+          "file": "pages/solutions.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "sdgs",
+          "title": "SDG map",
+          "route": "/sdgs",
+          "file": "pages/sdgs.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "reports",
+          "title": "Reports",
+          "route": "/reports",
+          "file": "pages/reports.jpg",
+          "role": "platform surface"
+        }
+      ]
+    },
+    {
+      "id": "platform-beyond",
+      "kind": "platform",
+      "title": "Beyond the 14 · GNSS integrity & situation room",
+      "summary": "Two ORBIT surfaces that are not tied to a single challenge: GNSS integrity assessment (real GnssLogger/NMEA parsing) and a live Earth situation room.",
+      "screens": [
+        {
+          "slug": "module-gnss",
+          "title": "GNSS Guardian",
+          "route": "/module/gnss",
+          "file": "pages/module-gnss.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "module-defense",
+          "title": "Defense & Crisis",
+          "route": "/module/defense",
+          "file": "pages/module-defense.jpg",
+          "role": "platform surface"
+        }
+      ]
+    },
+    {
+      "id": "platform-twin",
+      "kind": "platform",
+      "title": "Digital twin · Arctic Watch",
+      "summary": "The 3D Earth twin and the embedded Arctic Watch sibling app.",
+      "screens": [
+        {
+          "slug": "digital-twin",
+          "title": "Digital Twin",
+          "route": "/twin",
+          "file": "pages/digital-twin.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "arctic-watch",
+          "title": "Arctic Watch (embedded)",
+          "route": "/arctic",
+          "file": "pages/arctic-watch.jpg",
+          "role": "platform surface"
+        },
+        {
+          "slug": "analysis",
+          "title": "Analysis",
+          "route": "/analysis",
+          "file": "pages/analysis.jpg",
+          "role": "platform surface"
+        }
+      ]
+    },
+    {
+      "id": "challenge-01",
+      "kind": "challenge",
+      "number": 1,
+      "title": "Challenge 1 · Retired Hardware Story",
+      "summary": "Tell the stories of NASA hardware left on the Moon and Mars — and the science it made possible.",
+      "difficulty": "Beginner/Youth",
+      "subjects": [
+        "Astrophysics",
+        "Planets & Moons",
+        "Space Exploration"
+      ],
+      "screens": [
+        {
+          "slug": "solution-01",
+          "title": "Challenge 1 prototype",
+          "route": "/solution/1",
+          "file": "pages/solution-01.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-academy",
+          "title": "Mission Academy",
+          "route": "/module/academy",
+          "file": "pages/module-academy.jpg",
+          "role": "implementing module · P2"
+        }
+      ]
+    },
+    {
+      "id": "challenge-02",
+      "kind": "challenge",
+      "number": 2,
+      "title": "Challenge 2 · Earth System Trend Detective",
+      "summary": "Find NASA variables that are changing, visualize them, and test whether the change is statistically significant.",
+      "difficulty": "Advanced",
+      "subjects": [
+        "Earth Science",
+        "Software"
+      ],
+      "screens": [
+        {
+          "slug": "solution-02",
+          "title": "Challenge 2 prototype",
+          "route": "/solution/2",
+          "file": "pages/solution-02.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-earth",
+          "title": "Earth Intelligence",
+          "route": "/module/earth",
+          "file": "pages/module-earth.jpg",
+          "role": "implementing module · P0"
+        },
+        {
+          "slug": "module-disaster",
+          "title": "Disaster Watch",
+          "route": "/module/disaster",
+          "file": "pages/module-disaster.jpg",
+          "role": "implementing module · P1"
+        },
+        {
+          "slug": "module-agri",
+          "title": "Agri Intelligence",
+          "route": "/module/agri",
+          "file": "pages/module-agri.jpg",
+          "role": "implementing module · P1"
+        },
+        {
+          "slug": "module-ocean",
+          "title": "Ocean Intelligence",
+          "route": "/module/ocean",
+          "file": "pages/module-ocean.jpg",
+          "role": "implementing module · P1"
+        }
+      ]
+    },
+    {
+      "id": "challenge-03",
+      "kind": "challenge",
+      "number": 3,
+      "title": "Challenge 3 · Mars Outpost Trainer",
+      "summary": "A game where students run a lunar or Martian outpost, balancing life support, power and food.",
+      "difficulty": "Beginner/Youth",
+      "subjects": [
+        "Games",
+        "Space Exploration"
+      ],
+      "screens": [
+        {
+          "slug": "solution-03",
+          "title": "Challenge 3 prototype",
+          "route": "/solution/3",
+          "file": "pages/solution-03.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-autonomy",
+          "title": "Autonomy Lab",
+          "route": "/module/autonomy",
+          "file": "pages/module-autonomy.jpg",
+          "role": "implementing module · P2"
+        },
+        {
+          "slug": "module-academy",
+          "title": "Mission Academy",
+          "route": "/module/academy",
+          "file": "pages/module-academy.jpg",
+          "role": "implementing module · P2"
+        }
+      ]
+    },
+    {
+      "id": "challenge-04",
+      "kind": "challenge",
+      "number": 4,
+      "title": "Challenge 4 · Astronaut Health Monitor",
+      "summary": "Health monitoring software that gathers indicators so astronauts can assess their own status.",
+      "difficulty": "Intermediate",
+      "subjects": [
+        "Human Exploration",
+        "Software"
+      ],
+      "screens": [
+        {
+          "slug": "solution-04",
+          "title": "Challenge 4 prototype",
+          "route": "/solution/4",
+          "file": "pages/solution-04.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-human",
+          "title": "Human Space Lab",
+          "route": "/module/human",
+          "file": "pages/module-human.jpg",
+          "role": "implementing module · P3"
+        }
+      ]
+    },
+    {
+      "id": "challenge-05",
+      "kind": "challenge",
+      "number": 5,
+      "title": "Challenge 5 · Radar Surface Change",
+      "summary": "Use NISAR radar to track and visualize surface change — the \"Dancing with the SARs\" challenge.",
+      "difficulty": "Advanced",
+      "subjects": [
+        "Earth Science",
+        "Software"
+      ],
+      "screens": [
+        {
+          "slug": "solution-05",
+          "title": "Challenge 5 prototype",
+          "route": "/solution/5",
+          "file": "pages/solution-05.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-earth",
+          "title": "Earth Intelligence",
+          "route": "/module/earth",
+          "file": "pages/module-earth.jpg",
+          "role": "implementing module · P0"
+        },
+        {
+          "slug": "module-infrastructure",
+          "title": "Infrastructure",
+          "route": "/module/infrastructure",
+          "file": "pages/module-infrastructure.jpg",
+          "role": "implementing module · P2"
+        },
+        {
+          "slug": "module-sar",
+          "title": "SAR Earth Observatory",
+          "route": "/module/sar",
+          "file": "pages/module-sar.jpg",
+          "role": "implementing module · P0"
+        }
+      ]
+    },
+    {
+      "id": "challenge-06",
+      "kind": "challenge",
+      "number": 6,
+      "title": "Challenge 6 · Field Shift Rotation Planner",
+      "summary": "Help farmers explore crop rotations suited to soil health and a changing climate.",
+      "difficulty": "Intermediate",
+      "subjects": [
+        "Earth Science",
+        "Agriculture"
+      ],
+      "screens": [
+        {
+          "slug": "solution-06",
+          "title": "Challenge 6 prototype",
+          "route": "/solution/6",
+          "file": "pages/solution-06.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-earth",
+          "title": "Earth Intelligence",
+          "route": "/module/earth",
+          "file": "pages/module-earth.jpg",
+          "role": "implementing module · P0"
+        },
+        {
+          "slug": "module-agri",
+          "title": "Agri Intelligence",
+          "route": "/module/agri",
+          "file": "pages/module-agri.jpg",
+          "role": "implementing module · P1"
+        }
+      ]
+    },
+    {
+      "id": "challenge-07",
+      "kind": "challenge",
+      "number": 7,
+      "title": "Challenge 7 · Microgravity Fire Dashboard (ISS)",
+      "summary": "An AI dashboard that summarizes microgravity combustion experiments for fire safety.",
+      "difficulty": "Intermediate",
+      "subjects": [
+        "Living in Space",
+        "AI"
+      ],
+      "screens": [
+        {
+          "slug": "solution-07",
+          "title": "Challenge 7 prototype",
+          "route": "/solution/7",
+          "file": "pages/solution-07.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-human",
+          "title": "Human Space Lab",
+          "route": "/module/human",
+          "file": "pages/module-human.jpg",
+          "role": "implementing module · P3"
+        },
+        {
+          "slug": "module-ignis",
+          "title": "IGNIS · Flame in Freefall",
+          "route": "/module/ignis",
+          "file": "pages/module-ignis.jpg",
+          "role": "implementing module · P1"
+        }
+      ]
+    },
+    {
+      "id": "challenge-08",
+      "kind": "challenge",
+      "number": 8,
+      "title": "Challenge 8 · Fire Calendar Harmonizer",
+      "summary": "Harmonize MODIS and VIIRS active-fire records into one historical map.",
+      "difficulty": "Advanced",
+      "subjects": [
+        "Earth Science"
+      ],
+      "screens": [
+        {
+          "slug": "solution-08",
+          "title": "Challenge 8 prototype",
+          "route": "/solution/8",
+          "file": "pages/solution-08.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-earth",
+          "title": "Earth Intelligence",
+          "route": "/module/earth",
+          "file": "pages/module-earth.jpg",
+          "role": "implementing module · P0"
+        },
+        {
+          "slug": "module-disaster",
+          "title": "Disaster Watch",
+          "route": "/module/disaster",
+          "file": "pages/module-disaster.jpg",
+          "role": "implementing module · P1"
+        }
+      ]
+    },
+    {
+      "id": "challenge-09",
+      "kind": "challenge",
+      "number": 9,
+      "title": "Challenge 9 · Earth Analog Ranker",
+      "summary": "Find Earth sites that resemble the Moon and Mars for mission preparation.",
+      "difficulty": "Beginner/Youth",
+      "subjects": [
+        "Planets & Moons"
+      ],
+      "screens": [
+        {
+          "slug": "solution-09",
+          "title": "Challenge 9 prototype",
+          "route": "/solution/9",
+          "file": "pages/solution-09.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-explorer",
+          "title": "Space Explorer",
+          "route": "/module/explorer",
+          "file": "pages/module-explorer.jpg",
+          "role": "implementing module · P2"
+        }
+      ]
+    },
+    {
+      "id": "challenge-10",
+      "kind": "challenge",
+      "number": 10,
+      "title": "Challenge 10 · Martian Route Map",
+      "summary": "An interactive map for surface routes on Mars.",
+      "difficulty": "Intermediate",
+      "subjects": [
+        "Space Exploration"
+      ],
+      "screens": [
+        {
+          "slug": "solution-10",
+          "title": "Challenge 10 prototype",
+          "route": "/solution/10",
+          "file": "pages/solution-10.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-autonomy",
+          "title": "Autonomy Lab",
+          "route": "/module/autonomy",
+          "file": "pages/module-autonomy.jpg",
+          "role": "implementing module · P2"
+        }
+      ]
+    },
+    {
+      "id": "challenge-11",
+      "kind": "challenge",
+      "number": 11,
+      "title": "Challenge 11 · Lunar Site Navigator",
+      "summary": "Compare lunar south-pole landing sites by Sun and Earth visibility.",
+      "difficulty": "Advanced",
+      "subjects": [
+        "Space Exploration"
+      ],
+      "screens": [
+        {
+          "slug": "solution-11",
+          "title": "Challenge 11 prototype",
+          "route": "/solution/11",
+          "file": "pages/solution-11.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-explorer",
+          "title": "Space Explorer",
+          "route": "/module/explorer",
+          "file": "pages/module-explorer.jpg",
+          "role": "implementing module · P2"
+        }
+      ]
+    },
+    {
+      "id": "challenge-12",
+      "kind": "challenge",
+      "number": 12,
+      "title": "Challenge 12 · Sky Change Viewer",
+      "summary": "See changes in the infrared sky with SPHEREx data.",
+      "difficulty": "Intermediate",
+      "subjects": [
+        "Astrophysics"
+      ],
+      "screens": [
+        {
+          "slug": "solution-12",
+          "title": "Challenge 12 prototype",
+          "route": "/solution/12",
+          "file": "pages/solution-12.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-explorer",
+          "title": "Space Explorer",
+          "route": "/module/explorer",
+          "file": "pages/module-explorer.jpg",
+          "role": "implementing module · P2"
+        }
+      ]
+    },
+    {
+      "id": "challenge-13",
+      "kind": "challenge",
+      "number": 13,
+      "title": "Challenge 13 · Mission Design Game",
+      "summary": "A game for designing a complete space mission.",
+      "difficulty": "Beginner/Youth",
+      "subjects": [
+        "Games"
+      ],
+      "screens": [
+        {
+          "slug": "solution-13",
+          "title": "Challenge 13 prototype",
+          "route": "/solution/13",
+          "file": "pages/solution-13.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-academy",
+          "title": "Mission Academy",
+          "route": "/module/academy",
+          "file": "pages/module-academy.jpg",
+          "role": "implementing module · P2"
+        }
+      ]
+    },
+    {
+      "id": "challenge-14",
+      "kind": "challenge",
+      "number": 14,
+      "title": "Challenge 14 · Earth Sound Jukebox",
+      "summary": "Turn Earth observations into sound.",
+      "difficulty": "Beginner/Youth",
+      "subjects": [
+        "Earth Science"
+      ],
+      "screens": [
+        {
+          "slug": "solution-14",
+          "title": "Challenge 14 prototype",
+          "route": "/solution/14",
+          "file": "pages/solution-14.jpg",
+          "role": "challenge prototype (sample data)"
+        },
+        {
+          "slug": "module-earth",
+          "title": "Earth Intelligence",
+          "route": "/module/earth",
+          "file": "pages/module-earth.jpg",
+          "role": "implementing module · P0"
+        },
+        {
+          "slug": "module-ocean",
+          "title": "Ocean Intelligence",
+          "route": "/module/ocean",
+          "file": "pages/module-ocean.jpg",
+          "role": "implementing module · P1"
+        }
+      ]
+    }
+  ],
+  "uncategorised": [],
+  "notes": [
+    "Every screenshot was captured from the running app, not composed.",
+    "A screen can serve several use cases; the canonical file lives in pages/ and is linked from each case.",
+    "Sample vs live is visible in the UI: unfetched products render as \"not connected\" with no number."
+  ]
+}
