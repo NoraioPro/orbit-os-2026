@@ -241,7 +241,7 @@ function Fringes() {
       <svg viewBox="0 0 160 130" className="mt-1 w-full rounded" role="img" aria-label="sample fringe pattern">
         <rect width="160" height="130" fill="#0b1220" />
         {['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6'].map((hue, i) => (
-          <path key={i} d={`M 20 65 ${Array.from({ length: 120 }).map((_, x) => `${x % 2 ? 'Q' : ''}${20 + x} ${65 + Math.sin(x / 12 + i) * (18 - i * 2)}`).join(' ')}`} stroke={hue} strokeWidth="1.4" fill="none" opacity="0.85" />
+          <path key={i} d={`M 20 65 L ${Array.from({ length: 120 }).map((_, x) => `${20 + x} ${(65 + Math.sin(x / 12 + i) * (18 - i * 2)).toFixed(2)}`).join(' L')}`} stroke={hue} strokeWidth="1.4" fill="none" opacity="0.85" />
         ))}
       </svg>
       <div className="mt-1 text-[9px] text-amber-300/70">SAMPLE · no interferogram is processed in this build</div>
