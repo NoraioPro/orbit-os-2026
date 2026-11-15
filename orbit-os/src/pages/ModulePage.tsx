@@ -25,6 +25,7 @@ import { SarStory } from '../modules/SarStory';
 import { SvalbardLenses } from '../modules/SvalbardLenses';
 import { OceanStory } from '../modules/OceanStory';
 import { ExplorerStory } from '../modules/ExplorerStory';
+import { MissionStory } from '../modules/MissionStory';
 import { RealQuakeCase } from '../modules/RealQuakeCase';
 const StoryGlobe = lazy(() => import('../components/StoryGlobe').then((m) => ({ default: m.StoryGlobe })));
 import { WeatherNow, WEATHER_SITES } from '../components/WeatherNow';
@@ -205,6 +206,7 @@ export default function ModulePage() {
       {m.id === 'earth' && <SvalbardLenses />}
       {m.id === 'ocean' && <OceanStory />}
       {m.id === 'explorer' && <ExplorerStory />}
+      {m.id === 'academy' && <MissionStory />}
       <div data-tour="main"><Suspense fallback={<div role="status" className="grid min-h-48 place-items-center text-sm text-slate-400">Loading module…</div>}><W /></Suspense></div>
       <div data-tour="sources" className="mt-3 grid grid-cols-3 gap-3">
         <Glass className="p-4">
