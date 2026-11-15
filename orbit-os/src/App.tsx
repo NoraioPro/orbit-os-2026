@@ -19,6 +19,7 @@ const SettingsPage = lazy(() => import('./pages/Other').then((m) => ({ default: 
 const ArcticIntelWatch = lazy(() => import('./pages/ArcticIntelWatch'));
 const EarthdataPage = lazy(() => import('./pages/EarthdataPage'));
 const Unified = lazy(() => import('./pages/Unified'));
+const Verify = lazy(() => import('./pages/Verify'));
 
 function PageLoading() {
   return <div role="status" className="grid min-h-48 place-items-center text-sm text-slate-400">Loading ORBIT module…</div>;
@@ -44,6 +45,7 @@ export default function App() {
               <Route path="arctic" element={<ArcticIntelWatch />} />
               <Route path="earthdata" element={<EarthdataPage />} />
               <Route path="unified" element={<Unified />} />
+              <Route path="verify" element={<Verify />} />
               <Route path="data" element={<DataHub />} />
               <Route path="agents" element={<Agents />} />
               <Route path="settings" element={<SettingsPage />} />

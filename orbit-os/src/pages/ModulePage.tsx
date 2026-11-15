@@ -10,6 +10,9 @@ import { AcademyWidget, AgriWidget, AutonomyWidget, DisasterWidget, ExplorerWidg
 const GnssGuardian = lazy(() => import('../modules/GnssGuardian').then((m) => ({ default: m.GnssGuardian })));
 const SarObservatory = lazy(() => import('../modules/SarObservatory').then((m) => ({ default: m.SarObservatory })));
 const InfrastructureOslo = lazy(() => import('../modules/InfrastructureOslo').then((m) => ({ default: m.InfrastructureOslo })));
+const AgriBoard = lazy(() => import('../modules/AgriBoard').then((m) => ({ default: m.AgriBoard })));
+const OceanBoard = lazy(() => import('../modules/OceanBoard').then((m) => ({ default: m.OceanBoard })));
+const DisasterEventBoard = lazy(() => import('../modules/DisasterEventBoard').then((m) => ({ default: m.DisasterEventBoard })));
 import { QuickInvestigation } from '../components/QuickInvestigation';
 import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
@@ -54,9 +57,9 @@ const EarthSuite: ComponentType = () => (
     <EarthJukebox />
   </div>
 );
-const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterWidget /><FireCalendar /></div>;
+const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterEventBoard /><DisasterWidget /><FireCalendar /></div>;
 const SarSuite: ComponentType = () => <div className="space-y-3"><SarFaultLab /><SarGlobe /><SarChampion /></div>;
-const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanWidget /><SolarFish /></div>;
+const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanBoard /><OceanWidget /><SolarFish /></div>;
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
 const HumanSuite: ComponentType = () => <div className="space-y-3"><AstronautTwin /><HumanLab /><FlameLab /></div>;
 
@@ -71,8 +74,19 @@ function InfraSuite() {
   );
 }
 
+
+/** Agri: the Østfold crop board leads (real POWER + GIBS), the planning widget follows. */
+function AgriSuite() {
+  return (
+    <div className="space-y-3">
+      <AgriBoard />
+      <CropWatch />
+    </div>
+  );
+}
+
 const WIDGET: Record<string, ComponentType> = {
-  earth: EarthSuite, disaster: DisasterSuite, agri: CropWatch, ocean: OceanSuite, infrastructure: InfraSuite, gnss: GnssGuardian,
+  earth: EarthSuite, disaster: DisasterSuite, agri: AgriSuite, ocean: OceanSuite, infrastructure: InfraSuite, gnss: GnssGuardian,
   sar: SarSuite, autonomy: MartianRoutes, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanSuite, ignis: FlameLab, defense: SituationRoom,
 };
 export default function ModulePage() {

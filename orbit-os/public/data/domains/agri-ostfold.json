@@ -1,0 +1,137 @@
+{
+  "domain": "agri-ostfold",
+  "title": "Agri Intelligence",
+  "subtitle": "Crop-region monitoring · Østfold, Norway",
+  "aoi": {
+    "id": "agri-ostfold",
+    "name": "Østfold · Norway",
+    "lat": 59.39,
+    "lon": 11,
+    "community": "AG"
+  },
+  "generated_at": "2026-11-15T00:28:49.566Z",
+  "provenance": {
+    "provider": "NASA POWER (monthly point API, community=AG) + NASA GIBS",
+    "url": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=GWETROOT,T2M,PRECTOTCORR,WS2M,CLOUD_AMT&community=AG&longitude=11&latitude=59.39&start=2025&end=2026&format=JSON",
+    "access": "keyless",
+    "honesty": "live",
+    "note": "Soil moisture is POWER GWETROOT (root-zone wetness, 0-1), precipitation is PRECTOTCORR and PAR is ALLSKY_SFC_PAR_TOT. NDVI *values* are NOT available in this build (MODIS/VIIRS subsets need Earthdata or the ORNL subset API), so no NDVI number is shown."
+  },
+  "imagery": [
+    {
+      "id": "crop-health",
+      "title": "Vegetation Index (rolling 8-Day, MODIS, Terra)",
+      "label": "NDVI · MODIS Terra 8-day",
+      "status": "live",
+      "note": "Rendered from NASA GIBS tiles for the AOI window; no local pixel values are computed.",
+      "gibs": "MODIS_Terra_NDVI_8Day",
+      "theme": "ndvi",
+      "maxLevel": 9
+    }
+  ],
+  "series": [
+    {
+      "id": "gwetroot",
+      "label": "Soil moisture (root zone)",
+      "unit": "fraction 0-1",
+      "months": [
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep"
+      ],
+      "values": [
+        0.8,
+        0.7,
+        0.64,
+        0.57,
+        0.54,
+        0.54
+      ],
+      "latest": 0.54,
+      "mean": 0.632,
+      "note": "POWER GWETROOT monthly mean at the AOI point."
+    },
+    {
+      "id": "t2m",
+      "label": "Air temperature",
+      "unit": "C",
+      "months": [
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep"
+      ],
+      "values": [
+        6.29,
+        10.68,
+        15.68,
+        17.22,
+        15.69,
+        12.67
+      ],
+      "latest": 12.67,
+      "mean": 13.038,
+      "note": "POWER T2M monthly mean."
+    },
+    {
+      "id": "prectotcorr",
+      "label": "Precipitation",
+      "unit": "mm/day",
+      "months": [
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep"
+      ],
+      "values": [
+        2.27,
+        1.73,
+        2.93,
+        1.78,
+        2.08,
+        2.48
+      ],
+      "latest": 2.48,
+      "mean": 2.212,
+      "note": "POWER PRECTOTCORR monthly mean."
+    }
+  ],
+  "weather": [
+    {
+      "id": "precip",
+      "label": "Precipitation",
+      "unit": "mm/day",
+      "value": 2.48
+    },
+    {
+      "id": "temp",
+      "label": "Temperature",
+      "unit": "C",
+      "value": 12.67
+    },
+    {
+      "id": "wind",
+      "label": "Wind",
+      "unit": "m/s",
+      "value": 0.71
+    },
+    {
+      "id": "clouds",
+      "label": "Clouds",
+      "unit": "%",
+      "value": null
+    }
+  ],
+  "coverage": {
+    "start": "2025-01",
+    "end": "2026-09",
+    "window": "Apr-Sep 2026"
+  }
+}

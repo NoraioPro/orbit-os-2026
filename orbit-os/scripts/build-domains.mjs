@@ -23,6 +23,8 @@ const OUT = join(ROOT, 'public', 'data', 'domains');
 const AOI = {
   agri: { id: 'agri-sahel', name: 'Sahel · Niger', lat: 13.51, lon: 2.11, community: 'AG' },
   ocean: { id: 'ocean-gulfstream', name: 'Gulf Stream · 38N 50W', lat: 38.0, lon: -50.0, community: 'RE' },
+  // second land AOI: the Nordic crop region used by the Agri Intelligence board
+  agriNordic: { id: 'agri-ostfold', name: 'Østfold · Norway', lat: 59.39, lon: 11.0, community: 'AG' },
 };
 
 const PARAMS = ['GWETROOT', 'T2M', 'PRECTOTCORR', 'WS2M', 'CLOUD_AMT'];
@@ -97,12 +99,47 @@ function gibsPick(layers, ids) {
   return out;
 }
 
+
+/** Real ASF Search API harvest (keyless metadata): NISAR + Sentinel-1 over the Oslo AOI. */
+async function fetchAsf() {
+  const aoi = 'POINT(10.75 59.91)';
+  const q = (platform) =>
+    'https://api.daac.asf.alaska.edu/services/search/param?' +
+    new URLSearchParams({ platform, intersectsWith: aoi, maxResults: '8', output: 'json' }).toString();
+  const out = [];
+  for (const platform of ['NISAR', 'SENTINEL-1']) {
+    const url = q(platform);
+    try {
+      const res = await fetch(url, { headers: { 'User-Agent': 'ORBIT-OS/0.1 (NASA Space Apps)' } });
+      if (!res.ok) { out.push({ platform, url, status: `HTTP ${res.status}`, granules: [] }); continue; }
+      const json = await res.json();
+      const granules = (json?.[0] ?? []).map((g) => ({
+        granule: g.granuleName ?? null,
+        platform: g.platform ?? platform,
+        startTime: g.startTime ?? null,
+        product: g.processingLevel ? `${g.processingLevel} ${g.productType ?? ''}`.trim() : g.productType ?? null,
+        beamMode: g.beamModeType ?? null,
+        polarization: g.polarization ?? null,
+        fileSizeBytes: g.bytes ?? null,
+        path: g.pathNumber ?? null,
+        frame: g.frameNumber ?? null,
+        orbit: g.absoluteOrbit ?? null,
+        browse: Array.isArray(g.browse) ? g.browse.find((b) => /_LATLON\.png$/i.test(b)) ?? g.browse[0] ?? null : null,
+      }));
+      out.push({ platform, url, status: 'live', granules });
+    } catch (e) {
+      out.push({ platform, url, status: String(e.message ?? e), granules: [] });
+    }
+  }
+  return out;
+}
+
 async function main() {
   await mkdir(OUT, { recursive: true });
   const gibsRaw = JSON.parse(await readFile(join(ROOT, 'public', 'data', 'live', 'gibs-layers.json'), 'utf8'));
   const gibsList = Array.isArray(gibsRaw) ? gibsRaw : (gibsRaw.layers ?? [...Object.values(gibsRaw)].flat());
 
-  const [agriP, oceanP] = await Promise.all([fetchPower(AOI.agri), fetchPower(AOI.ocean)]);
+  const [agriP, oceanP, nordicP] = await Promise.all([fetchPower(AOI.agri), fetchPower(AOI.ocean), fetchPower(AOI.agriNordic)]);
   const generatedAt = new Date().toISOString();
 
   const agriRows = last(agriP.rows, 6);
@@ -198,6 +235,46 @@ async function main() {
     coverage: { ...coverage, window: `${oceanRows[0]?.label ?? '?'}–${oceanRows.at(-1)?.label ?? '?'} ${oceanRows.at(-1)?.ym?.slice(0, 4) ?? ''}` },
   };
 
+  const nordicRows = last(nordicP.rows, 6);
+  const nordic = {
+    domain: 'agri-ostfold',
+    title: 'Agri Intelligence',
+    subtitle: 'Crop-region monitoring · Østfold, Norway',
+    aoi: AOI.agriNordic,
+    generated_at: generatedAt,
+    provenance: {
+      provider: 'NASA POWER (monthly point API, community=AG) + NASA GIBS',
+      url: nordicP.url,
+      access: 'keyless',
+      honesty: 'live',
+      note: 'Soil moisture is POWER GWETROOT (root-zone wetness, 0-1), precipitation is PRECTOTCORR and PAR is ALLSKY_SFC_PAR_TOT. NDVI *values* are NOT available in this build (MODIS/VIIRS subsets need Earthdata or the ORNL subset API), so no NDVI number is shown.',
+    },
+    imagery: [
+      {
+        id: 'crop-health',
+        title: 'Crop health',
+        label: 'NDVI · MODIS Terra 8-day',
+        status: 'live',
+        note: 'Rendered from NASA GIBS tiles for the AOI window; no local pixel values are computed.',
+        ...gibsPick(gibsList, ['MODIS_Terra_NDVI_8Day', 'VIIRS_SNPP_NDVI_8Day'])[0],
+      },
+    ],
+    series: [
+      series(nordicRows, 'GWETROOT', 'Soil moisture (root zone)', 'fraction 0-1', 'POWER GWETROOT monthly mean at the AOI point.'),
+      series(nordicRows, 'T2M', 'Air temperature', 'C', 'POWER T2M monthly mean.'),
+      series(nordicRows, 'PRECTOTCORR', 'Precipitation', 'mm/day', 'POWER PRECTOTCORR monthly mean.'),
+    ],
+    weather: [
+      { id: 'precip', label: 'Precipitation', unit: 'mm/day', value: nordicRows.at(-1)?.PRECTOTCORR ?? null },
+      { id: 'temp', label: 'Temperature', unit: 'C', value: nordicRows.at(-1)?.T2M ?? null },
+      { id: 'wind', label: 'Wind', unit: 'm/s', value: nordicRows.at(-1)?.WS2M ?? null },
+      { id: 'clouds', label: 'Clouds', unit: '%', value: nordicRows.at(-1)?.CLOUD_AMT ?? null },
+    ],
+    coverage: { ...coverage, window: `${nordicRows[0]?.label ?? '?'}-${nordicRows.at(-1)?.label ?? '?'} ${nordicRows.at(-1)?.ym?.slice(0, 4) ?? ''}` },
+  };
+
+  await writeFile(join(OUT, 'agri-ostfold.json'), JSON.stringify(nordic, null, 2));
+
   const index = {
     generated_at: generatedAt,
     source: 'scripts/build-domains.mjs',
@@ -205,11 +282,33 @@ async function main() {
     domains: [
       { id: 'agri', file: 'agri.json', title: agri.title, honesty: 'live', series: agri.series.length, imagery: agri.imagery.filter((i) => i.gibs).length },
       { id: 'ocean', file: 'ocean.json', title: ocean.title, honesty: 'live', series: ocean.series.length, imagery: ocean.imagery.filter((i) => i.gibs).length },
+      { id: 'agri-ostfold', file: 'agri-ostfold.json', title: 'Agri Intelligence · Østfold', honesty: 'live', series: nordic.series.length, imagery: nordic.imagery.filter((i) => i.gibs).length },
+      { id: 'sar', file: 'sar.json', title: 'SAR acquisitions (ASF)', honesty: 'live', series: null, imagery: 0 },
     ],
   };
 
   await writeFile(join(OUT, 'agri.json'), JSON.stringify(agri, null, 2));
   await writeFile(join(OUT, 'ocean.json'), JSON.stringify(ocean, null, 2));
+  const asf = await fetchAsf();
+  const sar = {
+    domain: 'sar',
+    title: 'SAR acquisitions',
+    subtitle: 'ASF Search API harvest over the Oslo AOI',
+    aoi: { name: 'Oslo, Norway', lat: 59.91, lon: 10.75 },
+    generated_at: generatedAt,
+    provenance: {
+      provider: 'NASA ASF Search API (Alaska Satellite Facility)',
+      url: 'https://api.daac.asf.alaska.edu/services/search/param',
+      access: 'keyless metadata (granule DOWNLOAD needs an Earthdata login)',
+      honesty: 'live',
+      note: 'Granule metadata is real and returned by ASF. Downloading the products and running InSAR are NOT connected in this build.',
+    },
+    queries: asf,
+    granules: asf.flatMap((q) => q.granules.map((g) => ({ ...g, platformQuery: q.platform }))),
+  };
+  await writeFile(join(OUT, 'sar.json'), JSON.stringify(sar, null, 2));
+  const sarEntry = index.domains.find((d) => d.id === 'sar');
+  if (sarEntry) sarEntry.series = sar.granules.length;
   await writeFile(join(OUT, 'index.json'), JSON.stringify(index, null, 2));
   console.log('wrote', OUT);
   for (const d of [agri, ocean]) {

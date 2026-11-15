@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T00:05:15.122Z",
+  "generated_at": "2026-11-15T00:28:49.566Z",
   "source": "scripts/build-domains.mjs",
   "note": "Domain-organized data layer. Each file carries its own provenance block; panels read these files instead of hard-coded numbers.",
   "domains": [
@@ -18,6 +18,22 @@
       "honesty": "live",
       "series": 2,
       "imagery": 1
+    },
+    {
+      "id": "agri-ostfold",
+      "file": "agri-ostfold.json",
+      "title": "Agri Intelligence · Østfold",
+      "honesty": "live",
+      "series": 3,
+      "imagery": 1
+    },
+    {
+      "id": "sar",
+      "file": "sar.json",
+      "title": "SAR acquisitions (ASF)",
+      "honesty": "live",
+      "series": 16,
+      "imagery": 0
     }
   ]
 }
