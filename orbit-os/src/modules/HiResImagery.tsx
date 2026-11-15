@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { ZoomableImage } from '../components/ImageViewer';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 
 /**
@@ -191,12 +192,15 @@ export function HiResImagery({ aoiId, compact = false }: { aoiId: string; compac
       <div className={`mt-2 grid gap-1.5 ${compare ? 'grid-cols-2' : 'grid-cols-1'}`}>
         <div className="relative">
           {date && !failed ? (
-            <img
+            <ZoomableImage
               src={imageUrl(layer, date, aoi.bbox)}
-              alt={`${layer.label} over ${aoi.name}, ${date}`}
-              className={`w-full rounded object-cover ${imgH}`}
-              loading="lazy"
-              onError={() => setFailed(true)}
+              alt={layer.label + ' over ' + aoi.name + ', ' + (date ?? '')}
+              className={'w-full rounded ' + imgH}
+              label={layer.label + ' · ' + aoi.name}
+              caption={layer.resolution + ' m/px · GIBS WMS'}
+              source={layer.sensor}
+              date={date ?? undefined}
+              href={imageUrl(layer, date ?? '', aoi.bbox, 2048)}
             />
           ) : (
             <div className={`grid w-full place-items-center rounded border border-white/5 bg-slate-900/60 px-2 text-center text-[10px] text-slate-500 ${imgH}`}>
@@ -209,11 +213,14 @@ export function HiResImagery({ aoiId, compact = false }: { aoiId: string; compac
         </div>
         {compare && refDate && (
           <div className="relative">
-            <img
+            <ZoomableImage
               src={imageUrl(aoi.reference, refDate, aoi.bbox)}
-              alt={`MODIS reference over ${aoi.name}, ${refDate}`}
-              className={`w-full rounded object-cover ${imgH}`}
-              loading="lazy"
+              alt={'MODIS reference over ' + aoi.name}
+              className={'w-full rounded ' + imgH}
+              label={'MODIS 250 m reference · ' + aoi.name}
+              caption="the coarser layer, for scale comparison"
+              source={aoi.reference.sensor}
+              date={refDate ?? undefined}
             />
             <div className="pointer-events-none absolute left-1 top-1 rounded bg-slate-950/75 px-1 py-0.5 text-[9px] text-amber-200">
               MODIS 250 m · {refDate}

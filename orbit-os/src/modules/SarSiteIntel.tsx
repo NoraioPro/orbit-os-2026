@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Chip, Icon, StatusBadge } from '../components/ui';
+import { ZoomableImage } from '../components/ImageViewer';
 
 /**
  * What is actually over this site, per sensor, with before/after imagery.
@@ -91,12 +92,15 @@ function ImageryCard({ g, kind }: { g: Granule | null; kind: 'before' | 'after' 
         <span className="text-[9px] text-slate-500">{fmtDay(g?.startTime)}</span>
       </div>
       {src && !failed ? (
-        <img
+        <ZoomableImage
           src={src}
           alt={`Sentinel-1 ${kind} quicklook ${fmtDay(g?.startTime)}`}
-          className="mt-1 h-[168px] w-full rounded object-cover"
-          loading="lazy"
-          onError={() => setFailed(true)}
+          className="mt-1 h-[168px] w-full rounded"
+          label={`Sentinel-1 ${kind} · ${fmtDay(g?.startTime)}`}
+          caption={`${g?.platform ?? 'Sentinel-1'} ${g?.flightDirection ?? ''} ${g?.processingLevel ?? ''}`.trim()}
+          source={`NASA ASF quicklook · ${kind} pass`}
+          date={fmtDay(g?.startTime)}
+          href={g?.downloadUrl ?? src}
         />
       ) : (
         <div className="mt-1 grid h-[168px] place-items-center rounded border border-white/5 bg-slate-900/60 text-[9px] text-slate-500">

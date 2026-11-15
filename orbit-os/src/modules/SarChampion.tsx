@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { ZoomableImage } from '../components/ImageViewer';
 import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
 import {
   relateEvents, SAR_MISSIONS,
@@ -149,12 +150,15 @@ function RealBeforeAfter({ aoi }: { aoi: Aoi }) {
           <span className="text-[9px] text-slate-500">{g?.startTime?.slice(0, 10) ?? '—'}</span>
         </div>
         {src && !failed[kind] ? (
-          <img
+          <ZoomableImage
             src={src}
             alt={'Sentinel-1 ' + kind + ' quicklook, ' + aoi.region}
-            className="mt-1 h-[190px] w-full rounded object-cover"
-            loading="lazy"
-            onError={() => setFailed((f) => ({ ...f, [kind]: true }))}
+            className="mt-1 h-[190px] w-full rounded"
+            label={aoi.region + ' · Sentinel-1 ' + kind}
+            caption={(g?.flightDirection ?? '') + ' · ' + (g?.processingLevel ?? '')}
+            source="NASA ASF quicklook"
+            date={g?.startTime?.slice(0, 10)}
+            href={g?.downloadUrl ?? src}
           />
         ) : (
           <div className="mt-1 grid h-[190px] place-items-center rounded border border-white/5 bg-slate-900/60 px-2 text-center text-[10px] text-slate-500">

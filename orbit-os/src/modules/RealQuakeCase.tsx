@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { ZoomableImage } from '../components/ImageViewer';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { JsonPane, Table, ViewSwitch, useDataSheet } from '../components/DataSheet';
 
@@ -160,7 +161,16 @@ export function RealQuakeCase() {
           </div>
           {shakemap.available && shakemap.intensityMap ? (
             <>
-              <img src={shakemap.intensityMap} alt="USGS ShakeMap modified Mercalli intensity" className="mt-1.5 w-full rounded border border-white/10" loading="lazy" />
+              <ZoomableImage
+                src={shakemap.intensityMap}
+                alt="USGS ShakeMap modified Mercalli intensity"
+                className="mt-1.5 w-full rounded border border-white/10"
+                label="USGS ShakeMap · Kahramanmaraş M7.8"
+                caption={'max MMI ' + (shakemap.maxMmi ?? '—') + ' · max PGA ' + (shakemap.maxPga ?? '—') + ' g'}
+                source="USGS ShakeMap intensity"
+                date="2023-02-06"
+                href={shakemap.intensityMap}
+              />
               <div className="mt-1 grid grid-cols-3 gap-1">
                 <div className="rounded border border-white/10 bg-white/[0.02] px-1.5 py-1">
                   <div className="text-[8px] uppercase text-slate-500">Max MMI</div>
@@ -200,7 +210,18 @@ export function RealQuakeCase() {
                       <span className={`text-[9px] font-semibold uppercase ${tone}`}>{kind}</span>
                       <span className="text-[9px] text-slate-500">{g.date}</span>
                     </div>
-                    <img src={g.image} alt={`Sentinel-1 ${kind} quicklook ${g.date}`} className="mt-1 h-[150px] w-full rounded object-cover" loading="lazy" />
+                    <ZoomableImage
+                      src={g.image}
+                      alt={'Sentinel-1 ' + kind + ' quicklook ' + g.date}
+                      className="mt-1 h-[150px] w-full rounded"
+                      label={'Kahramanmaraş · Sentinel-1 ' + kind}
+                      caption={g.platform + ' · ' + g.time + ' UTC'}
+                      source="NASA ASF"
+                      date={g.date}
+                      href={g.granule}
+                      before={imagery.before ? { src: imagery.before.image, label: 'Sentinel-1 before', date: imagery.before.date, source: 'NASA ASF' } : undefined}
+                      after={imagery.after ? { src: imagery.after.image, label: 'Sentinel-1 after', date: imagery.after.date, source: 'NASA ASF' } : undefined}
+                    />
                     <div className="mt-0.5 truncate px-0.5 text-[8px] text-slate-500">{g.platform} · {g.time}</div>
                   </div>
                 ))}

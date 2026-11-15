@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { ZoomableImage } from '../components/ImageViewer';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { JsonPane, Table, ViewSwitch, useDataSheet } from '../components/DataSheet';
 
@@ -365,11 +366,13 @@ export function NorwayLive({ aoiId, title, compact = false }: { aoiId: string; t
 
       {showRadar && (
         <div className="mt-1.5">
-          <img
+          <ZoomableImage
             src="https://api.met.no/weatherapi/radar/2.0/?type=reflectivity&area=norway&content=image"
             alt="MET Norway precipitation radar over Norway"
             className="w-full rounded border border-white/10"
-            loading="lazy"
+            label="MET Norway precipitation radar · Norway"
+            source="MET Norway Radar 2.0"
+            href="https://api.met.no/weatherapi/radar/2.0/?type=reflectivity&area=norway&content=image"
           />
           <SourceLine
             text="MET Norway · Radar 2.0 reflectivity composite, Norway"

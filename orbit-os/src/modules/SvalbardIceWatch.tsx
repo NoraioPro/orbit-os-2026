@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { ZoomableImage } from '../components/ImageViewer';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { FindingsVoice } from '../components/FindingsVoice';
 import { JsonPane, Table, ViewSwitch, useDataSheet } from '../components/DataSheet';
@@ -449,11 +450,15 @@ export function SvalbardIceWatch() {
             ))}
           </div>
         </div>
-        <img
-          src={`https://cryo.met.no/sites/cryo.met.no/files/latest/${chartImg}_latest.png`}
-          alt={`Norwegian Ice Service ${chartImg} chart`}
+        <ZoomableImage
+          src={'https://cryo.met.no/sites/cryo.met.no/files/latest/' + chartImg + '_latest.png'}
+          alt={'Norwegian Ice Service ' + chartImg + ' chart'}
           className="mt-2 h-auto w-full rounded border border-white/10"
-          loading="lazy"
+          label={'Norwegian Ice Service · ' + chartImg + ' chart'}
+          caption={chart.data ? 'chart ' + chart.data.issued : undefined}
+          source="MET Norway / Norwegian Ice Service"
+          date={chart.data?.issued ?? undefined}
+          href={'https://cryo.met.no/sites/cryo.met.no/files/latest/' + chartImg + '_latest.png'}
         />
       </Glass>
 

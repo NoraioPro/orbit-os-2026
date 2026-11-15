@@ -93,7 +93,7 @@ export function SarGlobe() {
         lat: s.lat,
         lng: s.lon,
         color: sevColor(s.changedPct),
-        label: `${s.name} · ${(s.changedPct * 100).toFixed(0)}%`,
+        label: s.name,
         weight: s.id === sel ? 1 : top.includes(s.id) ? 0.75 : 0.4,
       })),
     [scored, sel, top],
@@ -170,7 +170,7 @@ export function SarGlobe() {
 
         <div className="flex flex-col gap-3 border-l border-white/10 p-3">
           <Glass className="p-3">
-            <div className="h-title">Best change locations</div>
+            <div className="h-title">Study sites</div>
             <ul className="mt-2 space-y-1.5 text-[11px]">
               {scored.map((s, i) => (
                 <li key={s.id}>
@@ -178,7 +178,7 @@ export function SarGlobe() {
                     <span className="w-4 text-[10px] font-bold text-slate-500">{i + 1}</span>
                     <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: sevColor(s.changedPct) }} />
                     <span className="flex-1 truncate text-slate-200">{s.name}</span>
-                    <span className="tabular-nums text-slate-400">{(s.changedPct * 100).toFixed(0)}%</span>
+                    <span className="text-[9px] uppercase tracking-wide text-slate-500">live inquiry</span>
                   </button>
                 </li>
               ))}
@@ -189,8 +189,8 @@ export function SarGlobe() {
             <div className="flex items-center justify-between"><div className="h-title">{current.name}</div><Chip className="border-teal-400/30 text-teal-200">{current.scenario}</Chip></div>
             <div className="mt-1 text-[10px] text-slate-500">{current.region} · {current.lat.toFixed(2)}°, {current.lon.toFixed(2)}°</div>
             <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-              <div className="rounded-md border border-white/10 bg-white/[.03] p-2"><div className="text-slate-400">Changed cells</div><div className="text-lg font-bold text-white">{current.changedCells}</div></div>
-              <div className="rounded-md border border-white/10 bg-white/[.03] p-2"><div className="text-slate-400">Affected area</div><div className="text-lg font-bold text-white">{current.areaKm2.toFixed(0)} km²</div></div>
+              <div className="rounded-md border border-white/10 bg-white/[.03] p-2"><div className="text-slate-400">ASF granules</div><div className="text-lg font-bold text-white">{asfState === 'ok' && asf ? asf.n : '—'}</div><div className="text-[9px] text-slate-500">1° box · NISAR + Sentinel-1</div></div>
+              <div className="rounded-md border border-white/10 bg-white/[.03] p-2"><div className="text-slate-400">Latest pass</div><div className="text-lg font-bold text-white">{asfState === 'ok' && asf?.latest ? asf.latest.slice(0, 10) : '—'}</div><div className="text-[9px] text-slate-500">UTC acquisition date</div></div>
             </div>
             <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2 text-[11px]">
               <span className="text-slate-400">ASF acquisitions (1° box)</span>
@@ -199,7 +199,7 @@ export function SarGlobe() {
               </span>
             </div>
 
-            <p className="mt-2 text-[10px] text-slate-500">Change % is from the SAMPLE synthetic before/after pairs (seeded, reproducible) — the acquisition counts and times are live ASF.</p>
+            <p className="mt-2 text-[10px] text-slate-500">No change percentage is shown: that needs a pair of radar scenes with measured pixels. The figures here are live ASF acquisitions for the selected point; the real before/after imagery loads below when you pick a site.</p>
           </Glass>
         </div>
 
