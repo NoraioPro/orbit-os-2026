@@ -281,7 +281,7 @@ export function NorwayLive({ aoiId, title, compact = false }: { aoiId: string; t
             <Metric label="Precip 1 h" value={n1(now.precipNextHourMm)} unit="mm" />
             <Metric label="Humidity" value={now.humidityPct != null ? String(Math.round(now.humidityPct)) : '—'} unit="%" />
           </div>
-          <SourceLine text={aoi.forecast!.source + (now.symbol ? ` · ${now.symbol.replace(/_/g, ' ')}` : '')} url={aoi.forecast!.url} at={aoi.forecast!.updated ?? aoi.fetched_at} />
+          <SourceLine text={aoi.forecast!.source + (now.symbol ? ` · ${now.symbol.replace(/_/g, ' ')}` : '') + (aoi.forecast!.hours?.[0]?.at ? ` · valid ${aoi.forecast!.hours[0].at.slice(11, 16)} UTC` : '')} url={aoi.forecast!.url} at={aoi.forecast!.updated ?? aoi.fetched_at} />
           {!compact && aoi.forecast?.hours && aoi.forecast.hours.length > 1 && (
             <div className="mt-1.5">
               <div className="text-[9px] uppercase tracking-wide text-slate-500">Next {Math.min(24, aoi.forecast.hours.length)} hours · air temperature</div>

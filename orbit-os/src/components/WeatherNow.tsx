@@ -65,8 +65,9 @@ export function WeatherNow({ lat, lon, label, compact = false }: { lat: number; 
             );
           })}
         </div>
-        <div className="mt-1 text-[8px] text-slate-500">
-          MET Norway Locationforecast 2.0 · updated {d.properties.meta.updated_at.slice(0, 16).replace('T', ' ')} UTC
+        <div className="mt-1 text-[8px] leading-snug text-slate-500">
+          MET Norway Locationforecast 2.0 · forecast valid {ts[0].time.slice(11, 16)} UTC, model run {d.properties.meta.updated_at.slice(0, 16).replace('T', ' ')} UTC
+          · point forecast at {lat.toFixed(3)}°, {lon.toFixed(3)}° — a widget on another device may use a different point or a later run
         </div>
       </div>
     );
