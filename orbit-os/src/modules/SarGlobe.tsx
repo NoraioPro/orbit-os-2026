@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Globe, { type GlobeMethods } from 'react-globe.gl';
 import { MeshPhongMaterial, Color } from 'three';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { NarrationButton } from '../components/Narration';
 import { backscatterChange, simulateSarPair } from '../kernel';
+import { ConnectorLines, useGlobeConnectors } from '../components/ConnectorLines';
+import type { GlobeProject } from '../components/OrbitGlobe';
 
 /* ------------------------------------------------------------------ *
  * SAR Earth Atlas — "Dancing with the SARs" mapped to Earth.
@@ -52,6 +54,9 @@ export function SarGlobe() {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const wrap = useRef<HTMLDivElement>(null);
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const rowEls = useRef(new Map<string, HTMLElement | null>());
+  const [project, setProject] = useState<GlobeProject | null>(null);
 
   // Rank every study area with the real SAR kernel (synthetic, seeded pairs).
   // The change-region radius varies per site so the "best change" ranking is real.
@@ -64,6 +69,42 @@ export function SarGlobe() {
     }).sort((a, b) => b.changedPct - a.changedPct), []);
 
   const top = scored.slice(0, 3).map((s) => s.id);
+
+  // lat/lng -> canvas pixels, so the connector pins follow the globe
+  useEffect(() => {
+    const g = globeRef.current;
+    if (!g) return;
+    setProject(() => (lat: number, lng: number) => {
+      try {
+        const c = g.getScreenCoords(lat, lng, 0);
+        return c && Number.isFinite(c.x) && Number.isFinite(c.y) ? { x: c.x, y: c.y } : null;
+      } catch {
+        return null;
+      }
+    });
+  }, [size.w, size.h]);
+
+  // the ranked list is the anchor: every dot on the globe connects to its row
+  const connectorPoints = useMemo(
+    () =>
+      scored.map((s) => ({
+        id: s.id,
+        lat: s.lat,
+        lng: s.lon,
+        color: sevColor(s.changedPct),
+        label: `${s.name} · ${(s.changedPct * 100).toFixed(0)}%`,
+        weight: s.id === sel ? 1 : top.includes(s.id) ? 0.75 : 0.4,
+      })),
+    [scored, sel, top],
+  );
+  const anchorEls = useCallback(() => rowEls.current, []);
+  const { pins, anchors } = useGlobeConnectors({
+    project,
+    points: connectorPoints,
+    containerRef: gridRef,
+    globeRectRef: wrap,
+    anchorEls,
+  });
   const current = scored.find((s) => s.id === sel)!;
 
   useEffect(() => {
@@ -89,7 +130,7 @@ export function SarGlobe() {
         <span className="text-[11px] text-slate-500">8 study areas · ranked by detected radar change · click any marker</span>
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_260px]">
+      <div ref={gridRef} className="relative grid grid-cols-[minmax(0,1fr)_260px]">
         <div ref={wrap} className="relative h-[460px]">
           {size.w > 0 && (
             <Globe
@@ -131,7 +172,7 @@ export function SarGlobe() {
             <ul className="mt-2 space-y-1.5 text-[11px]">
               {scored.map((s, i) => (
                 <li key={s.id}>
-                  <button onClick={() => setSel(s.id)} className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition ${sel === s.id ? 'bg-teal-500/15' : 'hover:bg-white/5'}`}>
+                  <button ref={(el) => { rowEls.current.set(s.id, el); }} onClick={() => setSel(s.id)} className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition ${sel === s.id ? 'bg-teal-500/15' : 'hover:bg-white/5'}`}>
                     <span className="w-4 text-[10px] font-bold text-slate-500">{i + 1}</span>
                     <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: sevColor(s.changedPct) }} />
                     <span className="flex-1 truncate text-slate-200">{s.name}</span>
@@ -158,6 +199,9 @@ export function SarGlobe() {
             <p className="mt-2 text-[10px] text-slate-500">Change % is from the SAMPLE synthetic before/after pairs (seeded, reproducible) — the acquisition counts and times are live ASF.</p>
           </Glass>
         </div>
+
+        {/* pins on the globe -> rows in the ranked list (and the reverse on select) */}
+        <ConnectorLines pins={pins} anchors={anchors} />
       </div>
     </Glass>
   );
