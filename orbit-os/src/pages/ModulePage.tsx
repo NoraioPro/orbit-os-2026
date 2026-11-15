@@ -20,6 +20,7 @@ import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
 import { NarrationButton } from '../components/Narration';
 import { NorwayLive } from '../modules/NorwayLive';
+import { EarthStory } from '../modules/EarthStory';
 import { RealQuakeCase } from '../modules/RealQuakeCase';
 const StoryGlobe = lazy(() => import('../components/StoryGlobe').then((m) => ({ default: m.StoryGlobe })));
 import { WeatherNow, WEATHER_SITES } from '../components/WeatherNow';
@@ -197,6 +198,7 @@ export default function ModulePage() {
       </div>
 
       {STORIES[m.id] && <div data-tour="story"><Suspense fallback={<div className="mb-3 grid h-[400px] place-items-center text-xs text-slate-500">Loading story globe…</div>}><StoryGlobe beats={STORIES[m.id].beats} db={db} types={GUIDES[m.id]?.focus} /></Suspense></div>}
+      {m.id === 'earth' && <EarthStory />}
       <div data-tour="main"><Suspense fallback={<div role="status" className="grid min-h-48 place-items-center text-sm text-slate-400">Loading module…</div>}><W /></Suspense></div>
       <div data-tour="sources" className="mt-3 grid grid-cols-3 gap-3">
         <Glass className="p-4">
