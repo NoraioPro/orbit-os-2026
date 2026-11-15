@@ -69,6 +69,13 @@ export const MODULE_TOPICS: Record<string, string[]> = {
   defense: ['satellite', 'situation room', 'crisis', 'swarm', 'space weather', 'tle', 'situation'],
 };
 
+/** first module (in rail order) that claims each challenge number */
+const challengeOwner = new Map<number, string>();
+for (const id of MODULE_ORDER) {
+  const m = MODULES.find((x) => x.id === id);
+  for (const n of m?.challenges ?? []) if (!challengeOwner.has(n)) challengeOwner.set(n, id);
+}
+
 const moduleItems: NavItem[] = MODULE_ORDER
   .map((id) => MODULES.find((m) => m.id === id))
   .filter((m): m is (typeof MODULES)[number] => Boolean(m))
@@ -81,31 +88,77 @@ const moduleItems: NavItem[] = MODULE_ORDER
     group: 'worlds' as const,
     badge: m.release,
     hint: m.tagline,
-    keywords: [m.id, ...m.patterns, ...m.sdgs.map(String), ...m.datasets, ...(MODULE_TOPICS[m.id] ?? []), ...m.question.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w.length > 3)],
+    keywords: [
+      m.id, ...m.patterns, ...m.sdgs.map(String), ...m.datasets, ...(MODULE_TOPICS[m.id] ?? []),
+      ...m.question.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w.length > 3),
+      ...m.challenges.map((n) => `challenge ${n}`),
+    ],
     color: MODULE_COLORS[m.id],
+    // dynamic: derived from MODULES[].challenges, so a module that gains a challenge
+    // grows a child row without anyone editing a list here. Each challenge is listed
+    // once — under the first module in MODULE_ORDER that claims it — and the hint
+    // names the other modules that implement it too, instead of repeating the row.
+    children: m.challenges
+      .filter((n) => (challengeOwner.get(n) ?? m.id) === m.id)
+      .map((n) => {
+        const item = challengeItem(n, 'worlds');
+        if (!item) return null;
+        const others = MODULES.filter((o) => o.id !== m.id && o.challenges.includes(n)).map((o) => o.name);
+        return others.length ? { ...item, hint: `${item.hint ?? ''} · also in ${others.join(', ')}`.trim() } : item;
+      })
+      .filter((x): x is NavItem => Boolean(x)),
   }));
 
-/** per-challenge rail icons (lucide names that already exist in components/ui.tsx) */
-const SOLUTION_ICONS: Record<number, string> = {
-  1: 'Box', 2: 'ChartColumn', 3: 'Gamepad2', 4: 'HeartPulse', 5: 'Radio', 6: 'Sprout', 7: 'Flame',
-  8: 'Clock', 9: 'Target', 10: 'Mars', 11: 'Moon', 12: 'Sparkles', 13: 'Rocket', 14: 'Music',
-};
+/**
+ * Per-challenge rail icons (lucide names that already exist in components/ui.tsx).
+ * A hoisted function, not a const map: moduleItems is evaluated at import time and
+ * calls challengeItem() before any later const would be initialised.
+ */
+function solutionIcon(n: number): string {
+  const icons: Record<number, string> = {
+    1: 'Box', 2: 'ChartColumn', 3: 'Gamepad2', 4: 'HeartPulse', 5: 'Radio', 6: 'Sprout', 7: 'Flame',
+    8: 'Clock', 9: 'Target', 10: 'Mars', 11: 'Moon', 12: 'Sparkles', 13: 'Rocket', 14: 'Music',
+  };
+  return icons[n] ?? 'Puzzle';
+}
 
-/** the 14 challenge prototypes, as second-level rows under Program › Solutions */
-export const SOLUTION_ITEMS: NavItem[] = CHALLENGES.map((c) => {
+/** Rail-length label for a challenge (the full title is in the hint). */
+// hoisted declaration on purpose: moduleItems is evaluated at import time and
+// already calls challengeItem(), so a const arrow here would hit the TDZ
+function shortTitle(name: string, max = 26) {
+  return name.length <= max ? name : `${name.slice(0, max - 1).trimEnd()}…`;
+}
+
+function challengeItem(n: number, group: NavGroupId): NavItem | null {
+  const c = CHALLENGES.find((x) => x.n === n);
+  if (!c) return null;
   const meta = CHALLENGE_META[c.n];
   return {
     id: `solution.${c.n}`,
-    label: c.name,
+    label: shortTitle(c.name),
     to: `/solution/${c.n}`,
-    icon: SOLUTION_ICONS[c.n] ?? 'Puzzle',
+    icon: solutionIcon(c.n),
     kind: 'page' as const,
-    group: 'program' as const,
+    group,
     badge: `C${c.n}`,
-    hint: meta?.desc,
-    keywords: ['challenge', 'solution', 'prototype', `challenge ${c.n}`, ...(meta?.subjects ?? []), ...(meta?.difficulty ? [meta.difficulty] : [])],
+    hint: `${c.name} — ${meta?.desc ?? ''}`.trim(),
+    keywords: [
+      'challenge', 'solution', 'prototype', `challenge ${c.n}`, `c${c.n}`,
+      c.name.toLowerCase(),
+      ...(meta?.subjects ?? []),
+      ...(meta?.difficulty ? [meta.difficulty] : []),
+    ],
   };
-});
+}
+
+/**
+ * Every challenge, once. The merged menu hangs each one under the module that
+ * actually implements it, so there is no second list repeating the same 14 rows.
+ */
+export const CHALLENGE_ITEMS: NavItem[] = CHALLENGES.map((c) => challengeItem(c.n, 'worlds')).filter((x): x is NavItem => Boolean(x));
+
+/** kept for callers that only want the flat list */
+export const SOLUTION_ITEMS = CHALLENGE_ITEMS;
 
 export const NAV_GROUPS: NavGroup[] = [
   {
@@ -121,7 +174,7 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: 'worlds', label: 'Worlds', hint: `${moduleItems.length} solution modules`, items: moduleItems,
+    id: 'worlds', label: 'Worlds', hint: `${moduleItems.length} modules · ${CHALLENGE_ITEMS.length} challenges`, items: moduleItems,
   },
   {
     id: 'intelligence',
@@ -144,7 +197,15 @@ export const NAV_GROUPS: NavGroup[] = [
     hint: 'missions & reports',
     items: [
       { id: 'page.missions', label: 'Missions', to: '/missions', icon: 'Rocket', kind: 'page', group: 'program', hint: 'Mission designs and the 14 challenge solutions', keywords: ['challenge', 'space apps'] },
-      { id: 'page.solutions', label: 'Solutions', to: '/solutions', icon: 'Puzzle', kind: 'page', group: 'program', hint: 'The 14 published challenge solutions', keywords: ['challenge', 'entries'], children: SOLUTION_ITEMS },
+      {
+        id: 'page.solutions', label: 'All 14 challenges', to: '/solutions', icon: 'Puzzle', kind: 'page', group: 'program', badge: '14',
+        hint: 'Index of every challenge prototype, grouped by module',
+        keywords: ['challenge', 'entries', 'all challenges', 'solutions', 'index'],
+        // whatever no module claims (today: challenge 1) still needs a home in the menu
+        children: CHALLENGES.filter((c) => !challengeOwner.has(c.n))
+          .map((c) => challengeItem(c.n, 'program'))
+          .filter((x): x is NavItem => Boolean(x)),
+      },
       { id: 'page.sdgs', label: 'SDGs', to: '/sdgs', icon: 'Target', kind: 'page', group: 'program', hint: 'Modules mapped to UN goals', keywords: ['un', 'goals', 'impact'] },
       { id: 'page.reports', label: 'Reports', to: '/reports', icon: 'FileText', kind: 'page', group: 'program', hint: 'Generated evidence reports', keywords: ['pdf', 'export', 'evidence'] },
     ],

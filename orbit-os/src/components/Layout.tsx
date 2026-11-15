@@ -105,7 +105,7 @@ function Spine({ rail, onToggleRail, onNavigate }: { rail: boolean; onToggleRail
                               onClick={onNavigate}
                               title={rail ? `${item.label}${item.badge ? ` · ${item.badge}` : ''}` : item.hint}
                               className={({ isActive }) =>
-                                `flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2.5 py-[4px] text-[12.5px] transition ${rail ? 'justify-center' : ''} ${
+                                `relative flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2.5 py-[4px] text-[12.5px] transition ${rail ? 'justify-center' : ''} ${
                                   isActive
                                     ? 'border border-sky-400/40 bg-gradient-to-r from-sky-500/30 to-indigo-500/10 text-white shadow-glow'
                                     : 'border border-transparent text-slate-200 hover:bg-white/5'
@@ -113,12 +113,20 @@ function Spine({ rail, onToggleRail, onNavigate }: { rail: boolean; onToggleRail
                               }
                             >
                               <Icon name={item.icon} className={`h-4 w-4 shrink-0 ${item.color ?? 'text-sky-300'}`} />
-                              {!rail && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
-                              {!rail && kids.length > 0 && (
-                                <span className="shrink-0 rounded border border-white/10 bg-white/5 px-1 py-[1px] text-[9px] font-semibold text-slate-400">{kids.length}</span>
+                              {rail && kids.length > 0 && (
+                                <span className={`absolute right-1 top-1 h-1 w-1 rounded-full ${kidActive ? 'bg-sky-300' : 'bg-slate-500'}`} />
                               )}
-                              {!rail && item.badge && !kids.length && (
+                              {!rail && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
+                              {!rail && item.badge && (
                                 <span className="shrink-0 rounded border border-white/10 bg-white/5 px-1 py-[1px] text-[9px] font-semibold tracking-wide text-slate-400">{item.badge}</span>
+                              )}
+                              {!rail && kids.length > 0 && (
+                                <span
+                                  className={`shrink-0 text-[9px] font-semibold tabular-nums ${kidActive ? 'text-sky-300' : 'text-slate-500'}`}
+                                  title={`${kids.length} challenge${kids.length === 1 ? '' : 's'} implemented by this module`}
+                                >
+                                  {kids.length}
+                                </span>
                               )}
                             </NavLink>
                             {!rail && kids.length > 0 && (
