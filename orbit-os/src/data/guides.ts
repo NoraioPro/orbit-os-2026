@@ -13,7 +13,6 @@ export const GUIDES: Record<ModuleId, ModuleGuide> = {
   explorer: { focus: [], howto: ['Rank Earth analogs against Mars/Moon', 'Read the scores', 'Run as a full investigation'] },
   academy: { focus: [], howto: ['Set a mass budget', 'Choose outpost modules', 'See the mission-value trade-off'] },
   human: { focus: [], howto: ['Open the suit layer by layer', 'Explode the assembly to read the parts list', 'Keep ISS combustion separate from Earth fire data'] },
-  ignis: { focus: [], howto: ['Read the published flame-spread values', 'Search the 19 NASA PSI investigations', 'Trace each figure to its NTRS source'] },
   sar: { focus: [], howto: ['Pick a study area', 'Swipe before/after and set the threshold', 'Check displacement and cross-links'] },
   defense: { focus: [], howto: ['Watch the live satellite swarm', 'Read the real-time situation panels', 'Review the free data sources behind it'] },
 };

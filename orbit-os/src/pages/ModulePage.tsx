@@ -33,7 +33,6 @@ import { TOURS } from '../data/tours';
 import { useStore } from '../state/store';
 
 const HumanLab = lazy(() => import('../modules/HumanLab').then((m) => ({ default: m.HumanLab })));
-const FlameLab = lazy(() => import('../modules/FlameLab').then((m) => ({ default: m.FlameLab })));
 const SolarFish = lazy(() => import('../modules/SolarFish').then((m) => ({ default: m.SolarFish })));
 const MissionAcademyPro = lazy(() => import('../modules/MissionAcademyPro').then((m) => ({ default: m.MissionAcademyPro })));
 const SituationRoom = lazy(() => import('../modules/SituationRoom').then((m) => ({ default: m.SituationRoom })));
@@ -71,7 +70,6 @@ const HumanSuite: ComponentType = () => (
     {/* the EVA build-lab artifact replaces the earlier digital-twin tile */}
     <EvaLab height={820} />
     <HumanLab />
-    <FlameLab />
   </div>
 );
 
@@ -100,7 +98,7 @@ function AgriSuite() {
 
 const WIDGET: Record<string, ComponentType> = {
   earth: EarthSuite, disaster: DisasterSuite, agri: AgriSuite, ocean: OceanSuite, infrastructure: InfraSuite, gnss: GnssGuardian,
-  sar: SarSuite, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanSuite, ignis: FlameLab, defense: SituationRoom,
+  sar: SarSuite, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanSuite,  defense: SituationRoom,
 };
 export default function ModulePage() {
   const { id = '' } = useParams();

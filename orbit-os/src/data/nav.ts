@@ -64,7 +64,6 @@ export const MODULE_TOPICS: Record<string, string[]> = {
   explorer: ['analog', 'analogue', 'mars', 'moon', 'site', 'ranking', 'transfer'],
   academy: ['learn', 'outpost', 'budget', 'education', 'game', 'design'],
   human: ['crew', 'astronaut', 'health', 'hr', 'physiology', 'iss'],
-  ignis: ['flame', 'combustion', 'saffire', 'luci', 'microgravity', 'psi', 'fire in space'],
   sar: ['radar', 'insar', 'coherence', 'backscatter', 'displacement', 'sentinel', 'nisar', 'before after'],
   defense: ['satellite', 'situation room', 'crisis', 'swarm', 'space weather', 'tle', 'situation'],
 };
@@ -129,7 +128,11 @@ function shortTitle(name: string, max = 26) {
   return name.length <= max ? name : `${name.slice(0, max - 1).trimEnd()}…`;
 }
 
+/** challenges deliberately kept out of the rail (module removed) */
+const HIDDEN_CHALLENGES = new Set<number>([7]);
+
 function challengeItem(n: number, group: NavGroupId): NavItem | null {
+  if (HIDDEN_CHALLENGES.has(n)) return null;
   const c = CHALLENGES.find((x) => x.n === n);
   if (!c) return null;
   const meta = CHALLENGE_META[c.n];
