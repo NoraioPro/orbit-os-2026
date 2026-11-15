@@ -11,6 +11,7 @@ const GnssGuardian = lazy(() => import('../modules/GnssGuardian').then((m) => ({
 const SarObservatory = lazy(() => import('../modules/SarObservatory').then((m) => ({ default: m.SarObservatory })));
 const InfrastructureOslo = lazy(() => import('../modules/InfrastructureOslo').then((m) => ({ default: m.InfrastructureOslo })));
 const AgriBoard = lazy(() => import('../modules/AgriBoard').then((m) => ({ default: m.AgriBoard })));
+const EvaLab = lazy(() => import('../components/EvaLab').then((m) => ({ default: m.EvaLab })));
 const OceanBoard = lazy(() => import('../modules/OceanBoard').then((m) => ({ default: m.OceanBoard })));
 const DisasterEventBoard = lazy(() => import('../modules/DisasterEventBoard').then((m) => ({ default: m.DisasterEventBoard })));
 const TurkiyeBoard = lazy(() => import('../modules/TurkiyeBoard').then((m) => ({ default: m.TurkiyeBoard })));
@@ -62,7 +63,15 @@ const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterE
 const SarSuite: ComponentType = () => <div className="space-y-3"><SarFaultLab /><SarGlobe /><SarChampion /></div>;
 const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanBoard /><OceanWidget /><SolarFish /></div>;
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
-const HumanSuite: ComponentType = () => <div className="space-y-3"><AstronautTwin /><HumanLab /><FlameLab /></div>;
+const HumanSuite: ComponentType = () => (
+  <div className="space-y-3">
+    {/* the EVA build-lab artifact is the lead surface of this module */}
+    <EvaLab height={780} />
+    <AstronautTwin />
+    <HumanLab />
+    <FlameLab />
+  </div>
+);
 
 
 /** Infrastructure: the Oslo SAR/InSAR situation board leads, the existing exposure widget follows. */

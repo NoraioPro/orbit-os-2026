@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T09:29:08.617Z",
+  "generated_at": "2026-11-15T09:55:30.940Z",
   "app": "ORBIT OS · Space Intelligence Platform",
   "base_url": "http://localhost:5173/",
   "capture": {
@@ -214,8 +214,8 @@
       "title": "Human Space Lab",
       "route": "/module/human",
       "file": "pages/module-human.jpg",
-      "bytes": 321144,
-      "captured_at": "2026-11-15T09:00:47.677Z"
+      "bytes": 363126,
+      "captured_at": "2026-11-15T09:55:30.674Z"
     },
     {
       "slug": "module-ignis",
