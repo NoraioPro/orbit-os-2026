@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { PlayBar, useAutoPlay } from '../lib/useAutoPlay';
 import { Glass, StatusBadge } from '../components/ui';
 import { Provenance } from '../components/Provenance';
 import { WorkflowStrip } from '../components/WorkflowStrip';
@@ -66,8 +67,20 @@ function parseFootprint(wkt?: string | null): [number, number][] {
 function FaultMap({ pair, quicklooks }: { pair: FaultFile['pair']; quicklooks?: FaultFile['quicklooks'] }) {
   const W = 800;
   const H = 440;
-  const [layer, setLayer] = useState<'after' | 'before'>('after');
+  // blink between the two passes so the change is visible without clicking:
+  // index 0 = before, 1 = after, and the film starts on 'after' like the tab did
+  const film = useAutoPlay(2, 1100, 1);
+  const layer: 'after' | 'before' = film.index === 0 ? 'before' : 'after';
+  const setLayer = film.goto;
   const [imgFailed, setImgFailed] = useState(false);
+  const canBlink = Boolean(quicklooks?.before?.quicklook && quicklooks?.after?.quicklook);
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current || !canBlink) return;
+    started.current = true;
+    film.toggle();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canBlink]);
   const before = useMemo(() => parseFootprint(pair.before?.footprint), [pair.before]);
   const after = useMemo(() => parseFootprint(pair.after?.footprint), [pair.after]);
   const qk = quicklooks?.[layer] ?? null;
@@ -102,14 +115,14 @@ function FaultMap({ pair, quicklooks }: { pair: FaultFile['pair']; quicklooks?: 
 
   return (
     <div className="relative">
-      <div className="absolute right-2 top-2 z-10 flex gap-1">
+      <div className="absolute right-2 top-2 z-10 flex items-center gap-1">
         {(['after', 'before'] as const).map((k) => {
           const q = quicklooks?.[k];
           const on = layer === k;
           return (
             <button
               key={k}
-              onClick={() => { setLayer(k); setImgFailed(false); }}
+              onClick={() => { film.goto(k === 'before' ? 0 : 1); setImgFailed(false); }}
               title={q?.quicklook ? `${q.platform ?? 'Sentinel-1'} GRD quicklook · ${fmt(q.startTime)}` : 'no quicklook'}
               className={`rounded border px-1.5 py-[1px] text-[9px] font-semibold uppercase transition ${on ? 'border-teal-400/60 bg-teal-500/20 text-teal-100' : 'border-white/10 bg-slate-950/70 text-slate-400 hover:text-white'}`}
             >
@@ -117,6 +130,19 @@ function FaultMap({ pair, quicklooks }: { pair: FaultFile['pair']; quicklooks?: 
             </button>
           );
         })}
+        {canBlink && (
+          <div className="rounded bg-slate-950/80 px-1 py-0.5">
+            <PlayBar
+              count={2}
+              index={film.index}
+              playing={film.playing}
+              onToggle={film.toggle}
+              onPick={film.goto}
+              label="blink"
+              intervalMs={1100}
+            />
+          </div>
+        )}
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" role="img" aria-label="Real Sentinel-1 quicklook with footprints over the East Anatolian Fault">
         <defs>
