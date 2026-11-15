@@ -49,8 +49,9 @@ export const MODULE_COLORS: Record<string, string> = {
 
 /** demo-critical order: P0 first, then P1, honesty-heavy modules last */
 export const MODULE_ORDER: string[] = [
-  'earth', 'sar', 'disaster', 'defense', 'agri', 'ocean', 'ignis',
-  'infrastructure', 'gnss', 'explorer', 'academy', 'human',
+  // Human Space Lab leads the rail; Earth Intelligence follows
+  'human', 'earth', 'sar', 'disaster', 'defense', 'agri', 'ocean',
+  'infrastructure', 'gnss', 'explorer', 'academy',
 ];
 
 /** demo-language topics: the words a judge or Hassan actually types */
