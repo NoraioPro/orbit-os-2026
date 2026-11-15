@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ZoomableImage } from '../components/ImageViewer';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { FindingsVoice } from '../components/FindingsVoice';
 import { JsonPane, Table, ViewSwitch, useDataSheet } from '../components/DataSheet';
+import { PlayBar, useAutoPlay } from '../lib/useAutoPlay';
 
 /**
  * Svalbard / European-Arctic ice watch — built only from published data.
@@ -277,6 +278,15 @@ export function SvalbardIceWatch() {
   const archive = useJson<Archive>('archive.json');
   const [chartImg, setChartImg] = useState<'svalbard' | 'fram_strait' | 'barents'>('svalbard');
   const sheet = useDataSheet('/data/ice/chart.json');
+  const archiveFrames = (archive.data?.images ?? []).filter((i) => i.region === 'arctic' || i.region === 'framst').length;
+  const arcFilm = useAutoPlay(archiveFrames, 2200);
+  const arcStarted = useRef(false);
+  useEffect(() => {
+    if (arcStarted.current || archiveFrames < 3) return;
+    arcStarted.current = true;
+    arcFilm.toggle();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [archiveFrames]);
 
   const t = chart.data?.totals;
   const findings = useMemo(() => {
@@ -483,19 +493,50 @@ export function SvalbardIceWatch() {
       <Glass className="p-4">
         <div className="text-[12px] font-semibold text-white">{archive.data?.title ?? 'Ice-chart archive'}</div>
         <p className="text-[10px] text-slate-400">{archive.data?.note ?? 'Loading archive…'}</p>
-        <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-          {archive.data?.images
-            .filter((i) => i.region === 'arctic' || i.region === 'framst')
-            .map((i) => (
-              <a key={i.url} href={i.url} target="_blank" rel="noreferrer" className="group w-[190px] shrink-0">
-                <img src={i.url} alt={`${i.region} chart ${i.date}`} className="h-[120px] w-full rounded border border-white/10 object-cover group-hover:border-white/30" loading="lazy" />
-                <div className="mt-0.5 flex justify-between text-[9px] text-slate-400">
-                  <span>{i.date}</span>
-                  <span className="text-slate-500">{i.region}</span>
+        {(() => {
+          const frames = (archive.data?.images ?? []).filter((i) => i.region === 'arctic' || i.region === 'framst');
+          if (!frames.length) return null;
+          const at = frames[Math.min(arcFilm.index, frames.length - 1)];
+          return (
+            <div className="mt-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="text-[10px] text-slate-400">
+                  February {at.date.slice(0, 4)} · {at.region === 'framst' ? 'Fram Strait' : 'Arctic'} · the analyst&apos;s own chart
                 </div>
+                <PlayBar
+                  count={frames.length}
+                  index={arcFilm.index}
+                  playing={arcFilm.playing}
+                  onToggle={arcFilm.toggle}
+                  onPick={arcFilm.goto}
+                  label="play years"
+                  intervalMs={2200}
+                />
+              </div>
+              <a href={at.url} target="_blank" rel="noreferrer" className="group mt-1 block">
+                <img
+                  src={at.url}
+                  alt={`${at.region} chart ${at.date}`}
+                  className="h-[300px] w-full rounded border border-white/10 object-contain group-hover:border-white/30"
+                  loading="lazy"
+                />
               </a>
-            ))}
-        </div>
+              <div className="mt-1 flex gap-1 overflow-x-auto pb-1">
+                {frames.map((f, i) => (
+                  <button
+                    key={f.url}
+                    type="button"
+                    onClick={() => arcFilm.goto(i)}
+                    className={`shrink-0 rounded border px-1 py-0.5 text-[8px] transition ${i === arcFilm.index ? 'border-sky-400/60 bg-sky-500/20 text-sky-200' : 'border-white/10 text-slate-400 hover:border-white/25'}`}
+                  >
+                    {f.date.slice(0, 4)}
+                  </button>
+                ))}
+              </div>
+              <div className="text-[8px] text-slate-500">Same week each year — the sequence plays the years in order, click any year to stop on it.</div>
+            </div>
+          );
+        })()}
         <div className="mt-1.5 flex flex-wrap gap-1">
           <Chip><Icon name="Database" className="h-3 w-3" />MET Norway SIGRID-3</Chip>
           <Chip>NSIDC v4.0 regional</Chip>

@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ZoomableImage } from '../components/ImageViewer';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
+import { PlayBar, useAutoPlay } from '../lib/useAutoPlay';
+import { JsonPane, Table, ViewSwitch, useDataSheet } from '../components/DataSheet';
 
 /**
  * 30 m imagery for one AOI, replacing the 250 m MODIS NDVI view.
@@ -85,9 +87,9 @@ export function HiResImagery({ aoiId, compact = false }: { aoiId: string; compac
   const [cat, setCat] = useState<Catalogue | null>(cache);
   const [err, setErr] = useState<string | null>(null);
   const [layerId, setLayerId] = useState<string | null>(null);
-  const [date, setDate] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [compare, setCompare] = useState(false);
+  const sheet = useDataSheet('/data/domains/hires.json');
 
   useEffect(() => {
     if (cache) return;
@@ -106,11 +108,20 @@ export function HiResImagery({ aoiId, compact = false }: { aoiId: string; compac
     return aoi.layers.find((l) => l.id === layerId) ?? aoi.layers[0] ?? null;
   }, [aoi, layerId]);
 
-  // reset the date whenever the layer changes, and never keep a date the layer lacks
+  // the dated tiles play as a short film; picking a date pauses on that frame
+  const film = useAutoPlay(layer?.dates.length ?? 0, 1600, Math.max(0, (layer?.dates.length ?? 1) - 1));
+  const date = layer && layer.dates.length ? layer.dates[Math.min(film.index, layer.dates.length - 1)] : null;
+
+  // start playing as soon as a layer with a real sequence is on screen
+  const startedRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!layer) return;
-    if (!date || !layer.dates.includes(date)) setDate(layer.dates[layer.dates.length - 1] ?? null);
-  }, [layer, date]);
+    if (!layer || layer.dates.length < 3) return;
+    const key = `${aoi?.id}:${layer.id}`;
+    if (startedRef.current === key) return;
+    startedRef.current = key;
+    if (!film.playing) film.toggle();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layer?.id, layer?.dates.length, aoi?.id]);
 
   useEffect(() => setFailed(false), [layerId, date]);
 
@@ -172,21 +183,31 @@ export function HiResImagery({ aoiId, compact = false }: { aoiId: string; compac
         })}
       </div>
 
-      {/* date filter — only dates that had a real tile at build time */}
-      <div className="mt-1.5 flex flex-wrap gap-1">
-        {layer.dates.map((d) => (
-          <button
-            key={d}
-            type="button"
-            onClick={() => setDate(d)}
-            className={`rounded px-1.5 py-0.5 font-mono text-[9px] transition ${
-              d === date ? 'bg-sky-500/20 text-sky-200' : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            {d.slice(5)}
-          </button>
-        ))}
-        {layer.dates.length === 0 && <span className="text-[9px] text-slate-500">no dated coverage</span>}
+      {/* date film: plays on its own, any click pauses on that frame */}
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <div className="flex flex-wrap gap-1">
+          {layer.dates.map((d, i) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => film.goto(i)}
+              className={`rounded px-1.5 py-0.5 font-mono text-[9px] transition ${
+                i === film.index ? 'bg-sky-500/20 text-sky-200' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {d.slice(5)}
+            </button>
+          ))}
+          {layer.dates.length === 0 && <span className="text-[9px] text-slate-500">no dated coverage</span>}
+        </div>
+        <PlayBar
+          count={layer.dates.length}
+          index={film.index}
+          playing={film.playing}
+          onToggle={film.toggle}
+          onPick={film.goto}
+          intervalMs={1600}
+        />
       </div>
 
       <div className={`mt-2 grid gap-1.5 ${compare ? 'grid-cols-2' : 'grid-cols-1'}`}>
@@ -237,6 +258,16 @@ export function HiResImagery({ aoiId, compact = false }: { aoiId: string; compac
         >
           {compare ? 'hide MODIS 250 m comparison' : 'compare with MODIS 250 m'}
         </button>
+        <ViewSwitch
+          open={sheet.open}
+          setOpen={sheet.setOpen}
+          jsonUrl="/data/domains/hires.json"
+          csv={{
+            head: ['layer', 'sensor', 'resolution m', 'date'],
+            body: aoi.layers.flatMap((l) => (l.dates.length ? l.dates.map((d) => [l.label, l.sensor, l.resolution, d]) : [[l.label, l.sensor, l.resolution, 'no coverage']])),
+          }}
+          csvName={`orbit-hires-${aoi.id}.csv`}
+        />
         {layer.legend && (
           <a
             className="text-[9px] text-sky-400 hover:underline"
@@ -256,6 +287,21 @@ export function HiResImagery({ aoiId, compact = false }: { aoiId: string; compac
           open in GIBS Worldview ↗
         </a>
       </div>
+
+      {sheet.open === 'table' && (
+        <Table
+          head={['Layer', 'Sensor', 'm/px', 'Dated tiles', 'Probed', 'Latest']}
+          body={aoi.layers.map((l) => [
+            l.short,
+            l.sensor,
+            l.resolution,
+            l.dates.length,
+            l.tested,
+            l.dates[l.dates.length - 1] ?? '—',
+          ])}
+        />
+      )}
+      {sheet.open === 'json' && <JsonPane raw={sheet.raw} err={sheet.err} url="/data/domains/hires.json" />}
 
       <div className="mt-1 text-[9px] leading-snug text-slate-500">
         {layer.sensor} · {layer.dates.length} dated tile{layer.dates.length === 1 ? '' : 's'} of {layer.tested} probed.
