@@ -585,43 +585,6 @@ export function InfrastructureOslo() {
             <p className="mt-1 text-[10px] leading-snug text-slate-500">{FOOTERS.timeseries}</p>
           </Glass>
 
-          {/* Processing jobs */}
-          <Glass className="p-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="h-title">Processing Jobs</div>
-              <button type="button" className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-300 hover:underline" title="Decorative — no job queue exists in this build">
-                View All <Icon name="ArrowRight" className="h-3 w-3" />
-              </button>
-            </div>
-            <div className="mt-1 flex items-center justify-between gap-2">
-              <span className="text-[10px] text-slate-500">HyP3 · simulated queue</span>
-              <StatusBadge status="sample" note="simulated jobs" />
-            </div>
-            <div className="mt-2 space-y-1.5">
-              {shownJobs.map((j) => {
-                const running = j.state === 'running';
-                return (
-                  <div key={j.id} className="rounded-lg border border-white/5 bg-white/[.02] px-2 py-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="min-w-0 truncate text-[11px] font-medium text-slate-100">{j.label}</span>
-                      {running ? (
-                        <span className="shrink-0 text-[10px] font-semibold text-sky-300">{j.progress}%</span>
-                      ) : (
-                        <span className="shrink-0 rounded border border-white/15 bg-white/5 px-1.5 py-[1px] text-[9px] font-semibold uppercase text-slate-300">sim done</span>
-                      )}
-                    </div>
-                    {running ? (
-                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded bg-white/10">
-                        <div className="h-1.5 rounded" style={{ width: `${j.progress}%`, background: '#38bdf8' }} />
-                      </div>
-                    ) : null}
-                    <div className={`mt-1 text-[10px] ${running ? 'text-sky-200/90' : 'text-emerald-300/90'}`}>{j.detail}</div>
-                  </div>
-                );
-              })}
-            </div>
-            <p className="mt-2 text-[10px] leading-snug text-slate-500">{FOOTERS.jobs}</p>
-          </Glass>
 
           {/* Uncertainty & quality */}
           <Glass className="p-3">

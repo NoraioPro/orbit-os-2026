@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LineChart } from '../components/LineChart';
-import { sonify } from '../components/sonify';
+import { SonifyButton } from '../components/SonifyButton';
 import { ConfidencePill, Glass, Icon, StatusBadge } from '../components/ui';
 import { trendEvidence } from '../data/evidence';
 import { getPowerSeries, PLACES, POWER_VARS } from '../data/power';
@@ -54,7 +54,7 @@ export function EarthPulse({ defaultPlace = 'norway', defaultVar = 'T2M', vars =
           )}
           <div className="flex flex-wrap gap-2">
             <button className="btn-primary !py-1.5" onClick={() => openEvidence(pack)}><Icon name="ShieldCheck" />Evidence pack</button>
-            <button className="btn-ghost !py-1.5" onClick={() => sonify(pack.series!.points)}><Icon name="Music" />Listen (challenge 14)</button>
+            <SonifyButton className="btn-ghost !py-1.5" label="Listen (challenge 14)" values={(pack.series?.points ?? []).map((p) => p.y).filter((v): v is number => v !== null)} />
           </div>
         </div>
       )}

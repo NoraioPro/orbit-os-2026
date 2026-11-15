@@ -10,7 +10,6 @@ export const GUIDES: Record<ModuleId, ModuleGuide> = {
   ocean: { focus: ['seaLakeIce'], howto: ['Pick a marine region', 'Read the air-temperature trend', 'Track ice events and open evidence'] },
   infrastructure: { focus: ['earthquake'], howto: ['Pick a city', 'See seismic exposure within 300 km', 'Review the radar-change grid'] },
   gnss: { focus: [], howto: ['Load a GnssLogger recording', 'Read the integrity score and events', 'Run a scenario in the simulation lab'] },
-  autonomy: { focus: [], howto: ['Switch Earth ↔ Mars', 'Watch the planner route around obstacles', 'Compare the energy cost'] },
   explorer: { focus: [], howto: ['Rank Earth analogs against Mars/Moon', 'Read the scores', 'Run as a full investigation'] },
   academy: { focus: [], howto: ['Set a mass budget', 'Choose outpost modules', 'See the mission-value trade-off'] },
   human: { focus: [], howto: ['Open the suit layer by layer', 'Explode the assembly to read the parts list', 'Keep ISS combustion separate from Earth fire data'] },

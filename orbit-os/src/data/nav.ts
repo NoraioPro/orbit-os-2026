@@ -43,15 +43,14 @@ export interface NavGroup {
 
 export const MODULE_COLORS: Record<string, string> = {
   earth: 'text-sky-300', disaster: 'text-orange-400', agri: 'text-lime-400',
-  ocean: 'text-cyan-300', infrastructure: 'text-blue-300', gnss: 'text-violet-300',
-  autonomy: 'text-fuchsia-300', explorer: 'text-indigo-300', academy: 'text-amber-300',
+  ocean: 'text-cyan-300', infrastructure: 'text-blue-300', gnss: 'text-violet-300', explorer: 'text-indigo-300', academy: 'text-amber-300',
   human: 'text-slate-200', ignis: 'text-orange-300', sar: 'text-teal-300', defense: 'text-rose-300',
 };
 
 /** demo-critical order: P0 first, then P1, honesty-heavy modules last */
 export const MODULE_ORDER: string[] = [
   'earth', 'sar', 'disaster', 'defense', 'agri', 'ocean', 'ignis',
-  'infrastructure', 'gnss', 'explorer', 'autonomy', 'academy', 'human',
+  'infrastructure', 'gnss', 'explorer', 'academy', 'human',
 ];
 
 /** demo-language topics: the words a judge or Hassan actually types */
@@ -62,7 +61,6 @@ export const MODULE_TOPICS: Record<string, string[]> = {
   ocean: ['sea', 'sst', 'marine', 'atlantic', 'ice', 'ocean colour', 'marine heat'],
   infrastructure: ['city', 'bridge', 'subsidence', 'deformation', 'asset', 'tokyo', 'seismic'],
   gnss: ['gps', 'jamming', 'spoof', 'signal', 'integrity', 'nmea', 'interference', 'navigation'],
-  autonomy: ['rover', 'drone', 'route', 'planner', 'energy', 'mars', 'svalbard'],
   explorer: ['analog', 'analogue', 'mars', 'moon', 'site', 'ranking', 'transfer'],
   academy: ['learn', 'outpost', 'budget', 'education', 'game', 'design'],
   human: ['crew', 'astronaut', 'health', 'hr', 'physiology', 'iss'],

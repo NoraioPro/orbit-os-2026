@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
+import { FindingsVoice } from '../components/FindingsVoice';
+import { JsonPane, Table, ViewSwitch, useDataSheet } from '../components/DataSheet';
 
 /**
  * Svalbard / European-Arctic ice watch — built only from published data.
@@ -273,8 +275,41 @@ export function SvalbardIceWatch() {
   const trends = useJson<Trends>('trends.json');
   const archive = useJson<Archive>('archive.json');
   const [chartImg, setChartImg] = useState<'svalbard' | 'fram_strait' | 'barents'>('svalbard');
+  const sheet = useDataSheet('/data/ice/chart.json');
 
   const t = chart.data?.totals;
+  const findings = useMemo(() => {
+    const c = chart.data;
+    const tr = trends.data;
+    if (!c) return 'The Norwegian ice chart could not be loaded, so there are no findings to read.';
+    const barents = tr?.regions.find((r) => r.id === 'barents');
+    const sept = barents?.stats_by_month.find((s) => s.month === 9);
+    const km = (v: number) => Math.round(v / 1000).toLocaleString('en-US');
+    const parts = [
+      'Ice chart for ' + String(c.issued) + ', issued by the Norwegian Ice Service.',
+      km(c.totals.ice_covered_km2) +
+        ' thousand square kilometres of ice cover, ' +
+        km(c.totals.ice_covered_in_window_km2) +
+        ' thousand of it inside the Fram Strait, Svalbard and Barents window.',
+    ];
+    if (sept) {
+      parts.push(
+        'Barents Sea September ice is running ' +
+          Math.abs(sept.slope_km2_per_decade).toLocaleString('en-US') +
+          ' square kilometres lower per decade, ' +
+          Math.abs(sept.pct_per_decade ?? 0) +
+          ' percent. In ' +
+          sept.latest_year +
+          ' September ice covered ' +
+          sept.latest_km2.toLocaleString('en-US') +
+          ' square kilometres, against a 1991 to 2020 average of ' +
+          (sept.climatology_1991_2020_km2 ?? 0).toLocaleString('en-US') +
+          '.',
+      );
+    }
+    parts.push('These are the published chart and NSIDC regional figures, not a forecast.');
+    return parts.join(' ');
+  }, [chart.data, trends.data]);
 
   return (
     <div className="space-y-3">
@@ -284,6 +319,23 @@ export function SvalbardIceWatch() {
             <div className="flex items-center gap-2">
               <h2 className="text-[15px] font-semibold text-white">Svalbard ice watch · MET Norway ice charts</h2>
               <StatusBadge status={chart.data ? 'live' : 'snapshot'} note={chart.data ? 'chart parsed' : 'loading'} />
+              <FindingsVoice text={findings} />
+              <ViewSwitch
+                open={sheet.open}
+                setOpen={sheet.setOpen}
+                jsonUrl="/data/ice/chart.json"
+                csv={{
+                  head: ['class', 'concentration %', 'polygons', 'area in window km2', 'ice covered in window km2'],
+                  body: (chart.data?.classes ?? []).map((c) => [
+                    c.nis_class,
+                    c.ct,
+                    c.polygons,
+                    Math.round(c.area_in_window_km2),
+                    Math.round(c.ice_covered_in_window_km2 ?? 0),
+                  ]),
+                }}
+                csvName="orbit-svalbard-ice-chart.csv"
+              />
             </div>
             <p className="mt-0.5 text-[11px] text-slate-400">
               The Norwegian Ice Service chart for the European Arctic, parsed from its published SIGRID-3 shapefile
@@ -298,6 +350,25 @@ export function SvalbardIceWatch() {
             </div>
           )}
         </div>
+
+        {chart.data && sheet.open === 'table' && (
+          <div className="mt-2">
+            <Table
+              head={['Concentration class', 'CT %', 'Polygons', 'Charted km²', 'Ice-covered km²']}
+              body={chart.data.classes.map((c) => [
+                c.nis_class,
+                c.ct,
+                c.polygons,
+                Math.round(c.area_in_window_km2),
+                Math.round(c.ice_covered_in_window_km2 ?? 0),
+              ])}
+            />
+            <div className="mt-1 text-[9px] text-slate-500">
+              Chart {chart.data.issued} · areas computed from the SIGRID-3 polygon geometry, window {chart.data.window.minLat}°–{chart.data.window.maxLat}°N.
+            </div>
+          </div>
+        )}
+        {sheet.open === 'json' && <JsonPane raw={sheet.raw} err={sheet.err} url="/data/ice/chart.json" />}
 
         {chart.err && (
           <div className="mt-2 rounded border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-200">

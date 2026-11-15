@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { PATTERNS, saveReview, type EvidencePack, type ReviewState } from '../kernel';
 import { useStore } from '../state/store';
 import { LineChart } from './LineChart';
-import { sonify } from './sonify';
+import { SonifyButton } from './SonifyButton';
 import { Chip, ConfidencePill, Icon, StatusBadge } from './ui';
 
 export function EvidenceDrawer() {
@@ -44,7 +44,7 @@ export function EvidenceDrawer() {
         {e.series && (
           <section className="mt-4 rounded-xl border border-white/10 bg-white/[.02] p-3">
             <div className="mb-1 flex items-center justify-between text-xs text-slate-400"><span>{e.series.label}{e.series.trend ? ' · dashed = OLS fit' : ''}</span>
-              <button className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-sky-300 hover:bg-sky-500/10" onClick={() => sonify(e.series!.points)} title="Challenge 14: hear the data"><Icon name="Music" className="h-3.5 w-3.5" />Listen</button></div>
+              <SonifyButton values={(e.series?.points ?? []).map((p) => p.y).filter((v): v is number => v !== null)} /></div>
             <LineChart points={e.series.points} trend={e.series.trend} unit={e.series.unit} bars={e.kind === 'anomaly' || e.kind === 'investigation'} color={e.kind === 'anomaly' ? '#f97316' : '#38bdf8'} xLabel={e.kind === 'anomaly' || e.kind === 'investigation' ? (x) => (x === 0 ? 'snapshot' : `${x} d`) : undefined} />
           </section>
         )}

@@ -6,7 +6,7 @@ import { DATASETS } from '../data/datasets';
 import { CHALLENGES, moduleById, SDGS } from '../data/modules';
 import { PATTERNS } from '../kernel';
 import { EarthPulse } from '../modules/EarthPulse';
-import { AcademyWidget, AgriWidget, AutonomyWidget, DisasterWidget, ExplorerWidget, HumanWidget, InfraWidget, OceanWidget } from '../modules/widgets';
+import { AcademyWidget, ExplorerWidget, HumanWidget } from '../modules/widgets';
 const GnssGuardian = lazy(() => import('../modules/GnssGuardian').then((m) => ({ default: m.GnssGuardian })));
 const SarObservatory = lazy(() => import('../modules/SarObservatory').then((m) => ({ default: m.SarObservatory })));
 const InfrastructureOslo = lazy(() => import('../modules/InfrastructureOslo').then((m) => ({ default: m.InfrastructureOslo })));
@@ -19,6 +19,7 @@ import { QuickInvestigation } from '../components/QuickInvestigation';
 import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
 import { NarrationButton } from '../components/Narration';
+import { NorwayLive } from '../modules/NorwayLive';
 const StoryGlobe = lazy(() => import('../components/StoryGlobe').then((m) => ({ default: m.StoryGlobe })));
 import { TodayEarth } from '../components/TodayEarth';
 import { WeatherNow, WEATHER_SITES } from '../components/WeatherNow';
@@ -30,7 +31,6 @@ import { useStore } from '../state/store';
 const HumanLab = lazy(() => import('../modules/HumanLab').then((m) => ({ default: m.HumanLab })));
 const FlameLab = lazy(() => import('../modules/FlameLab').then((m) => ({ default: m.FlameLab })));
 const SolarFish = lazy(() => import('../modules/SolarFish').then((m) => ({ default: m.SolarFish })));
-const MartianRoutes = lazy(() => import('../modules/MartianRoutes').then((m) => ({ default: m.MartianRoutes })));
 const MissionAcademyPro = lazy(() => import('../modules/MissionAcademyPro').then((m) => ({ default: m.MissionAcademyPro })));
 const SituationRoom = lazy(() => import('../modules/SituationRoom').then((m) => ({ default: m.SituationRoom })));
 const SarGlobe = lazy(() => import('../modules/SarGlobe').then((m) => ({ default: m.SarGlobe })));
@@ -58,9 +58,9 @@ const EarthSuite: ComponentType = () => (
     <EarthJukebox />
   </div>
 );
-const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterEventBoard /><TurkiyeBoard /><DisasterWidget /><FireCalendar /></div>;
+const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterEventBoard /><TurkiyeBoard /><FireCalendar /></div>;
 const SarSuite: ComponentType = () => <div className="space-y-3"><SarFaultLab /><SarGlobe /><SarChampion /></div>;
-const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanBoard /><OceanWidget /><SolarFish /></div>;
+const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanBoard /><NorwayLive aoiId="barents" title="Barents Sea live state · routing at the ice margin" /><SolarFish /></div>;
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
 const HumanSuite: ComponentType = () => (
   <div className="space-y-3">
@@ -76,8 +76,8 @@ const HumanSuite: ComponentType = () => (
 function InfraSuite() {
   return (
     <div className="space-y-3">
+      <NorwayLive aoiId="oslo" title="Oslo live context · wind, precipitation and air quality" />
       <InfrastructureOslo />
-      <InfraWidget />
     </div>
   );
 }
@@ -87,6 +87,7 @@ function InfraSuite() {
 function AgriSuite() {
   return (
     <div className="space-y-3">
+      <NorwayLive aoiId="ostfold" title="Østfold live context · frost, wind and field conditions" compact />
       <AgriBoard />
       <CropWatch />
     </div>
@@ -95,7 +96,7 @@ function AgriSuite() {
 
 const WIDGET: Record<string, ComponentType> = {
   earth: EarthSuite, disaster: DisasterSuite, agri: AgriSuite, ocean: OceanSuite, infrastructure: InfraSuite, gnss: GnssGuardian,
-  sar: SarSuite, autonomy: MartianRoutes, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanSuite, ignis: FlameLab, defense: SituationRoom,
+  sar: SarSuite, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanSuite, ignis: FlameLab, defense: SituationRoom,
 };
 export default function ModulePage() {
   const { id = '' } = useParams();
@@ -118,7 +119,7 @@ export default function ModulePage() {
           <div className="flex items-start gap-3">
             <div className="mt-1 rounded-xl border border-white/20 bg-white/10 p-2 backdrop-blur"><Icon name={m.icon} className="h-7 w-7 text-white" /></div>
             <div><h1 className="text-[28px] font-bold leading-tight tracking-tight text-white">{m.name}</h1><p className="mt-1 max-w-2xl text-sm text-slate-200">{m.tagline}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2"><NarrationButton src={art?.audio} /><button className="btn-ghost !py-1.5 text-xs" onClick={() => setTour(true)}><Icon name="Compass" className="h-4 w-4" />Take a tour</button><Chip>{m.release}</Chip><Chip>{m.state}</Chip>{m.patterns.map((p) => <Chip key={p} className="border-violet-400/30 text-violet-200">{PATTERNS[p].short}</Chip>)}</div></div>
+              <div className="mt-3 flex flex-wrap items-center gap-2"><NarrationButton src={art?.audio ?? assets.byKey[m.id]?.audio} /><button className="btn-ghost !py-1.5 text-xs" onClick={() => setTour(true)}><Icon name="Compass" className="h-4 w-4" />Take a tour</button><Chip>{m.release}</Chip><Chip>{m.state}</Chip>{m.patterns.map((p) => <Chip key={p} className="border-violet-400/30 text-violet-200">{PATTERNS[p].short}</Chip>)}</div></div>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SvalbardIceWatch } from '../modules/SvalbardIceWatch';
+import { NorwayLive } from '../modules/NorwayLive';
 
 /**
  * Arctic Watch.
@@ -27,6 +28,7 @@ export default function ArcticIntelWatch() {
         </a>
       </div>
 
+      <NorwayLive aoiId="longyearbyen" title="Longyearbyen live context · polar night, wind and warnings" />
       <SvalbardIceWatch />
 
       <div className="pt-2">

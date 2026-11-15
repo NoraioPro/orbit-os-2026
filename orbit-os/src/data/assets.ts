@@ -2,8 +2,15 @@
 import { useEffect, useState } from 'react';
 import { MODULES } from './modules';
 
-export interface Assets { logo?: string; hero?: string; intro?: string; modules: Record<string, { image?: string; audio?: string }> }
-const EMPTY: Assets = { modules: {} };
+export interface Assets {
+  logo?: string;
+  hero?: string;
+  intro?: string;
+  modules: Record<string, { image?: string; audio?: string }>;
+  /** manifest keys that are not module ids (data, agents, pages) kept by name */
+  byKey: Record<string, { image?: string; audio?: string }>;
+}
+const EMPTY: Assets = { modules: {}, byKey: {} };
 
 const isImg = (s: string) => /\.(png|jpe?g|webp|svg|gif|avif)$/i.test(s);
 const isAudio = (s: string) => /\.(mp3|m4a|ogg|wav)$/i.test(s);
@@ -25,16 +32,49 @@ const ALIASES: Record<string, string[]> = {
 
 export function normalise(j: unknown): Assets {
   const files = collect(j);
-  const a: Assets = { modules: {} };
+  const a: Assets = { modules: {}, byKey: {} };
+  const ids = new Set<string>(MODULES.map((m) => String(m.id)));
   for (const f of files) {
+    const segs = f.trail.split('.');
+    const stem = (f.path.split('/').pop() ?? '').replace(/\.[a-z0-9]+$/i, '').toLowerCase();
     const hay = `${f.trail} ${f.path.toLowerCase()}`;
-    const mod = MODULES.find((m) => ALIASES[m.id].some((al) => new RegExp(`(^|[^a-z])${al}([^a-z]|$)`).test(hay)));
-    if (mod && !/(^|[^a-z])(logo|hero)([^a-z]|$)/.test(hay)) {
-      const slot = (a.modules[mod.id] ??= {});
-      if (isImg(f.path)) slot.image ??= url(f.path); else slot.audio ??= url(f.path);
+
+    // 1. the manifest's own key wins: modules.<id> / pages.<id> are unambiguous,
+    //    which is what "sar-earth-observatory.mp3" needed (it used to be scored
+    //    as Earth's narration because the filename contains "earth").
+    const keyed = segs[0] === 'modules' || segs[0] === 'pages' ? segs[1] : null;
+    if (keyed) {
+      if (ids.has(keyed)) {
+        const slot = (a.modules[keyed] ??= {});
+        if (isImg(f.path)) slot.image ??= url(f.path);
+        else if (isAudio(f.path)) slot.audio ??= url(f.path);
+      } else {
+        const slot = (a.byKey[keyed] ??= {});
+        if (isImg(f.path)) slot.image ??= url(f.path);
+        else if (isAudio(f.path)) slot.audio ??= url(f.path);
+      }
+      continue;
+    }
+
+    // 2. otherwise match on the file stem, never on a substring of a longer word
+    const match = MODULES.find((m) =>
+      ALIASES[m.id].some((al) => stem === al || stem.startsWith(`${al}-`) || stem.endsWith(`-${al}`) || stem.startsWith(al)),
+    );
+    if (match && !/(^|[^a-z])(logo|hero)([^a-z]|$)/.test(hay)) {
+      const slot = (a.modules[match.id] ??= {});
+      if (isImg(f.path)) slot.image ??= url(f.path);
+      else if (isAudio(f.path)) slot.audio ??= url(f.path);
     } else if (/logo/.test(hay) && isImg(f.path)) a.logo ??= url(f.path);
     else if (/hero|command/.test(hay) && isImg(f.path)) a.hero ??= url(f.path);
     else if (/intro/.test(hay) && isAudio(f.path)) a.intro ??= url(f.path);
+    else if (isAudio(f.path)) {
+      for (const al of Object.keys(ALIASES)) {
+        if (stem.startsWith(al)) {
+          const slot = (a.byKey[al] ??= {});
+          slot.audio ??= url(f.path);
+        }
+      }
+    }
   }
   return a;
 }

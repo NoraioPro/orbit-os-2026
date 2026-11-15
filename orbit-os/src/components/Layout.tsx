@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { stopNarration, stopSonify } from '../lib/audio';
 import { MODULES } from '../data/modules';
 import { NAV_GROUPS, matchNav, type NavGroupId } from '../data/nav';
 import { useStore } from '../state/store';
@@ -270,6 +271,11 @@ export function Layout() {
   const loc = useLocation();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  // narration and sonification belong to the page that started them
+  useEffect(() => {
+    stopNarration();
+    stopSonify();
+  }, [loc.pathname]);
   const [rail, setRail] = useState<boolean>(() => {
     try {
       const stored = localStorage.getItem(RAIL_KEY);

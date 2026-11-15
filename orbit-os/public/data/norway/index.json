@@ -1,0 +1,1387 @@
+{
+ "domain": "norway",
+ "title": "Norwegian official data · weather, sea state, air quality, warnings",
+ "generated_at": "2026-11-15T11:14:48.048Z",
+ "provenance": {
+  "providers": [
+   "MET Norway (api.met.no)",
+   "NVE / Varsom (api01.nve.no)"
+  ],
+  "licences": [
+   "MET Norway: CC BY 4.0",
+   "NVE: NLOD"
+  ],
+  "access": "keyless public APIs; MET Norway requires a descriptive User-Agent",
+  "honesty": "Values are copied from the API responses at generated_at. An empty warning array means NVE issued no warning for that region and window — it is not a missing fetch. Failed calls are stored with an __error field and rendered as unavailable."
+ },
+ "aois": [
+  {
+   "id": "oslo",
+   "name": "Oslo",
+   "lat": 59.9139,
+   "lon": 10.7522,
+   "use_case": "Bridge and roadway integrity — wind and precipitation load the structures the InSAR board tracks.",
+   "fetched_at": "2026-11-15T11:14:48.053Z",
+   "forecast": {
+    "updated": "2026-11-15T10:30:57Z",
+    "source": "MET Norway · Locationforecast 2.0",
+    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=59.9139&lon=10.7522",
+    "now": {
+     "airTempC": 7.9,
+     "windMs": 8,
+     "windDirDeg": 193,
+     "humidityPct": 76.9,
+     "pressureHpa": 996.6,
+     "cloudPct": 86.9,
+     "symbol": "cloudy",
+     "precipNextHourMm": 0
+    },
+    "hours": [
+     {
+      "at": "2026-11-15T10:00:00Z",
+      "airTempC": 7.9,
+      "windMs": 8,
+      "windDirDeg": 193,
+      "humidityPct": 76.9,
+      "cloudPct": 86.9,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T11:00:00Z",
+      "airTempC": 8.3,
+      "windMs": 8,
+      "windDirDeg": 191,
+      "humidityPct": 74.9,
+      "cloudPct": 90,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T12:00:00Z",
+      "airTempC": 8.5,
+      "windMs": 7.5,
+      "windDirDeg": 196,
+      "humidityPct": 74.9,
+      "cloudPct": 93.2,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T13:00:00Z",
+      "airTempC": 8.4,
+      "windMs": 7.2,
+      "windDirDeg": 194,
+      "humidityPct": 73.9,
+      "cloudPct": 96.3,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T14:00:00Z",
+      "airTempC": 8.3,
+      "windMs": 6.8,
+      "windDirDeg": 196,
+      "humidityPct": 75.6,
+      "cloudPct": 95.7,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T15:00:00Z",
+      "airTempC": 7.7,
+      "windMs": 5.8,
+      "windDirDeg": 183,
+      "humidityPct": 77.4,
+      "cloudPct": 95.4,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T16:00:00Z",
+      "airTempC": 7.4,
+      "windMs": 6.3,
+      "windDirDeg": 182,
+      "humidityPct": 86.7,
+      "cloudPct": 98.1,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T17:00:00Z",
+      "airTempC": 7.4,
+      "windMs": 6,
+      "windDirDeg": 181,
+      "humidityPct": 86.1,
+      "cloudPct": 96.8,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T18:00:00Z",
+      "airTempC": 7.2,
+      "windMs": 6,
+      "windDirDeg": 184,
+      "humidityPct": 88.8,
+      "cloudPct": 90.7,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T19:00:00Z",
+      "airTempC": 7,
+      "windMs": 5.5,
+      "windDirDeg": 184,
+      "humidityPct": 88.4,
+      "cloudPct": 89,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T20:00:00Z",
+      "airTempC": 6.9,
+      "windMs": 3.8,
+      "windDirDeg": 184,
+      "humidityPct": 90.7,
+      "cloudPct": 92.4,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T21:00:00Z",
+      "airTempC": 6.5,
+      "windMs": 2.6,
+      "windDirDeg": 186,
+      "humidityPct": 91.8,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T22:00:00Z",
+      "airTempC": 6.4,
+      "windMs": 1.3,
+      "windDirDeg": 250,
+      "humidityPct": 93,
+      "cloudPct": 100,
+      "precipMm": 0.3,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-15T23:00:00Z",
+      "airTempC": 6.1,
+      "windMs": 1.4,
+      "windDirDeg": 274,
+      "humidityPct": 89.4,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T00:00:00Z",
+      "airTempC": 5.4,
+      "windMs": 1.3,
+      "windDirDeg": 232,
+      "humidityPct": 87.8,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T01:00:00Z",
+      "airTempC": 5,
+      "windMs": 1,
+      "windDirDeg": 265,
+      "humidityPct": 86.1,
+      "cloudPct": 100,
+      "precipMm": 0.1,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T02:00:00Z",
+      "airTempC": 4.5,
+      "windMs": 0.7,
+      "windDirDeg": 265,
+      "humidityPct": 87,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T03:00:00Z",
+      "airTempC": 4.3,
+      "windMs": 0.6,
+      "windDirDeg": 203,
+      "humidityPct": 86,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T04:00:00Z",
+      "airTempC": 4,
+      "windMs": 0.9,
+      "windDirDeg": 160,
+      "humidityPct": 90.3,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T05:00:00Z",
+      "airTempC": 3.9,
+      "windMs": 0.7,
+      "windDirDeg": 123,
+      "humidityPct": 91.1,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T06:00:00Z",
+      "airTempC": 4,
+      "windMs": 1.2,
+      "windDirDeg": 77,
+      "humidityPct": 87.8,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T07:00:00Z",
+      "airTempC": 3.8,
+      "windMs": 0.9,
+      "windDirDeg": 122,
+      "humidityPct": 88.1,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T08:00:00Z",
+      "airTempC": 3.5,
+      "windMs": 1.1,
+      "windDirDeg": 49,
+      "humidityPct": 87.3,
+      "cloudPct": 99.6,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T09:00:00Z",
+      "airTempC": 3.5,
+      "windMs": 1.4,
+      "windDirDeg": 28,
+      "humidityPct": 81.7,
+      "cloudPct": 93.7,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     }
+    ],
+    "hours_available": 87,
+    "licence": "CC BY 4.0 · MET Norway"
+   },
+   "sun": {
+    "source": "MET Norway · Sunrise 3.0",
+    "url": "https://api.met.no/weatherapi/sunrise/3.0/sun?lat=59.9139&lon=10.7522&date=2026-11-15&offset=%2B01:00",
+    "sunrise": "2026-11-15T08:14+01:00",
+    "sunset": "2026-11-15T15:48+01:00",
+    "solarNoon": "2026-11-15T12:01+01:00",
+    "body": "Sun",
+    "polar": null
+   },
+   "air": {
+    "source": "MET Norway · Air Quality Forecast 0.1",
+    "url": "https://api.met.no/weatherapi/airqualityforecast/0.1/?lat=59.9139&lon=10.7522",
+    "at": "2026-11-15T06:00:00Z",
+    "pm25": 2.2,
+    "pm10": 8.1,
+    "no2": 2.9,
+    "ozone": 72.78,
+    "aqi": 1.73,
+    "aqi_pm25": 1.07,
+    "aqi_no2": 1.03,
+    "hours": [
+     {
+      "at": "2026-11-15T06:00:00Z",
+      "pm25": 2.2041800022125244,
+      "aqi": 1.7277690172195435
+     },
+     {
+      "at": "2026-11-15T07:00:00Z",
+      "pm25": 2.406510591506958,
+      "aqi": 1.7190693616867065
+     },
+     {
+      "at": "2026-11-15T08:00:00Z",
+      "pm25": 2.631898880004883,
+      "aqi": 1.7201839685440063
+     },
+     {
+      "at": "2026-11-15T09:00:00Z",
+      "pm25": 2.9397454261779785,
+      "aqi": 1.7371271848678589
+     },
+     {
+      "at": "2026-11-15T10:00:00Z",
+      "pm25": 3.2895936965942383,
+      "aqi": 1.74439537525177
+     },
+     {
+      "at": "2026-11-15T11:00:00Z",
+      "pm25": 3.750399589538574,
+      "aqi": 1.6948485374450684
+     },
+     {
+      "at": "2026-11-15T12:00:00Z",
+      "pm25": 4.575865268707275,
+      "aqi": 1.6433136463165283
+     },
+     {
+      "at": "2026-11-15T13:00:00Z",
+      "pm25": 4.380674362182617,
+      "aqi": 1.6393115520477295
+     },
+     {
+      "at": "2026-11-15T14:00:00Z",
+      "pm25": 3.6732845306396484,
+      "aqi": 1.668972373008728
+     },
+     {
+      "at": "2026-11-15T15:00:00Z",
+      "pm25": 3.120333671569824,
+      "aqi": 1.682863712310791
+     },
+     {
+      "at": "2026-11-15T16:00:00Z",
+      "pm25": 3.130373239517212,
+      "aqi": 1.6709414720535278
+     },
+     {
+      "at": "2026-11-15T17:00:00Z",
+      "pm25": 2.6694929599761963,
+      "aqi": 1.681951880455017
+     }
+    ],
+    "licence": "CC BY 4.0 · MET Norway"
+   },
+   "metar": {
+    "source": "MET Norway · TAF/METAR (ENGM)",
+    "url": "https://api.met.no/weatherapi/tafmetar/1.0/metar?icao=ENGM",
+    "raw": "ENGM 141120Z 22003KT 190V250 CAVOK M02/M05 Q1003 NOSIG=\nENGM 141150Z VRB01KT CAVOK M03/M05 Q1003 NOSIG=\nENGM 141220Z VRB01KT CAVOK M04/M06 Q1002 NOSIG=\nENGM 141250Z 00000KT CAVOK M04/M05 Q1002 NOSIG=\nENGM 141320Z VRB02KT CAVOK M03/M05 Q1002 NOSIG=\nENGM 141350Z 17008KT CAVOK 00/M03 Q1002 NOSIG=\nENGM 141420Z 18007KT CAVOK M00/M03 Q1002 NOSIG=\nENGM 141450Z 19005KT CAVOK M01/M03 Q1002 NOSIG=\nENGM 1415"
+   },
+   "flood_warnings": {
+    "source": "NVE · flood warnings, region 1",
+    "url": "https://api01.nve.no/hydrology/forecast/flood/v1.0.8/api/Warning/1/2026-11-15/2026-11-17",
+    "from": "2026-11-15",
+    "to": "2026-11-17",
+    "count": 0,
+    "items": [],
+    "licence": "NLOD · NVE"
+   },
+   "landslide_warnings": {
+    "source": "NVE · landslide warnings, region 1",
+    "url": "https://api01.nve.no/hydrology/forecast/landslide/v1.0.8/api/Warning/1/2026-11-15/2026-11-17",
+    "from": "2026-11-15",
+    "to": "2026-11-17",
+    "count": 0,
+    "items": [],
+    "licence": "NLOD · NVE"
+   }
+  },
+  {
+   "id": "ostfold",
+   "name": "Østfold",
+   "lat": 59.39,
+   "lon": 11,
+   "use_case": "Field operations — frost and soil temperature decide whether heavy machinery can move.",
+   "fetched_at": "2026-11-15T11:14:48.277Z",
+   "forecast": {
+    "updated": "2026-11-15T10:32:35Z",
+    "source": "MET Norway · Locationforecast 2.0",
+    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=59.39&lon=11",
+    "now": {
+     "airTempC": 7.6,
+     "windMs": 6.4,
+     "windDirDeg": 211,
+     "humidityPct": 88.5,
+     "pressureHpa": 998,
+     "cloudPct": 94.3,
+     "symbol": "cloudy",
+     "precipNextHourMm": 0
+    },
+    "hours": [
+     {
+      "at": "2026-11-15T11:00:00Z",
+      "airTempC": 7.6,
+      "windMs": 6.4,
+      "windDirDeg": 211,
+      "humidityPct": 88.5,
+      "cloudPct": 94.3,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T12:00:00Z",
+      "airTempC": 7.6,
+      "windMs": 6.6,
+      "windDirDeg": 212,
+      "humidityPct": 87,
+      "cloudPct": 95.6,
+      "precipMm": 0.4,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-15T13:00:00Z",
+      "airTempC": 7.4,
+      "windMs": 5.8,
+      "windDirDeg": 206,
+      "humidityPct": 96.9,
+      "cloudPct": 97.7,
+      "precipMm": 0.5,
+      "symbol": "rain"
+     },
+     {
+      "at": "2026-11-15T14:00:00Z",
+      "airTempC": 7.2,
+      "windMs": 6.6,
+      "windDirDeg": 194,
+      "humidityPct": 95.6,
+      "cloudPct": 100,
+      "precipMm": 0.3,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-15T15:00:00Z",
+      "airTempC": 6.9,
+      "windMs": 6.4,
+      "windDirDeg": 193,
+      "humidityPct": 95.7,
+      "cloudPct": 100,
+      "precipMm": 0.4,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-15T16:00:00Z",
+      "airTempC": 6.8,
+      "windMs": 5.4,
+      "windDirDeg": 195,
+      "humidityPct": 95.5,
+      "cloudPct": 100,
+      "precipMm": 0.6,
+      "symbol": "rain"
+     },
+     {
+      "at": "2026-11-15T17:00:00Z",
+      "airTempC": 6.5,
+      "windMs": 4.5,
+      "windDirDeg": 203,
+      "humidityPct": 96.4,
+      "cloudPct": 100,
+      "precipMm": 0.5,
+      "symbol": "rain"
+     },
+     {
+      "at": "2026-11-15T18:00:00Z",
+      "airTempC": 6.3,
+      "windMs": 4.7,
+      "windDirDeg": 192,
+      "humidityPct": 95.1,
+      "cloudPct": 100,
+      "precipMm": 0.4,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-15T19:00:00Z",
+      "airTempC": 6.2,
+      "windMs": 5.3,
+      "windDirDeg": 188,
+      "humidityPct": 92.7,
+      "cloudPct": 100,
+      "precipMm": 0.4,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-15T20:00:00Z",
+      "airTempC": 6,
+      "windMs": 5.1,
+      "windDirDeg": 192,
+      "humidityPct": 95.6,
+      "cloudPct": 99.9,
+      "precipMm": 0.5,
+      "symbol": "rain"
+     },
+     {
+      "at": "2026-11-15T21:00:00Z",
+      "airTempC": 6.1,
+      "windMs": 4.4,
+      "windDirDeg": 191,
+      "humidityPct": 96.5,
+      "cloudPct": 99.8,
+      "precipMm": 0.5,
+      "symbol": "rain"
+     },
+     {
+      "at": "2026-11-15T22:00:00Z",
+      "airTempC": 6.2,
+      "windMs": 3.5,
+      "windDirDeg": 206,
+      "humidityPct": 96.9,
+      "cloudPct": 95.8,
+      "precipMm": 0.7,
+      "symbol": "rain"
+     },
+     {
+      "at": "2026-11-15T23:00:00Z",
+      "airTempC": 6.2,
+      "windMs": 3.2,
+      "windDirDeg": 207,
+      "humidityPct": 97.6,
+      "cloudPct": 99.8,
+      "precipMm": 0.7,
+      "symbol": "rain"
+     },
+     {
+      "at": "2026-11-16T00:00:00Z",
+      "airTempC": 6.2,
+      "windMs": 2.5,
+      "windDirDeg": 209,
+      "humidityPct": 98.7,
+      "cloudPct": 99.8,
+      "precipMm": 0.2,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T01:00:00Z",
+      "airTempC": 6.2,
+      "windMs": 2.5,
+      "windDirDeg": 202,
+      "humidityPct": 98.5,
+      "cloudPct": 100,
+      "precipMm": 0.1,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T02:00:00Z",
+      "airTempC": 5.8,
+      "windMs": 2.1,
+      "windDirDeg": 322,
+      "humidityPct": 98.9,
+      "cloudPct": 100,
+      "precipMm": 0.1,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T03:00:00Z",
+      "airTempC": 4.4,
+      "windMs": 2.5,
+      "windDirDeg": 352,
+      "humidityPct": 90.3,
+      "cloudPct": 100,
+      "precipMm": 0.2,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T04:00:00Z",
+      "airTempC": 3.9,
+      "windMs": 2.9,
+      "windDirDeg": 359,
+      "humidityPct": 87.6,
+      "cloudPct": 100,
+      "precipMm": 0.2,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T05:00:00Z",
+      "airTempC": 3.6,
+      "windMs": 1.7,
+      "windDirDeg": 27,
+      "humidityPct": 84.4,
+      "cloudPct": 100,
+      "precipMm": 0.2,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T06:00:00Z",
+      "airTempC": 3.6,
+      "windMs": 2,
+      "windDirDeg": 40,
+      "humidityPct": 93.2,
+      "cloudPct": 100,
+      "precipMm": 0.2,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T07:00:00Z",
+      "airTempC": 3.5,
+      "windMs": 2.3,
+      "windDirDeg": 41,
+      "humidityPct": 90.9,
+      "cloudPct": 99.9,
+      "precipMm": 0.1,
+      "symbol": "lightrain"
+     },
+     {
+      "at": "2026-11-16T08:00:00Z",
+      "airTempC": 3.5,
+      "windMs": 2.3,
+      "windDirDeg": 49,
+      "humidityPct": 92.7,
+      "cloudPct": 99.9,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T09:00:00Z",
+      "airTempC": 3.3,
+      "windMs": 1.8,
+      "windDirDeg": 40,
+      "humidityPct": 90.5,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T10:00:00Z",
+      "airTempC": 3.3,
+      "windMs": 2.2,
+      "windDirDeg": 23,
+      "humidityPct": 87,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     }
+    ],
+    "hours_available": 86,
+    "licence": "CC BY 4.0 · MET Norway"
+   },
+   "sun": {
+    "source": "MET Norway · Sunrise 3.0",
+    "url": "https://api.met.no/weatherapi/sunrise/3.0/sun?lat=59.39&lon=11&date=2026-11-15&offset=%2B01:00",
+    "sunrise": "2026-11-15T08:10+01:00",
+    "sunset": "2026-11-15T15:50+01:00",
+    "solarNoon": "2026-11-15T12:00+01:00",
+    "body": "Sun",
+    "polar": null
+   },
+   "air": {
+    "source": "MET Norway · Air Quality Forecast 0.1",
+    "url": "https://api.met.no/weatherapi/airqualityforecast/0.1/?lat=59.39&lon=11",
+    "at": "2026-11-15T06:00:00Z",
+    "pm25": 2.05,
+    "pm10": 9.39,
+    "no2": 0.85,
+    "ozone": 78.37,
+    "aqi": 1.78,
+    "aqi_pm25": 1.07,
+    "aqi_no2": 1.01,
+    "hours": [
+     {
+      "at": "2026-11-15T06:00:00Z",
+      "pm25": 2.0531272888183594,
+      "aqi": 1.7837094068527222
+     },
+     {
+      "at": "2026-11-15T07:00:00Z",
+      "pm25": 2.064554452896118,
+      "aqi": 1.7891530990600586
+     },
+     {
+      "at": "2026-11-15T08:00:00Z",
+      "pm25": 2.521796941757202,
+      "aqi": 1.7833260297775269
+     },
+     {
+      "at": "2026-11-15T09:00:00Z",
+      "pm25": 3.1275975704193115,
+      "aqi": 1.7569125890731812
+     },
+     {
+      "at": "2026-11-15T10:00:00Z",
+      "pm25": 3.9561262130737305,
+      "aqi": 1.7186553478240967
+     },
+     {
+      "at": "2026-11-15T11:00:00Z",
+      "pm25": 3.7269229888916016,
+      "aqi": 1.7216811180114746
+     },
+     {
+      "at": "2026-11-15T12:00:00Z",
+      "pm25": 2.538360595703125,
+      "aqi": 1.7262097597122192
+     },
+     {
+      "at": "2026-11-15T13:00:00Z",
+      "pm25": 4.004878520965576,
+      "aqi": 1.7049498558044434
+     },
+     {
+      "at": "2026-11-15T14:00:00Z",
+      "pm25": 6.3270978927612305,
+      "aqi": 1.6816476583480835
+     },
+     {
+      "at": "2026-11-15T15:00:00Z",
+      "pm25": 7.66117525100708,
+      "aqi": 1.6646249294281006
+     },
+     {
+      "at": "2026-11-15T16:00:00Z",
+      "pm25": 9.656681060791016,
+      "aqi": 1.6466326713562012
+     },
+     {
+      "at": "2026-11-15T17:00:00Z",
+      "pm25": 11.546825408935547,
+      "aqi": 1.5852596759796143
+     }
+    ],
+    "licence": "CC BY 4.0 · MET Norway"
+   },
+   "flood_warnings": {
+    "source": "NVE · flood warnings, region 2",
+    "url": "https://api01.nve.no/hydrology/forecast/flood/v1.0.8/api/Warning/2/2026-11-15/2026-11-17",
+    "from": "2026-11-15",
+    "to": "2026-11-17",
+    "count": 0,
+    "items": [],
+    "licence": "NLOD · NVE"
+   },
+   "landslide_warnings": {
+    "source": "NVE · landslide warnings, region 2",
+    "url": "https://api01.nve.no/hydrology/forecast/landslide/v1.0.8/api/Warning/2/2026-11-15/2026-11-17",
+    "from": "2026-11-15",
+    "to": "2026-11-17",
+    "count": 0,
+    "items": [],
+    "licence": "NLOD · NVE"
+   }
+  },
+  {
+   "id": "longyearbyen",
+   "name": "Longyearbyen · Svalbard",
+   "lat": 78.2232,
+   "lon": 15.6469,
+   "use_case": "Polar operations — be aware of polar night, wind chill and the ice edge before any vessel or field work.",
+   "fetched_at": "2026-11-15T11:14:48.406Z",
+   "forecast": {
+    "updated": "2026-11-15T10:13:30Z",
+    "source": "MET Norway · Locationforecast 2.0",
+    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=78.2232&lon=15.6469",
+    "now": {
+     "airTempC": -6.9,
+     "windMs": 7.3,
+     "windDirDeg": 174,
+     "humidityPct": 44.1,
+     "pressureHpa": 1003.2,
+     "cloudPct": 0,
+     "symbol": "clearsky_polartwilight",
+     "precipNextHourMm": 0
+    },
+    "hours": [
+     {
+      "at": "2026-11-15T10:00:00Z",
+      "airTempC": -6.9,
+      "windMs": 7.3,
+      "windDirDeg": 174,
+      "humidityPct": 44.1,
+      "cloudPct": 0,
+      "precipMm": 0,
+      "symbol": "clearsky_polartwilight"
+     },
+     {
+      "at": "2026-11-15T11:00:00Z",
+      "airTempC": -7.4,
+      "windMs": 7.3,
+      "windDirDeg": 181,
+      "humidityPct": 45.8,
+      "cloudPct": 0,
+      "precipMm": 0,
+      "symbol": "clearsky_polartwilight"
+     },
+     {
+      "at": "2026-11-15T12:00:00Z",
+      "airTempC": -7.5,
+      "windMs": 7.2,
+      "windDirDeg": 184,
+      "humidityPct": 51,
+      "cloudPct": 0,
+      "precipMm": 0,
+      "symbol": "clearsky_polartwilight"
+     },
+     {
+      "at": "2026-11-15T13:00:00Z",
+      "airTempC": -7.3,
+      "windMs": 7.1,
+      "windDirDeg": 176,
+      "humidityPct": 64.1,
+      "cloudPct": 0,
+      "precipMm": 0,
+      "symbol": "clearsky_polartwilight"
+     },
+     {
+      "at": "2026-11-15T14:00:00Z",
+      "airTempC": -7.3,
+      "windMs": 7.2,
+      "windDirDeg": 169,
+      "humidityPct": 69.2,
+      "cloudPct": 0.1,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-15T15:00:00Z",
+      "airTempC": -7.5,
+      "windMs": 6.2,
+      "windDirDeg": 170,
+      "humidityPct": 72.8,
+      "cloudPct": 0,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-15T16:00:00Z",
+      "airTempC": -7.9,
+      "windMs": 5.6,
+      "windDirDeg": 186,
+      "humidityPct": 71.6,
+      "cloudPct": 0.3,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-15T17:00:00Z",
+      "airTempC": -7.8,
+      "windMs": 5.8,
+      "windDirDeg": 188,
+      "humidityPct": 72.9,
+      "cloudPct": 23.2,
+      "precipMm": 0,
+      "symbol": "fair_night"
+     },
+     {
+      "at": "2026-11-15T18:00:00Z",
+      "airTempC": -7.3,
+      "windMs": 5.4,
+      "windDirDeg": 181,
+      "humidityPct": 75.1,
+      "cloudPct": 18.9,
+      "precipMm": 0,
+      "symbol": "fair_night"
+     },
+     {
+      "at": "2026-11-15T19:00:00Z",
+      "airTempC": -6.8,
+      "windMs": 4.9,
+      "windDirDeg": 180,
+      "humidityPct": 77.1,
+      "cloudPct": 39.1,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-15T20:00:00Z",
+      "airTempC": -7.2,
+      "windMs": 4.3,
+      "windDirDeg": 180,
+      "humidityPct": 78.6,
+      "cloudPct": 20.7,
+      "precipMm": 0,
+      "symbol": "fair_night"
+     },
+     {
+      "at": "2026-11-15T21:00:00Z",
+      "airTempC": -7.2,
+      "windMs": 4.1,
+      "windDirDeg": 179,
+      "humidityPct": 76.4,
+      "cloudPct": 20.1,
+      "precipMm": 0,
+      "symbol": "fair_night"
+     },
+     {
+      "at": "2026-11-15T22:00:00Z",
+      "airTempC": -7.3,
+      "windMs": 4.5,
+      "windDirDeg": 179,
+      "humidityPct": 74.5,
+      "cloudPct": 5.1,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-15T23:00:00Z",
+      "airTempC": -7.6,
+      "windMs": 4.4,
+      "windDirDeg": 192,
+      "humidityPct": 72.5,
+      "cloudPct": 1.2,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T00:00:00Z",
+      "airTempC": -9.5,
+      "windMs": 2.2,
+      "windDirDeg": 273,
+      "humidityPct": 81.5,
+      "cloudPct": 1.5,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T01:00:00Z",
+      "airTempC": -9.8,
+      "windMs": 2.1,
+      "windDirDeg": 237,
+      "humidityPct": 76.9,
+      "cloudPct": 0.5,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T02:00:00Z",
+      "airTempC": -10,
+      "windMs": 3,
+      "windDirDeg": 194,
+      "humidityPct": 72.3,
+      "cloudPct": 0.8,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T03:00:00Z",
+      "airTempC": -11.4,
+      "windMs": 1.6,
+      "windDirDeg": 232,
+      "humidityPct": 73.7,
+      "cloudPct": 0,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T04:00:00Z",
+      "airTempC": -10.2,
+      "windMs": 2.8,
+      "windDirDeg": 204,
+      "humidityPct": 71,
+      "cloudPct": 0.2,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T05:00:00Z",
+      "airTempC": -10.8,
+      "windMs": 2.3,
+      "windDirDeg": 208,
+      "humidityPct": 71.3,
+      "cloudPct": 1.8,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T06:00:00Z",
+      "airTempC": -10.7,
+      "windMs": 2.4,
+      "windDirDeg": 214,
+      "humidityPct": 71.3,
+      "cloudPct": 1.6,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T07:00:00Z",
+      "airTempC": -10.6,
+      "windMs": 2.4,
+      "windDirDeg": 218,
+      "humidityPct": 74.4,
+      "cloudPct": 0,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T08:00:00Z",
+      "airTempC": -11.2,
+      "windMs": 1.8,
+      "windDirDeg": 255,
+      "humidityPct": 81.3,
+      "cloudPct": 0.2,
+      "precipMm": 0,
+      "symbol": "clearsky_night"
+     },
+     {
+      "at": "2026-11-16T09:00:00Z",
+      "airTempC": -11.4,
+      "windMs": 1.5,
+      "windDirDeg": 317,
+      "humidityPct": 84.6,
+      "cloudPct": 0.6,
+      "precipMm": 0,
+      "symbol": "clearsky_polartwilight"
+     }
+    ],
+    "hours_available": 92,
+    "licence": "CC BY 4.0 · MET Norway"
+   },
+   "sun": {
+    "source": "MET Norway · Sunrise 3.0",
+    "url": "https://api.met.no/weatherapi/sunrise/3.0/sun?lat=78.2232&lon=15.6469&date=2026-11-15&offset=%2B01:00",
+    "sunrise": null,
+    "sunset": null,
+    "solarNoon": "2026-11-15T11:42+01:00",
+    "body": "Sun",
+    "polar": null
+   }
+  },
+  {
+   "id": "barents",
+   "name": "Barents Sea · 76.5N 20E",
+   "lat": 76.5,
+   "lon": 20,
+   "use_case": "Vessel routing through the ice margin — sea state and water temperature next to the ice edge.",
+   "fetched_at": "2026-11-15T11:14:48.445Z",
+   "forecast": {
+    "updated": "2026-11-15T11:13:31Z",
+    "source": "MET Norway · Locationforecast 2.0",
+    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=76.5&lon=20",
+    "now": {
+     "airTempC": -0.4,
+     "windMs": 14.7,
+     "windDirDeg": 40,
+     "humidityPct": 84.9,
+     "pressureHpa": 997.5,
+     "cloudPct": 100,
+     "symbol": "cloudy",
+     "precipNextHourMm": 0
+    },
+    "hours": [
+     {
+      "at": "2026-11-15T11:00:00Z",
+      "airTempC": -0.4,
+      "windMs": 14.7,
+      "windDirDeg": 40,
+      "humidityPct": 84.9,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T12:00:00Z",
+      "airTempC": -0.1,
+      "windMs": 14.1,
+      "windDirDeg": 44,
+      "humidityPct": 81.5,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T13:00:00Z",
+      "airTempC": 0.1,
+      "windMs": 14.3,
+      "windDirDeg": 47,
+      "humidityPct": 72.2,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T14:00:00Z",
+      "airTempC": 0.1,
+      "windMs": 14.3,
+      "windDirDeg": 43,
+      "humidityPct": 72.8,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T15:00:00Z",
+      "airTempC": 0,
+      "windMs": 14.5,
+      "windDirDeg": 40,
+      "humidityPct": 72.4,
+      "cloudPct": 99.4,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T16:00:00Z",
+      "airTempC": -0.1,
+      "windMs": 14.4,
+      "windDirDeg": 41,
+      "humidityPct": 75.4,
+      "cloudPct": 99.6,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T17:00:00Z",
+      "airTempC": 0,
+      "windMs": 14.4,
+      "windDirDeg": 41,
+      "humidityPct": 76.2,
+      "cloudPct": 99.9,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T18:00:00Z",
+      "airTempC": -0.1,
+      "windMs": 14.2,
+      "windDirDeg": 40,
+      "humidityPct": 74.2,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T19:00:00Z",
+      "airTempC": -0.2,
+      "windMs": 14.4,
+      "windDirDeg": 39,
+      "humidityPct": 72.7,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T20:00:00Z",
+      "airTempC": -0.3,
+      "windMs": 14.6,
+      "windDirDeg": 37,
+      "humidityPct": 71.8,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T21:00:00Z",
+      "airTempC": -0.4,
+      "windMs": 14.5,
+      "windDirDeg": 37,
+      "humidityPct": 72.2,
+      "cloudPct": 100,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T22:00:00Z",
+      "airTempC": -0.6,
+      "windMs": 14.5,
+      "windDirDeg": 30,
+      "humidityPct": 70.8,
+      "cloudPct": 98.6,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-15T23:00:00Z",
+      "airTempC": -0.8,
+      "windMs": 15,
+      "windDirDeg": 28,
+      "humidityPct": 70.8,
+      "cloudPct": 96.6,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T00:00:00Z",
+      "airTempC": -0.8,
+      "windMs": 15.8,
+      "windDirDeg": 30,
+      "humidityPct": 72,
+      "cloudPct": 92,
+      "precipMm": 0,
+      "symbol": "cloudy"
+     },
+     {
+      "at": "2026-11-16T01:00:00Z",
+      "airTempC": -1,
+      "windMs": 15.6,
+      "windDirDeg": 28,
+      "humidityPct": 70.9,
+      "cloudPct": 71,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-16T02:00:00Z",
+      "airTempC": -1.2,
+      "windMs": 15.3,
+      "windDirDeg": 26,
+      "humidityPct": 71.5,
+      "cloudPct": 41.6,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-16T03:00:00Z",
+      "airTempC": -1.2,
+      "windMs": 15,
+      "windDirDeg": 24,
+      "humidityPct": 70,
+      "cloudPct": 41.2,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-16T04:00:00Z",
+      "airTempC": -1.2,
+      "windMs": 15.4,
+      "windDirDeg": 23,
+      "humidityPct": 71.3,
+      "cloudPct": 65.5,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-16T05:00:00Z",
+      "airTempC": -1.3,
+      "windMs": 15.3,
+      "windDirDeg": 20,
+      "humidityPct": 70,
+      "cloudPct": 56.9,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-16T06:00:00Z",
+      "airTempC": -1.5,
+      "windMs": 14.8,
+      "windDirDeg": 15,
+      "humidityPct": 70.2,
+      "cloudPct": 67.4,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-16T07:00:00Z",
+      "airTempC": -1.7,
+      "windMs": 14.9,
+      "windDirDeg": 16,
+      "humidityPct": 71.9,
+      "cloudPct": 50.3,
+      "precipMm": 0,
+      "symbol": "partlycloudy_night"
+     },
+     {
+      "at": "2026-11-16T08:00:00Z",
+      "airTempC": -1.6,
+      "windMs": 15.2,
+      "windDirDeg": 13,
+      "humidityPct": 69,
+      "cloudPct": 26.4,
+      "precipMm": 0,
+      "symbol": "fair_night"
+     },
+     {
+      "at": "2026-11-16T09:00:00Z",
+      "airTempC": -1.7,
+      "windMs": 14.9,
+      "windDirDeg": 11,
+      "humidityPct": 68.2,
+      "cloudPct": 28.7,
+      "precipMm": 0,
+      "symbol": "fair_polartwilight"
+     },
+     {
+      "at": "2026-11-16T10:00:00Z",
+      "airTempC": -1.8,
+      "windMs": 14.4,
+      "windDirDeg": 9,
+      "humidityPct": 67.4,
+      "cloudPct": 41.6,
+      "precipMm": 0,
+      "symbol": "partlycloudy_polartwilight"
+     }
+    ],
+    "hours_available": 91,
+    "licence": "CC BY 4.0 · MET Norway"
+   },
+   "ocean": {
+    "updated": "2026-11-15T09:08:23Z",
+    "source": "MET Norway · Oceanforecast 2.0",
+    "url": "https://api.met.no/weatherapi/oceanforecast/2.0/complete?lat=76.5&lon=20",
+    "seaWaterTempC": 3.1,
+    "waveHeightM": 3.2,
+    "waveDirectionDeg": 89.5,
+    "currentSpeedMs": 0.3,
+    "currentDirDeg": 247,
+    "hours": [
+     {
+      "at": "2026-11-15T11:00:00Z",
+      "waveM": 3.2,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T12:00:00Z",
+      "waveM": 3.4,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T13:00:00Z",
+      "waveM": 3.6,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T14:00:00Z",
+      "waveM": 3.7,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T15:00:00Z",
+      "waveM": 3.7,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T16:00:00Z",
+      "waveM": 3.8,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T17:00:00Z",
+      "waveM": 3.9,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T18:00:00Z",
+      "waveM": 3.9,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T19:00:00Z",
+      "waveM": 3.9,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T20:00:00Z",
+      "waveM": 3.8,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T21:00:00Z",
+      "waveM": 3.8,
+      "seaTempC": 3.1
+     },
+     {
+      "at": "2026-11-15T22:00:00Z",
+      "waveM": 3.7,
+      "seaTempC": 3.1
+     }
+    ],
+    "licence": "CC BY 4.0 · MET Norway"
+   },
+   "sun": {
+    "source": "MET Norway · Sunrise 3.0",
+    "url": "https://api.met.no/weatherapi/sunrise/3.0/sun?lat=76.5&lon=20&date=2026-11-15&offset=%2B01:00",
+    "sunrise": null,
+    "sunset": null,
+    "solarNoon": "2026-11-15T11:24+01:00",
+    "body": "Sun",
+    "polar": null
+   }
+  }
+ ]
+}
