@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { fetchJson } from '../data/live';
 import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { Provenance } from '../components/Provenance';
+import { HiResImagery } from './HiResImagery';
 
 /**
  * Agri Intelligence board — Østfold, Norway.
@@ -200,33 +201,8 @@ export function AgriBoard() {
       )}
 
       <div className="grid gap-3 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,1fr)]">
-        {/* map */}
-        <div className="relative min-h-[320px] overflow-hidden rounded-xl border border-white/10 bg-slate-950/60">
-          {ndviLayer && !imgFailed ? (
-            <img
-              src={gibsUrl(ndviLayer, BBOX_OSTFOLD)}
-              alt="MODIS Terra NDVI 8-day over Østfold — NASA GIBS"
-              className="h-full min-h-[320px] w-full object-cover"
-              onError={() => setImgFailed(true)}
-              loading="lazy"
-            />
-          ) : (
-            <div className="grid h-full min-h-[320px] place-items-center p-4 text-center text-[11px] text-slate-400">
-              {imgFailed ? 'GIBS imagery unavailable for this window.' : 'Loading GIBS raster…'}
-            </div>
-          )}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/40" />
-          <div className="absolute left-3 top-3 rounded-lg border border-white/10 bg-slate-950/80 px-2 py-1">
-            <div className="text-[10px] font-semibold text-white">Crop health · NDVI</div>
-            <div className="text-[9px] text-slate-400">{d?.aoi.name ?? 'Østfold, Norway'} · MODIS Terra 8-day</div>
-          </div>
-          <div className="absolute bottom-3 left-3 right-3">
-            <div className="text-[9px] uppercase tracking-wide text-slate-300">NDVI render scale</div>
-            <div className="mt-1 h-2 w-full rounded" style={{ background: 'linear-gradient(90deg,#8b5a2b,#d9c14a,#7bc96f,#1f8a3b)' }} />
-            <div className="mt-0.5 flex justify-between text-[9px] text-slate-400"><span>0.0</span><span>0.5</span><span>1.0</span></div>
-            <div className="mt-1 text-[9px] text-slate-500">GIBS render colormap — the app never reads pixel values back as a measurement. Dark areas are cloud/water/no-data in the tile, not low vegetation.</div>
-          </div>
-        </div>
+        {/* 30 m imagery: HLS + OPERA, replacing the 250 m MODIS NDVI view */}
+        <HiResImagery aoiId="agri-ostfold" />
 
         {/* indicators */}
         <div className="flex flex-col gap-2">
@@ -300,7 +276,7 @@ export function AgriBoard() {
           citation="ORBIT OS · agri domain file written by scripts/build-domains.mjs"
           sources={[
             { name: 'NASA POWER', url: 'https://power.larc.nasa.gov/', note: 'GWETROOT · T2M · PRECTOTCORR, monthly point API' },
-            { name: 'NASA GIBS', url: 'https://gibs.earthdata.nasa.gov/', note: 'MODIS Terra NDVI 8-day — imagery only' },
+            { name: 'NASA GIBS', url: 'https://gibs.earthdata.nasa.gov/', note: 'HLS S30/L30 + OPERA 30 m — imagery only' },
           ]}
         />
       )}

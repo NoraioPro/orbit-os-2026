@@ -1,0 +1,237 @@
+{
+  "domain": "hires",
+  "title": "30 m imagery catalogue",
+  "subtitle": "Harmonized Landsat / Sentinel-2 and OPERA products over each AOI, replacing the 250 m MODIS NDVI view",
+  "generated_at": "2026-11-15T10:50:47.658Z",
+  "provenance": {
+    "provider": "NASA GIBS (Global Imagery Browse Services)",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi",
+    "access": "keyless WMS GetMap, EPSG:4326",
+    "honesty": "A date is listed only when GIBS returned a non-empty tile for that AOI (>=8 kB compressed response). That is an availability test, not a pixel count: no reflectance, NDVI or water fraction is computed anywhere in this pipeline.",
+    "note": "MODIS Terra NDVI 8-day is kept beside each AOI purely as the 250 m reference the user asked to replace."
+  },
+  "aois": [
+    {
+      "id": "agri-sahel",
+      "name": "Sahel · Niger",
+      "bbox": [
+        1.6,
+        13,
+        2.6,
+        14
+      ],
+      "centre": [
+        13.51,
+        2.11
+      ],
+      "layers": [
+        {
+          "id": "hls-s2",
+          "label": "HLS · Sentinel-2 true colour",
+          "short": "S2 · 30 m",
+          "gibs": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+          "resolution": 30,
+          "sensor": "Sentinel-2 MSI, harmonised (HLS S30)",
+          "format": "image/jpeg",
+          "transparent": false,
+          "dates": [
+            "2026-08-25",
+            "2026-09-06",
+            "2026-09-24",
+            "2026-10-06",
+            "2026-10-24",
+            "2026-11-05"
+          ],
+          "tested": 45
+        },
+        {
+          "id": "hls-l30",
+          "label": "HLS · Landsat true colour",
+          "short": "Landsat · 30 m",
+          "gibs": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+          "resolution": 30,
+          "sensor": "Landsat 8/9 OLI, harmonised (HLS L30)",
+          "format": "image/jpeg",
+          "transparent": false,
+          "dates": [
+            "2026-08-23",
+            "2026-09-08",
+            "2026-09-24",
+            "2026-10-02",
+            "2026-10-18",
+            "2026-11-03"
+          ],
+          "tested": 45
+        },
+        {
+          "id": "dist-alert",
+          "label": "Vegetation disturbance (DIST-ALERT)",
+          "short": "disturbance · 30 m",
+          "gibs": "OPERA_L3_DIST-ALERT-HLS_Color_Index",
+          "resolution": 30,
+          "sensor": "OPERA DIST-ALERT (HLS-based)",
+          "format": "image/png",
+          "transparent": true,
+          "legend": "https://gibs.earthdata.nasa.gov/legends/OPERA_Vegetation_Disturbance_Status_H.png",
+          "caveat": "Alerts only — a site with no alert renders as an empty tile, which is not the same as \"no change\".",
+          "dates": [
+            "2026-08-23",
+            "2026-08-31",
+            "2026-09-06",
+            "2026-09-22",
+            "2026-10-12",
+            "2026-11-01"
+          ],
+          "tested": 45
+        },
+        {
+          "id": "water",
+          "label": "Surface water extent",
+          "short": "water · 30 m",
+          "gibs": "OPERA_L3_Dynamic_Surface_Water_Extent-HLS",
+          "resolution": 30,
+          "sensor": "OPERA DSWx (HLS-based)",
+          "format": "image/png",
+          "transparent": true,
+          "legend": "https://gibs.earthdata.nasa.gov/legends/OPERA_Dynamic_Surface_Water_Extent_H.png",
+          "caveat": "Grey = no water or no observation on that date; it is not a flood verdict.",
+          "dates": [
+            "2026-08-23",
+            "2026-08-31",
+            "2026-09-16",
+            "2026-09-26",
+            "2026-10-16",
+            "2026-11-05"
+          ],
+          "tested": 45
+        }
+      ],
+      "reference": {
+        "id": "modis-ndvi",
+        "label": "MODIS Terra NDVI (the layer this replaces)",
+        "short": "MODIS · 250 m",
+        "gibs": "MODIS_Terra_NDVI_8Day",
+        "resolution": 250,
+        "sensor": "MODIS Terra, 8-day composite",
+        "format": "image/png",
+        "transparent": true,
+        "dates": [
+          "2026-08-19",
+          "2026-11-13"
+        ],
+        "tested": 45
+      }
+    },
+    {
+      "id": "agri-ostfold",
+      "name": "Østfold · Norway",
+      "bbox": [
+        10.6,
+        59.2,
+        11.4,
+        59.7
+      ],
+      "centre": [
+        59.39,
+        11
+      ],
+      "layers": [
+        {
+          "id": "hls-s2",
+          "label": "HLS · Sentinel-2 true colour",
+          "short": "S2 · 30 m",
+          "gibs": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+          "resolution": 30,
+          "sensor": "Sentinel-2 MSI, harmonised (HLS S30)",
+          "format": "image/jpeg",
+          "transparent": false,
+          "dates": [
+            "2026-08-19",
+            "2026-08-31",
+            "2026-09-16",
+            "2026-09-26",
+            "2026-10-20",
+            "2026-11-05"
+          ],
+          "tested": 45
+        },
+        {
+          "id": "hls-l30",
+          "label": "HLS · Landsat true colour",
+          "short": "Landsat · 30 m",
+          "gibs": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+          "resolution": 30,
+          "sensor": "Landsat 8/9 OLI, harmonised (HLS L30)",
+          "format": "image/jpeg",
+          "transparent": false,
+          "dates": [
+            "2026-08-19",
+            "2026-09-02",
+            "2026-09-12",
+            "2026-10-04",
+            "2026-10-14",
+            "2026-10-30"
+          ],
+          "tested": 45
+        },
+        {
+          "id": "dist-alert",
+          "label": "Vegetation disturbance (DIST-ALERT)",
+          "short": "disturbance · 30 m",
+          "gibs": "OPERA_L3_DIST-ALERT-HLS_Color_Index",
+          "resolution": 30,
+          "sensor": "OPERA DIST-ALERT (HLS-based)",
+          "format": "image/png",
+          "transparent": true,
+          "legend": "https://gibs.earthdata.nasa.gov/legends/OPERA_Vegetation_Disturbance_Status_H.png",
+          "caveat": "Alerts only — a site with no alert renders as an empty tile, which is not the same as \"no change\".",
+          "dates": [
+            "2026-08-19",
+            "2026-08-31",
+            "2026-09-12",
+            "2026-09-26",
+            "2026-10-18",
+            "2026-11-05"
+          ],
+          "tested": 45
+        },
+        {
+          "id": "water",
+          "label": "Surface water extent",
+          "short": "water · 30 m",
+          "gibs": "OPERA_L3_Dynamic_Surface_Water_Extent-HLS",
+          "resolution": 30,
+          "sensor": "OPERA DSWx (HLS-based)",
+          "format": "image/png",
+          "transparent": true,
+          "legend": "https://gibs.earthdata.nasa.gov/legends/OPERA_Dynamic_Surface_Water_Extent_H.png",
+          "caveat": "Grey = no water or no observation on that date; it is not a flood verdict.",
+          "dates": [
+            "2026-08-21",
+            "2026-09-02",
+            "2026-09-18",
+            "2026-10-12",
+            "2026-10-26",
+            "2026-11-05"
+          ],
+          "tested": 45
+        }
+      ],
+      "reference": {
+        "id": "modis-ndvi",
+        "label": "MODIS Terra NDVI (the layer this replaces)",
+        "short": "MODIS · 250 m",
+        "gibs": "MODIS_Terra_NDVI_8Day",
+        "resolution": 250,
+        "sensor": "MODIS Terra, 8-day composite",
+        "format": "image/png",
+        "transparent": true,
+        "dates": [
+          "2026-08-19",
+          "2026-11-13"
+        ],
+        "tested": 45
+      }
+    }
+  ]
+}

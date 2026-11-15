@@ -5,6 +5,7 @@ import { Chip, Glass, Icon, StatusBadge } from '../components/ui';
 import { OrbitGlobe, type GlobeProject } from '../components/OrbitGlobe';
 import { Provenance } from '../components/Provenance';
 import { NarrationButton } from '../components/Narration';
+import { HiResImagery } from './HiResImagery';
 
 /**
  * One Earth, two domains — with the AOIs drawn ON the globe and wired to the
@@ -213,7 +214,11 @@ function DomainPanel({ d, side }: { d: DomainData; side: 'left' | 'right' }) {
         {side === 'right' && <Icon name="ChevronRight" className="h-3.5 w-3.5 shrink-0 text-slate-500" />}
       </div>
 
-      <ImageryCard img={d.imagery[0]} bbox={bbox} accent={accent} />
+      {d.domain === 'agri' ? (
+        <HiResImagery aoiId={d.aoi.id === 'agri-ostfold' ? 'agri-ostfold' : 'agri-sahel'} compact />
+      ) : (
+        <ImageryCard img={d.imagery[0]} bbox={bbox} accent={accent} />
+      )}
 
       <div className="grid grid-cols-2 gap-2">
         {agri ? (
@@ -464,7 +469,7 @@ export function UnifiedGeospatial() {
             citation="ORBIT OS · unified domain layer built by scripts/build-domains.mjs from keyless NASA POWER + NASA GIBS"
             sources={[
               { name: 'NASA POWER', url: 'https://power.larc.nasa.gov/', note: 'GWETROOT · T2M · PRECTOTCORR · WS2M, monthly point API' },
-              { name: 'NASA GIBS', url: 'https://gibs.earthdata.nasa.gov/', note: 'MODIS Terra NDVI 8-day · GHRSST MUR L4 SST (imagery only)' },
+              { name: 'NASA GIBS', url: 'https://gibs.earthdata.nasa.gov/', note: 'HLS S30/L30 30 m, OPERA disturbance + surface water, GHRSST MUR SST (imagery only)' },
               { name: 'NASA Earthdata', url: 'https://www.earthdata.nasa.gov/', note: 'imagery and parameter access path' },
             ]}
           />
