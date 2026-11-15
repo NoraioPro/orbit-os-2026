@@ -71,7 +71,9 @@ export function GnssGuardian() {
         <div>
           <div className="flex items-center gap-2 text-sm font-bold tracking-tight text-white"><Icon name="Satellite" className="h-5 w-5 text-violet-300" />GNSS Guardian</div>
           <p className="mt-0.5 text-xs text-slate-300">Know when navigation cannot be trusted.</p>
-          <div className="mt-2 flex flex-wrap items-center gap-2"><StatusBadge status={status} note={status === 'sample' ? 'synthetic sample' : 'uploaded recording'} /><Chip>rule-based · experimental</Chip></div>
+          {/* real Arctic context leads; the integrity engine needs a recording */}
+        <div className="mb-2"><NorwayLive aoiId="longyearbyen" title="Arctic context · Longyearbyen live conditions" compact /></div>
+        <div className="mt-2 flex flex-wrap items-center gap-2"><StatusBadge status={status} note={measurements.length ? 'uploaded recording' : 'no recording loaded'} /><Chip>rule-based · experimental</Chip></div>
         </div>
         <div className="flex items-center gap-2">
           <input ref={fileRef} type="file" accept=".csv,.txt,.log,.nmea,.nmea0183" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ''; }} />
@@ -232,7 +234,7 @@ export function GnssGuardian() {
             <div className="h-title">Provenance</div>
             <dl className="mt-2 space-y-1 text-xs">
               <div className="flex justify-between"><dt className="text-slate-400">Source</dt><dd className="text-slate-100">{source}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-400">Data status</dt><dd><StatusBadge status={status} note={status === 'sample' ? 'synthetic sample' : 'uploaded recording'} /></dd></div>
+              <div className="flex justify-between"><dt className="text-slate-400">Data status</dt><dd><StatusBadge status={status} note={measurements.length ? 'uploaded recording' : 'no recording loaded'} /></dd></div>
               <div className="flex justify-between"><dt className="text-slate-400">Measurements</dt><dd className="text-slate-100">{integrity.n.toLocaleString('en-US')}</dd></div>
               <div className="flex justify-between"><dt className="text-slate-400">Duration</dt><dd className="text-slate-100">{integrity.durationS.toFixed(0)} s</dd></div>
               <div className="flex justify-between"><dt className="text-slate-400">Assessment</dt><dd className="text-slate-100">{cls}</dd></div>

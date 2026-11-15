@@ -63,7 +63,6 @@ export const STORIES: Record<string, ModuleStory> = {
   gnss: {
     intro: 'Know when navigation cannot be trusted.',
     beats: [
-      { id: 'andoya', lat: 69.29, lng: 16.03, title: 'Interference detection · Andøya', text: 'C/N0 and AGC anomaly detection over Arctic skies. A synthetic trace until a live receiver feed connects.', status: 'sample', source: 'ORBIT GNSS engine (synthetic)', next: 'Arctic Intel Watch integration' },
       { id: 'svalbard', lat: 78.22, lng: 15.65, title: 'High-latitude space weather', text: 'Geomagnetic storms degrade GNSS. NOAA SWPC Kp is shown as context — never as evidence of spoofing.', status: 'live', source: 'NOAA SWPC', next: 'CDDIS ephemeris' },
     ],
   },
