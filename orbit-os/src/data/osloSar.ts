@@ -98,7 +98,7 @@ export const LOS_ASSETS: LosAsset[] = [
   { id: 'e6', name: 'E6 Corridor', shortName: 'E6 Corridor', kind: 'Road corridor', displacementMm: -23.6, uncertaintyMm: 3.8, coherence: 0.78, severity: 'high', x: 74, y: 64, blobWidth: 54 },
 ];
 
-/** −23.6 mm — the E6 corridor value above (always sample data). */
+/** −not computed — the E6 corridor value above (always sample data). */
 export const MAX_DISPLACEMENT_MM = Math.min(...LOS_ASSETS.map((a) => a.displacementMm));
 /** Assets flagged moderate or high (2 in this demo). */
 export const CONCERN_COUNT = LOS_ASSETS.filter((a) => a.severity !== 'low').length;

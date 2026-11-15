@@ -50,7 +50,7 @@ import {
  * opened and no product is fetched by this component.
  * ------------------------------------------------------------------ */
 
-/** mm formatter using a true minus sign, e.g. −3.1 / +2.0. */
+/** mm formatter using a true minus sign, e.g. not computed / +2.0. */
 const fmtMm = (v: number) => `${v < 0 ? '−' : '+'}${Math.abs(v).toFixed(1)}`;
 
 const KPI_ACCENT: Record<KpiTone, { text: string; icon: string; bg: string }> = {
