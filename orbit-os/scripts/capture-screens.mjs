@@ -141,8 +141,14 @@ async function main() {
     await writeFile(join(ROOT, '..', 'screens', '_capture.json'), JSON.stringify({ captured_at: new Date().toISOString(), base: BASE, screens: done }, null, 2));
     console.log(`captured ${done.length}/${list.length}`);
     ws.close();
+    process.exitCode = done.length === list.length ? 0 : 1;
   } finally {
-    chrome.kill();
+    // a child that already exited throws on kill(); that must not fail the run
+    try {
+      chrome.kill();
+    } catch {
+      /* already gone */
+    }
   }
 }
 

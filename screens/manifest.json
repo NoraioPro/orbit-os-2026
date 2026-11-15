@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T09:06:22.135Z",
+  "generated_at": "2026-11-15T09:07:54.874Z",
   "app": "ORBIT OS · Space Intelligence Platform",
   "base_url": "http://localhost:5173/",
   "capture": {
@@ -14,8 +14,8 @@
       "title": "Command Center",
       "route": "/",
       "file": "pages/command-center.jpg",
-      "bytes": 289176,
-      "captured_at": "2026-11-15T08:57:30.295Z"
+      "bytes": 280932,
+      "captured_at": "2026-11-15T09:07:48.641Z"
     },
     {
       "slug": "unified-earth",

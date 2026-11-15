@@ -1,6 +1,6 @@
 # ORBIT OS — screen map
 
-43 screens captured on 15/11/2026, 09:57:30 from `http://localhost:5173/` at 1440 px, JPEG q80.
+43 screens captured on 15/11/2026, 10:07:48 from `http://localhost:5173/` at 1440 px, JPEG q80.
 
 Screens live once in `pages/`; each use case below links to the ones that prove it.
 
