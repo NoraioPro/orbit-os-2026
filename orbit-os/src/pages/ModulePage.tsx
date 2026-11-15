@@ -30,7 +30,6 @@ import { useStore } from '../state/store';
 const HumanLab = lazy(() => import('../modules/HumanLab').then((m) => ({ default: m.HumanLab })));
 const FlameLab = lazy(() => import('../modules/FlameLab').then((m) => ({ default: m.FlameLab })));
 const SolarFish = lazy(() => import('../modules/SolarFish').then((m) => ({ default: m.SolarFish })));
-const AstronautTwin = lazy(() => import('../modules/AstronautTwin').then((m) => ({ default: m.AstronautTwin })));
 const MartianRoutes = lazy(() => import('../modules/MartianRoutes').then((m) => ({ default: m.MartianRoutes })));
 const MissionAcademyPro = lazy(() => import('../modules/MissionAcademyPro').then((m) => ({ default: m.MissionAcademyPro })));
 const SituationRoom = lazy(() => import('../modules/SituationRoom').then((m) => ({ default: m.SituationRoom })));
@@ -65,9 +64,8 @@ const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanBoard /
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
 const HumanSuite: ComponentType = () => (
   <div className="space-y-3">
-    {/* the EVA build-lab artifact is the lead surface of this module */}
-    <EvaLab height={780} />
-    <AstronautTwin />
+    {/* the EVA build-lab artifact replaces the earlier digital-twin tile */}
+    <EvaLab height={820} />
     <HumanLab />
     <FlameLab />
   </div>
