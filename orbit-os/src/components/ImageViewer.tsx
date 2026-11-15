@@ -26,6 +26,7 @@ function Overlay({ before, after, single, onClose }: { before: ViewerImage; afte
   const [zoom, setZoom] = useState(1);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [split, setSplit] = useState(50);
+  const [sweep, setSweep] = useState(true);
   const [showB, setShowB] = useState(false);
   const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
   const splitDrag = useRef(false);
@@ -33,6 +34,20 @@ function Overlay({ before, after, single, onClose }: { before: ViewerImage; afte
   const pair = Boolean(after);
 
   const clamp = (v: number) => Math.min(12, Math.max(1, v));
+
+  useEffect(() => {
+    if (!after || !sweep) return;
+    let dir = 1;
+    const id = window.setInterval(() => {
+      setSplit((v) => {
+        const next = v + dir * 1.1;
+        if (next >= 100) dir = -1;
+        if (next <= 0) dir = 1;
+        return Math.min(100, Math.max(0, next));
+      });
+    }, 40);
+    return () => window.clearInterval(id);
+  }, [after, sweep]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -61,6 +76,7 @@ function Overlay({ before, after, single, onClose }: { before: ViewerImage; afte
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (splitDrag.current && stage.current) {
+      setSweep(false);
       const r = stage.current.getBoundingClientRect();
       setSplit(Math.min(100, Math.max(0, ((e.clientX - r.left) / r.width) * 100)));
       return;
@@ -85,6 +101,16 @@ function Overlay({ before, after, single, onClose }: { before: ViewerImage; afte
           </div>
         </div>
         <div className="flex items-center gap-1">
+          {pair && (
+            <button
+              type="button"
+              onClick={() => setSweep((v) => !v)}
+              className={`rounded border px-2 py-1 text-[10px] ${sweep ? 'border-emerald-400/60 bg-emerald-500/15 text-emerald-200' : 'border-white/15 text-slate-300'}`}
+              title="Animate the divider across the pair"
+            >
+              {sweep ? 'sweep on' : 'sweep off'}
+            </button>
+          )}
           {pair && (
             <button
               type="button"
@@ -181,7 +207,7 @@ function Overlay({ before, after, single, onClose }: { before: ViewerImage; afte
       </div>
 
       <div className="border-t border-white/10 px-3 py-1 text-[9px] text-slate-500">
-        wheel to zoom · drag to pan · double-click to reset{pair ? ' · drag the divider for before/after · ←/→ to nudge' : ''} · Esc to close
+        wheel to zoom · drag to pan · double-click to reset{pair ? " · the divider sweeps automatically (toggle sweep) · drag it to take over · ←/→ to nudge" : ''} · Esc to close
       </div>
     </div>
   );
