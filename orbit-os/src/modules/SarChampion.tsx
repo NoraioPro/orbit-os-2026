@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
-import { SarCanvas, ampPalette, changePalette, phasePalette } from '../components/SarCanvas';
 import {
-  backscatterChange, classifyChange, phaseToDisplacement, relateEvents,
-  simulateSarPair, SAR_MISSIONS, type SarRaster,
+  relateEvents, SAR_MISSIONS,
 } from '../kernel';
 import { useStore } from '../state/store';
 import { TYPE_META } from '../data/events';
@@ -15,8 +13,7 @@ import { TYPE_META } from '../data/events';
 //
 // Honesty contract (enforced here, not just promised):
 //  • The before/after rasters and the InSAR phase → displacement raster are
-//    SYNTHETIC, produced by simulateSarPair / a seeded phase field. They are
-//    labelled SAMPLE everywhere and are NOT derived from the live granules.
+//    replaced by the public quicklooks the API returns; nothing synthetic is drawn.
 //  • The acquisition catalogue is fetched LIVE, keyless, from the ASF SearchAPI
 //    and displays the exact fields the API returns (startTime, processingLevel,
 //    platform, polarization). It is labelled LIVE.
@@ -30,7 +27,7 @@ interface Aoi {
   name: string;
   region: string;
   bbox: Bbox;   // [minLon, minLat, maxLon, maxLat]
-  lat: number;  // area centre (for event cross-linking + synthetic raster)
+  lat: number;  // area centre (for event cross-linking)
   lon: number;
 }
 
@@ -41,12 +38,6 @@ const AOIS: Aoi[] = [
   { id: 'alps', name: 'Swiss Alps (ice)', region: 'Valais, Switzerland', bbox: [7.0, 45.8, 8.0, 46.4], lat: 46.1, lon: 7.5 },
 ];
 
-const SCENARIOS = [
-  { id: 'flood', name: 'Flood / inundation' },
-  { id: 'urban', name: 'Urban growth' },
-  { id: 'deforestation', name: 'Forest disturbance' },
-  { id: 'glacier', name: 'Glacier / ice change' },
-];
 
 interface AsfGranule {
   granuleName: string | null;
@@ -88,49 +79,150 @@ const fmtTime = (t: string | null): string => (t ? `${t.slice(0, 10)} ${t.slice(
 const thumbFor = (g: AsfGranule): string | null =>
   g.thumbnailUrl ?? (g.browse ?? []).find((b) => /thumb/i.test(b)) ?? (g.browse ?? [])[0] ?? null;
 
-// ── SAMPLE rasters rendered through the smooth canvas renderer (SarCanvas). ──
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+/** Real before/after imagery for the selected AOI, straight from ASF quicklooks. */
+function quickUrl(g: AsfGranule | null): string | null {
+  if (!g) return null;
+  const b = g.browse as unknown;
+  if (typeof b === 'string' && b.startsWith('http')) return b;
+  if (Array.isArray(b)) {
+    const hit = b.find((x) => typeof x === 'string') as string | undefined;
+    return hit ?? null;
+  }
+  return null;
+}
+
+function RealBeforeAfter({ aoi }: { aoi: Aoi }) {
+  const [pair, setPair] = useState<{ before: AsfGranule | null; after: AsfGranule | null; n: number; dir: string | null } | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [failed, setFailed] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    let alive = true;
+    setPair(null);
+    setErr(null);
+    setFailed({});
+    const [minLon, minLat, maxLon, maxLat] = aoi.bbox;
+    const url =
+      'https://api.daac.asf.alaska.edu/services/search/param' +
+      '?platform=SENTINEL-1&processingLevel=GRD_HD&bbox=' + minLon + ',' + minLat + ',' + maxLon + ',' + maxLat +
+      '&output=json&maxResults=80';
+    fetch(url, { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('ASF HTTP ' + r.status))))
+      .then((json: unknown) => {
+        if (!alive) return;
+        const rows = (Array.isArray(json) ? (Array.isArray(json[0]) ? json[0] : json) : ((json as { results?: unknown[] }).results ?? [])) as AsfGranule[];
+        const usable = rows.filter((g) => quickUrl(g) && g.startTime);
+        // a before/after comparison only means something on one viewing geometry
+        const byDir = new Map<string, AsfGranule[]>();
+        for (const g of usable) {
+          const d = g.flightDirection ?? 'unknown';
+          byDir.set(d, [...(byDir.get(d) ?? []), g]);
+        }
+        const best = [...byDir.entries()].sort((a, b) => b[1].length - a[1].length)[0];
+        const list = (best?.[1] ?? []).sort((a, b) => (a.startTime! < b.startTime! ? -1 : 1));
+        setPair({
+          before: list[0] ?? null,
+          after: list.length > 1 ? list[list.length - 1] : null,
+          n: usable.length,
+          dir: best?.[0] ?? null,
+        });
+      })
+      .catch((e: Error) => alive && setErr(e.message));
+    return () => {
+      alive = false;
+    };
+  }, [aoi.id, aoi.bbox]);
+
+  const spanDays =
+    pair?.before?.startTime && pair?.after?.startTime
+      ? Math.round((new Date(pair.after.startTime).getTime() - new Date(pair.before.startTime).getTime()) / 86400000)
+      : null;
+
+  const card = (g: AsfGranule | null, kind: 'before' | 'after') => {
+    const src = quickUrl(g);
+    const tone = kind === 'before' ? 'text-amber-300' : 'text-cyan-300';
+    return (
+      <div className="rounded-lg border border-white/10 bg-slate-950/50 p-1.5">
+        <div className="flex items-center justify-between px-0.5">
+          <span className={'text-[10px] font-semibold uppercase tracking-wide ' + tone}>{kind}</span>
+          <span className="text-[9px] text-slate-500">{g?.startTime?.slice(0, 10) ?? '—'}</span>
+        </div>
+        {src && !failed[kind] ? (
+          <img
+            src={src}
+            alt={'Sentinel-1 ' + kind + ' quicklook, ' + aoi.region}
+            className="mt-1 h-[190px] w-full rounded object-cover"
+            loading="lazy"
+            onError={() => setFailed((f) => ({ ...f, [kind]: true }))}
+          />
+        ) : (
+          <div className="mt-1 grid h-[190px] place-items-center rounded border border-white/5 bg-slate-900/60 px-2 text-center text-[10px] text-slate-500">
+            {src ? 'quicklook unavailable' : 'no public quicklook for this window'}
+          </div>
+        )}
+        <div className="mt-1 truncate px-0.5 text-[9px] text-slate-500">
+          {g
+            ? (g.platform ?? 'Sentinel-1') + ' · ' + (g.flightDirection ?? '—') + ' · ' + (g.processingLevel ?? '—') + ' · ' + (g.startTime?.slice(11, 16) ?? '—') + ' UTC'
+            : '—'}
+        </div>
+        {g?.downloadUrl && (
+          <a className="px-0.5 text-[9px] text-sky-400 hover:underline" href={g.downloadUrl} target="_blank" rel="noreferrer">
+            granule ↗
+          </a>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[.03] p-2">
-      <div className="text-slate-400">{label}</div>
-      <div className="text-lg font-bold text-white">{value}{sub && <span className="ml-1 text-xs font-normal text-slate-500">{sub}</span>}</div>
-    </div>
+    <Glass className="p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div className="h-title">Before / after · real Sentinel-1 imagery</div>
+        <StatusBadge status={pair ? 'live' : 'snapshot'} note={pair ? 'asf quicklooks' : 'querying'} />
+      </div>
+      <p className="mt-1 text-[11px] text-slate-400">
+        Public GRD quicklooks for {aoi.region} — earliest and latest scene of the same pass direction, so the pair shares viewing geometry.
+      </p>
+      {err && (
+        <div className="mt-2 rounded border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-200">
+          ASF unavailable: {err}. No synthetic image is substituted.
+        </div>
+      )}
+      {!pair && !err && <div className="mt-2 text-[11px] text-slate-500">Querying ASF…</div>}
+      {pair && (
+        <>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            {card(pair.before, 'before')}
+            {card(pair.after, 'after')}
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
+            <span>
+              {pair.n} public quicklook{pair.n === 1 ? '' : 's'} in this box
+            </span>
+            {spanDays !== null && pair.dir && (
+              <span>
+                · {spanDays} d apart · both {pair.dir.toLowerCase()}
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-[10px] text-slate-500">
+            Quicklooks are browse images — ORBIT reads no pixel values from them and computes no change map here.
+          </p>
+        </>
+      )}
+    </Glass>
   );
 }
 
 export function SarChampion() {
   const { db } = useStore();
   const [aoi, setAoi] = useState<Aoi>(AOIS[0]);
-  const [scenario, setScenario] = useState(SCENARIOS[0].id);
-  const [thr, setThr] = useState(3);
-  const [band, setBand] = useState<'L' | 'C'>('L');
   const [catTab, setCatTab] = useState<'NISAR' | 'Sentinel-1'>('NISAR');
   const [catalog, setCatalog] = useState<{ nisar: AsfGranule[]; s1: AsfGranule[] }>({ nisar: [], s1: [] });
   const [catState, setCatState] = useState<'loading' | 'ok' | 'error'>('loading');
   const [catError, setCatError] = useState<string | null>(null);
 
-  // SAMPLE synthetic before/after pair, centred on the chosen AOI (not the live granules).
-  const pair = useMemo(
-    () => simulateSarPair(scenario, { seed: 7, size: 44, extent: [aoi.lon - 0.4, aoi.lat - 0.32, aoi.lon + 0.4, aoi.lat + 0.32] as Bbox }),
-    [scenario, aoi],
-  );
-  const change = useMemo(() => backscatterChange(pair.before, pair.after, { thresholdDb: thr }), [pair, thr]);
-  const classes = useMemo(() => classifyChange(change.diff), [change]);
-  const phase = useMemo(() => {
-    const w = 44, h = 44;
-    const vals = new Array<number>(w * h);
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      const d = Math.sqrt((x - w / 2) ** 2 + (y - h / 2) ** 2) / (w / 2);
-      vals[y * w + x] = 2 * Math.PI * Math.exp(-(d * d) * 3);
-    }
-    return { width: w, height: h, extent: pair.after.extent, values: vals, quantity: 'phase-rad' as const, unit: 'rad', label: 'Synthetic wrapped phase' };
-  }, [pair]);
-  const dispMax = useMemo(() => {
-    const lambda = band === 'L' ? 0.238 : 0.0555; // NISAR L-band ≈24 cm, Sentinel-1 C-band ≈5.5 cm
-    const disp = phaseToDisplacement(phase, lambda);
-    return { maxCm: Math.max(...disp.values.map((v) => Math.abs(v))) * 100, lambda };
-  }, [phase, band]);
   const related = useMemo(
     () => (db ? relateEvents(aoi.lat, aoi.lon, 500, db.events.map((e) => ({ type: e.type, title: e.title, lat: e.lat, lon: e.lon, t: e.t }))) : []),
     [db, aoi],
@@ -166,11 +258,11 @@ export function SarChampion() {
       <PageHeader
         icon="Radio"
         title="SAR Champion"
-        subtitle="Dancing with the SARs — detect surface change and measure InSAR displacement, backed by a live ASF acquisition catalogue."
+        subtitle="Dancing with the SARs — the live ASF catalogue, the public quicklooks for the selected area, and the independent event feeds beside them. No synthetic raster is shown on this page."
         right={
           <div className="flex flex-col items-end gap-1.5">
             <StatusBadge status={catState === 'ok' ? 'live' : 'not connected'} note={catState === 'ok' ? 'LIVE · ASF catalogue' : catState === 'loading' ? 'fetching ASF…' : 'ASF unavailable'} />
-            <StatusBadge status="sample" note="SAMPLE · simulated rasters" />
+            <StatusBadge status="live" note="live ASF catalogue" />
           </div>
         }
       />
@@ -216,7 +308,7 @@ export function SarChampion() {
         )}
         {catState === 'error' && (
           <div className="mt-3 rounded-lg border border-rose-400/25 bg-rose-500/10 p-3 text-xs text-rose-200">
-            Live catalogue unavailable: <b>{catError}</b>. The detector below still runs on SAMPLE rasters.
+            Live catalogue unavailable: <b>{catError}</b>. Nothing is substituted — the panels below stay empty rather than invent a scene.
           </div>
         )}
         {catState === 'ok' && granules.length === 0 && (
@@ -258,78 +350,9 @@ export function SarChampion() {
         )}
       </Glass>
 
-      {/* ── Before / after change studio (SAMPLE) ──────────────────────── */}
-      <Glass className="p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="h-title">Before / after surface-change studio</div>
-            <StatusBadge status="sample" />
-          </div>
-          <select aria-label="Change scenario" className="input !w-auto !py-1" value={scenario} onChange={(e) => setScenario(e.target.value)}>
-            {SCENARIOS.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-        </div>
-        <div className="mt-1 text-xs text-slate-400">
-          {pair.groundTruth} Centred on {aoi.region} ({aoi.lat.toFixed(2)}°, {aoi.lon.toFixed(2)}°) for reference only — not the live granules above.
-        </div>
-        <div className="mt-3 grid grid-cols-2 gap-4">
-          <div>
-            <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Before · σ0 (dB)</div>
-            <SarCanvas r={pair.before} palette={ampPalette} />
-          </div>
-          <div>
-            <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">After · σ0 (dB)</div>
-            <SarCanvas r={pair.after} palette={ampPalette} />
-          </div>
-        </div>
-        <label className="mt-3 flex items-center gap-2 text-xs text-slate-300">
-          Detection threshold: <b>{thr} dB</b>
-          <input type="range" min={2} max={8} value={thr} onChange={(e) => setThr(+e.target.value)} className="flex-1" />
-        </label>
-        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_260px] gap-4">
-          <div>
-            <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Change · after − before (dB)</div>
-            <SarCanvas r={change.diff} palette={changePalette} />
-          </div>
-          <div className="space-y-2 text-xs">
-            <Stat label="Changed cells" value={String(change.changedCells)} sub={`(${(change.changedPct * 100).toFixed(1)}%)`} />
-            <Stat label="Est. affected area" value={`${change.areaKm2.toFixed(0)} km²`} />
-            <Stat label="Clusters" value={String(change.clusters)} />
-            <div className="space-y-1">
-              {classes.map((c) => (
-                <div key={c.label} className="rounded-md border border-white/10 p-1.5"><b className="text-teal-200">{c.label}</b><div className="text-slate-400">{c.reasoning}</div></div>
-              ))}
-            </div>
-            <p className="text-[10px] text-slate-500">{change.method}</p>
-          </div>
-        </div>
-      </Glass>
-
-      {/* ── InSAR lab (SAMPLE) + live cross-links ──────────────────────── */}
+      {/* ── Real imagery + live cross-links ────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3">
-        <Glass className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="h-title">InSAR laboratory</div>
-            <StatusBadge status="sample" />
-          </div>
-          <p className="mt-1 text-[11px] text-slate-400">
-            Synthetic wrapped phase → line-of-sight displacement (λ = {dispMax.lambda.toFixed(3)} m, {band === 'L' ? 'L-band' : 'C-band'}).
-            Each colour cycle is one 2π phase wrap; max LOS displacement ≈ <b className="text-white">{dispMax.maxCm.toFixed(1)} cm</b>. LOS only — a single component of 3-D motion.
-          </p>
-          <div className="mt-2 flex gap-1">
-            {(['L', 'C'] as const).map((b) => (
-              <button key={b} onClick={() => setBand(b)} className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold transition ${band === b ? 'border-sky-400/40 bg-sky-500/20 text-sky-200' : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200'}`}>
-                {b}-band
-              </button>
-            ))}
-          </div>
-          <div className="mx-auto mt-3 max-w-[300px]">
-            <SarCanvas r={phase} palette={phasePalette} />
-          </div>
-          <p className="mt-2 text-[10px] text-slate-500">
-            Each colour cycle is one 2π phase wrap — concentric rings mean a smooth displacement field. Atmospheric delays, orbit error and phase ambiguity are not modelled here — this is a SAMPLE raster, not a real interferogram.
-          </p>
-        </Glass>
+        <RealBeforeAfter aoi={aoi} />
 
         <Glass className="p-4">
           <div className="flex items-center justify-between">
@@ -364,7 +387,7 @@ export function SarChampion() {
           <Icon name="Database" className="h-4 w-4 text-slate-500" />
           <span className="text-slate-300">Instruments</span>
           {SAR_MISSIONS.map((m) => <Chip key={m.id}>{m.id} · {m.band}-band</Chip>)}
-          <span className="ml-auto text-slate-500">Simulated rasters: SAMPLE · Acquisition list: LIVE ASF SearchAPI</span>
+          <span className="ml-auto text-slate-500">Acquisition list + imagery: LIVE ASF SearchAPI · no synthetic rasters on this page</span>
         </div>
       </Glass>
     </div>
