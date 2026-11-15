@@ -17,7 +17,8 @@
     "data:domains": "node scripts/build-domains.mjs",
     "data:hires": "node scripts/build-hires.mjs",
     "data:ice": "python scripts/build-ice.py",
-    "data:norway": "node scripts/build-norway.mjs"
+    "data:norway": "node scripts/build-norway.mjs",
+    "data:quake": "node scripts/build-quake.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -20,6 +20,7 @@ import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
 import { NarrationButton } from '../components/Narration';
 import { NorwayLive } from '../modules/NorwayLive';
+import { RealQuakeCase } from '../modules/RealQuakeCase';
 const StoryGlobe = lazy(() => import('../components/StoryGlobe').then((m) => ({ default: m.StoryGlobe })));
 import { TodayEarth } from '../components/TodayEarth';
 import { WeatherNow, WEATHER_SITES } from '../components/WeatherNow';
@@ -58,7 +59,7 @@ const EarthSuite: ComponentType = () => (
     <EarthJukebox />
   </div>
 );
-const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterEventBoard /><TurkiyeBoard /><FireCalendar /></div>;
+const DisasterSuite: ComponentType = () => <div className="space-y-3"><RealQuakeCase /><FireCalendar /></div>;
 const SarSuite: ComponentType = () => <div className="space-y-3"><SarFaultLab /><SarGlobe /><SarChampion /></div>;
 const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanBoard /><NorwayLive aoiId="barents" title="Barents Sea live state · routing at the ice margin" /><SolarFish /></div>;
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;

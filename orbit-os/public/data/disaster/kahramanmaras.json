@@ -1,0 +1,393 @@
+{
+ "domain": "disaster-case",
+ "title": "Kahramanmaraş M7.8 — one real case, from published products",
+ "generated_at": "2026-11-15T11:20:54.419Z",
+ "event": {
+  "id": "us6000jllz",
+  "title": "M 7.8 - Pazarcik earthquake, Kahramanmaras earthquake sequence",
+  "magnitude": 7.8,
+  "magnitudeType": "mww",
+  "time": "2023-02-06T01:17:34.342Z",
+  "place": "Pazarcik earthquake, Kahramanmaras earthquake sequence",
+  "depthKm": 10,
+  "lat": 37.2256,
+  "lon": 37.0143,
+  "mmi": 9.537,
+  "alert": "red",
+  "tsunami": 0,
+  "felt": 3182,
+  "significance": 2910,
+  "reviewStatus": "reviewed",
+  "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000jllz",
+  "source": "USGS Earthquake Catalog (fdsnws)"
+ },
+ "aftershocks": {
+  "window": {
+   "from": "2023-02-06",
+   "to": "2023-04-30",
+   "minMagnitude": 3,
+   "bbox": [
+    35,
+    35.5,
+    39.5,
+    38.8
+   ]
+  },
+  "count": 516,
+  "counts": [
+   {
+    "mag": 3,
+    "count": 1
+   },
+   {
+    "mag": 3.5,
+    "count": 7
+   },
+   {
+    "mag": 4,
+    "count": 334
+   },
+   {
+    "mag": 4.5,
+    "count": 136
+   },
+   {
+    "mag": 5,
+    "count": 26
+   },
+   {
+    "mag": 5.5,
+    "count": 6
+   },
+   {
+    "mag": 6,
+    "count": 3
+   },
+   {
+    "mag": 6.5,
+    "count": 1
+   },
+   {
+    "mag": 7.5,
+    "count": 2
+   }
+  ],
+  "byDay": [
+   {
+    "date": "2023-02-06",
+    "count": 220
+   },
+   {
+    "date": "2023-02-07",
+    "count": 56
+   },
+   {
+    "date": "2023-02-08",
+    "count": 30
+   },
+   {
+    "date": "2023-02-09",
+    "count": 21
+   },
+   {
+    "date": "2023-02-10",
+    "count": 9
+   },
+   {
+    "date": "2023-02-11",
+    "count": 17
+   },
+   {
+    "date": "2023-02-12",
+    "count": 17
+   },
+   {
+    "date": "2023-02-13",
+    "count": 4
+   },
+   {
+    "date": "2023-02-14",
+    "count": 6
+   },
+   {
+    "date": "2023-02-15",
+    "count": 5
+   },
+   {
+    "date": "2023-02-16",
+    "count": 6
+   },
+   {
+    "date": "2023-02-17",
+    "count": 2
+   },
+   {
+    "date": "2023-02-18",
+    "count": 3
+   },
+   {
+    "date": "2023-02-19",
+    "count": 7
+   },
+   {
+    "date": "2023-02-20",
+    "count": 8
+   },
+   {
+    "date": "2023-02-21",
+    "count": 4
+   },
+   {
+    "date": "2023-02-22",
+    "count": 3
+   },
+   {
+    "date": "2023-02-23",
+    "count": 3
+   },
+   {
+    "date": "2023-02-24",
+    "count": 3
+   },
+   {
+    "date": "2023-02-25",
+    "count": 3
+   },
+   {
+    "date": "2023-02-26",
+    "count": 2
+   },
+   {
+    "date": "2023-02-27",
+    "count": 4
+   },
+   {
+    "date": "2023-02-28",
+    "count": 7
+   },
+   {
+    "date": "2023-03-01",
+    "count": 4
+   },
+   {
+    "date": "2023-03-02",
+    "count": 1
+   },
+   {
+    "date": "2023-03-03",
+    "count": 1
+   },
+   {
+    "date": "2023-03-04",
+    "count": 1
+   },
+   {
+    "date": "2023-03-05",
+    "count": 1
+   },
+   {
+    "date": "2023-03-06",
+    "count": 6
+   },
+   {
+    "date": "2023-03-07",
+    "count": 3
+   },
+   {
+    "date": "2023-03-09",
+    "count": 2
+   },
+   {
+    "date": "2023-03-10",
+    "count": 2
+   },
+   {
+    "date": "2023-03-11",
+    "count": 2
+   },
+   {
+    "date": "2023-03-12",
+    "count": 1
+   },
+   {
+    "date": "2023-03-13",
+    "count": 3
+   },
+   {
+    "date": "2023-03-14",
+    "count": 3
+   },
+   {
+    "date": "2023-03-15",
+    "count": 1
+   },
+   {
+    "date": "2023-03-17",
+    "count": 1
+   },
+   {
+    "date": "2023-03-18",
+    "count": 4
+   },
+   {
+    "date": "2023-03-19",
+    "count": 2
+   },
+   {
+    "date": "2023-03-20",
+    "count": 2
+   },
+   {
+    "date": "2023-03-22",
+    "count": 1
+   },
+   {
+    "date": "2023-03-23",
+    "count": 3
+   },
+   {
+    "date": "2023-03-24",
+    "count": 2
+   },
+   {
+    "date": "2023-03-25",
+    "count": 2
+   },
+   {
+    "date": "2023-03-27",
+    "count": 1
+   },
+   {
+    "date": "2023-03-28",
+    "count": 1
+   },
+   {
+    "date": "2023-03-29",
+    "count": 4
+   },
+   {
+    "date": "2023-03-31",
+    "count": 1
+   },
+   {
+    "date": "2023-04-01",
+    "count": 2
+   },
+   {
+    "date": "2023-04-03",
+    "count": 3
+   },
+   {
+    "date": "2023-04-06",
+    "count": 1
+   },
+   {
+    "date": "2023-04-08",
+    "count": 1
+   },
+   {
+    "date": "2023-04-10",
+    "count": 1
+   },
+   {
+    "date": "2023-04-11",
+    "count": 1
+   },
+   {
+    "date": "2023-04-13",
+    "count": 1
+   },
+   {
+    "date": "2023-04-15",
+    "count": 2
+   },
+   {
+    "date": "2023-04-16",
+    "count": 1
+   },
+   {
+    "date": "2023-04-17",
+    "count": 1
+   },
+   {
+    "date": "2023-04-19",
+    "count": 1
+   },
+   {
+    "date": "2023-04-25",
+    "count": 1
+   },
+   {
+    "date": "2023-04-26",
+    "count": 2
+   },
+   {
+    "date": "2023-04-27",
+    "count": 1
+   },
+   {
+    "date": "2023-04-28",
+    "count": 1
+   },
+   {
+    "date": "2023-04-29",
+    "count": 1
+   }
+  ],
+  "strongest": {
+   "magnitude": 7.8,
+   "place": "Pazarcik earthquake, Kahramanmaras earthquake sequence",
+   "time": "2023-02-06T01:17:34.342Z"
+  },
+  "meanDepthKm": 10.4,
+  "source": "USGS aftershock catalogue (fdsnws), M≥3",
+  "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=3&starttime=2023-02-06&endtime=2023-04-30&minlatitude=35.5&maxlatitude=38.8&minlongitude=35.0&maxlongitude=39.5"
+ },
+ "shakemap": {
+  "source": "USGS ShakeMap (product us6000jllz)",
+  "available": true,
+  "mapStatus": "automatic",
+  "reviewStatus": "automatic",
+  "maxMmi": 9.537,
+  "maxPga": 1.312,
+  "intensityMap": "https://earthquake.usgs.gov/product/shakemap/us6000jllz/us/1756921940993/download/intensity.jpg",
+  "pgaMap": "https://earthquake.usgs.gov/product/shakemap/us6000jllz/us/1756921940993/download/pga.jpg",
+  "contours": "https://earthquake.usgs.gov/product/shakemap/us6000jllz/us/1756921940993/download/cont_mmi.json",
+  "stations": {
+   "count": 1721,
+   "mmiReadings": 0,
+   "maxMmi": null,
+   "pgaReadings": 384,
+   "maxPga": 161.698
+  },
+  "url": null
+ },
+ "imagery": {
+  "available": true,
+  "source": "NASA ASF · Sentinel-1 GRD quicklook (browse image, no pixel values read)",
+  "pass": "ASCENDING",
+  "before": {
+   "date": "2023-01-04",
+   "time": "15:34:25",
+   "platform": "Sentinel-1A",
+   "image": "https://datapool.asf.alaska.edu/BROWSE/SA/S1A_IW_GRDH_1SDV_20230104T153425_20230104T153450_046636_0596ED_FE8F.jpg",
+   "granule": "S1A_IW_GRDH_1SDV_20230104T153425_20230104T153450_046636_0596ED_FE8F"
+  },
+  "after": {
+   "date": "2023-03-24",
+   "time": "15:26:08",
+   "platform": "Sentinel-1A",
+   "image": "https://datapool.asf.alaska.edu/BROWSE/SA/S1A_IW_GRDH_1SDV_20230324T152608_20230324T152633_047788_05BDC7_050D.jpg",
+   "granule": "S1A_IW_GRDH_1SDV_20230324T152608_20230324T152633_047788_05BDC7_050D"
+  }
+ },
+ "provenance": {
+  "providers": [
+   "USGS Earthquake Hazards Program",
+   "USGS ShakeMap",
+   "NASA ASF"
+  ],
+  "access": "keyless public APIs",
+  "honesty": "Event, aftershocks, ShakeMap intensity/PGA and the Sentinel-1 quicklooks are published products copied as-is. ORBIT computes only the aftershock counts, daily series, magnitude bins and mean depth from the catalogue rows. No deformation value is invented: InSAR displacement needs a processed SLC pair, which this build cannot authenticate."
+ }
+}
