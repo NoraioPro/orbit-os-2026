@@ -15,7 +15,8 @@
     "assets": "node scripts/sync-assets.mjs",
     "data:all": "node scripts/build-events.mjs && node scripts/build-live.mjs",
     "data:domains": "node scripts/build-domains.mjs",
-    "data:hires": "node scripts/build-hires.mjs"
+    "data:hires": "node scripts/build-hires.mjs",
+    "data:ice": "python scripts/build-ice.py"
   },
   "engines": {
     "node": ">=20"

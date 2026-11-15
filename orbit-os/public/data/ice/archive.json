@@ -1,0 +1,93 @@
+{
+ "domain": "ice-archive",
+ "title": "Ice-chart quicklooks \u00b7 mid-February each year",
+ "note": "The analyst's own published chart images, one per year, same week of year \u2014 a like-for-like visual comparison, not an ORBIT rendering.",
+ "source_url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/",
+ "images": [
+  {
+   "date": "2010-02-15",
+   "region": "arctic",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2010/20100215/arctic_20100215_col.png"
+  },
+  {
+   "date": "2015-02-16",
+   "region": "barent",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2015/20150216/barent_20150216_col.png"
+  },
+  {
+   "date": "2015-02-16",
+   "region": "framst",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2015/20150216/framst_20150216_col.png"
+  },
+  {
+   "date": "2015-02-16",
+   "region": "arctic",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2015/20150216/arctic_20150216_col.png"
+  },
+  {
+   "date": "2020-02-17",
+   "region": "barent",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2020/20200217/barent_20200217_col.png"
+  },
+  {
+   "date": "2020-02-17",
+   "region": "framst",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2020/20200217/framst_20200217_col.png"
+  },
+  {
+   "date": "2020-02-17",
+   "region": "isfjrd",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2020/20200217/isfjrd_20200217_col.png"
+  },
+  {
+   "date": "2020-02-17",
+   "region": "arctic",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2020/20200217/arctic_20200217_col.png"
+  },
+  {
+   "date": "2025-02-17",
+   "region": "barent",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2025/20250217/barent_20250217_col.png"
+  },
+  {
+   "date": "2025-02-17",
+   "region": "framst",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2025/20250217/framst_20250217_col.png"
+  },
+  {
+   "date": "2025-02-17",
+   "region": "isfjrd",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2025/20250217/isfjrd_20250217_col.png"
+  },
+  {
+   "date": "2025-02-17",
+   "region": "arctic",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2025/20250217/arctic_20250217_col.png"
+  },
+  {
+   "date": "2026-02-16",
+   "region": "barent",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2026/20260216/barent_20260216_col.png"
+  },
+  {
+   "date": "2026-02-16",
+   "region": "framst",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2026/20260216/framst_20260216_col.png"
+  },
+  {
+   "date": "2026-02-16",
+   "region": "isfjrd",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2026/20260216/isfjrd_20260216_col.png"
+  },
+  {
+   "date": "2026-02-16",
+   "region": "arctic",
+   "url": "https://cryo.met.no/archive/ice-service/icecharts/quicklooks/2026/20260216/arctic_20260216_col.png"
+  }
+ ],
+ "provenance": {
+  "provider": "MET Norway / Norwegian Ice Service",
+  "access": "keyless",
+  "honesty": "Unmodified published quicklooks."
+ }
+}
