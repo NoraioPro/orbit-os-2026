@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 const OrbitGlobe = lazy(() => import('../components/OrbitGlobe').then((m) => ({ default: m.OrbitGlobe })));
 import { Chip, Glass, Icon, PageHeader, StatusBadge } from '../components/ui';
@@ -184,7 +184,85 @@ const DATA_FILES: { path: string; label: string; size: string }[] = [
   { path: '/data/ignis/documents.json', label: 'IGNIS · 10 NTRS source documents', size: 'small' },
   { path: '/data/ignis/saffire.csv', label: 'IGNIS · Saffire flame-spread (CSV)', size: 'small' },
   { path: '/data/ignis/luci.csv', label: 'IGNIS · LUCI flame-spread (CSV)', size: 'small' },
+  { path: '/data/domains/index.json', label: 'Domain layer index (agri · ocean)', size: 'small' },
+  { path: '/data/domains/agri.json', label: 'Domain · Agri (POWER GWETROOT + GIBS NDVI)', size: 'small' },
+  { path: '/data/domains/ocean.json', label: 'Domain · Ocean (POWER marine T2M + GIBS SST)', size: 'small' },
 ];
+
+
+/** Domain layer: the agri/ocean files built by scripts/build-domains.mjs, shown as data (not decoration). */
+function DomainLayer() {
+  const [files, setFiles] = useState<{ domain: string; title: string; aoi: string; honesty: string; window: string; series: { label: string; unit: string; latest: number | null }[]; imagery: number; notConnected: string[] }[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch('/data/domains/index.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then(async (idx: { domains: { id: string; file: string }[] }) => {
+        const list = await Promise.all(
+          idx.domains.map(async (d) => {
+            const f = await fetch(`/data/domains/${d.file}`).then((r) => r.json());
+            return {
+              domain: f.domain,
+              title: f.title,
+              aoi: f.aoi?.name ?? '—',
+              honesty: f.provenance?.honesty ?? 'sample',
+              window: f.coverage?.window ?? '—',
+              series: (f.series ?? []).map((x: { label: string; unit: string; latest: number | null }) => ({ label: x.label, unit: x.unit, latest: x.latest })),
+              imagery: (f.imagery ?? []).filter((i: { gibs?: string }) => i.gibs).length,
+              notConnected: (f.imagery ?? []).filter((i: { status?: string }) => i.status === 'not connected').map((i: { title: string }) => i.title),
+            };
+          }),
+        );
+        if (live) setFiles(list);
+      })
+      .catch((e: Error) => live && setErr(e.message));
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  return (
+    <Glass className="mt-3 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div className="h-title">Domain layer</div>
+          <div className="text-[11px] text-slate-400">One file per domain, each carrying its own provenance. Built by <code className="rounded bg-white/10 px-1">node scripts/build-domains.mjs</code> from keyless NASA POWER + GIBS.</div>
+        </div>
+        <StatusBadge status="live" note="rebuilt from source" />
+      </div>
+      {err && <p className="mt-2 text-[11px] text-amber-300">Domain layer unavailable ({err}). Nothing is shown rather than a guess.</p>}
+      {!err && !files && <p className="mt-2 text-[11px] text-slate-500">Loading…</p>}
+      {files && (
+        <div className="mt-2 grid gap-2 md:grid-cols-2">
+          {files.map((f) => (
+            <div key={f.domain} className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[13px] font-medium text-white">{f.title}</span>
+                <StatusBadge status={f.honesty === 'live' ? 'live' : 'snapshot'} note={f.honesty} />
+              </div>
+              <div className="text-[10px] text-slate-400">{f.aoi} · {f.window} · {f.imagery} GIBS imagery layer{f.imagery === 1 ? '' : 's'}</div>
+              <ul className="mt-1.5 space-y-0.5">
+                {f.series.map((s) => (
+                  <li key={s.label} className="flex items-center justify-between gap-2 text-[11px]">
+                    <span className="truncate text-slate-300">{s.label}</span>
+                    <span className="shrink-0 font-medium text-slate-100">{s.latest === null ? '—' : s.latest.toFixed(2)} <span className="text-[10px] font-normal text-slate-500">{s.unit}</span></span>
+                  </li>
+                ))}
+              </ul>
+              {f.notConnected.length > 0 && <div className="mt-1 text-[10px] text-amber-300/80">not connected: {f.notConnected.join(', ')}</div>}
+              <div className="mt-1.5 flex gap-2">
+                <a className="btn-ghost !px-2 !py-1 text-[11px]" href={`/data/domains/${f.domain}.json`} target="_blank" rel="noreferrer">Preview</a>
+                <a className="btn-ghost !px-2 !py-1 text-[11px]" href={`/data/domains/${f.domain}.json`} download>JSON</a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Glass>
+  );
+}
 
 export function DataHub() {
   const { db } = useStore();
@@ -199,7 +277,9 @@ export function DataHub() {
         <Glass className="p-3"><div className="text-2xl font-bold text-violet-300">{DATA_FILES.length}</div><div className="text-[11px] text-slate-400">Extractable data files</div></Glass>
       </div>
 
-      <Glass className="overflow-hidden p-0"><table className="w-full text-xs"><thead className="bg-white/5 text-left text-slate-400"><tr><th className="p-3">Dataset</th><th>Provider</th><th>Connection</th><th>Status</th><th>Notes</th></tr></thead>
+      <DomainLayer />
+
+      <Glass className="mt-3 overflow-hidden p-0"><table className="w-full text-xs"><thead className="bg-white/5 text-left text-slate-400"><tr><th className="p-3">Dataset</th><th>Provider</th><th>Connection</th><th>Status</th><th>Notes</th></tr></thead>
         <tbody>{DATASETS.map((d) => <tr key={d.id} className="border-t border-white/5"><td className="p-3 font-medium text-white">{d.url ? <a href={d.url} target="_blank" rel="noreferrer" className="hover:text-sky-300">{d.name}</a> : d.name}</td><td className="text-slate-300">{d.provider}</td><td className="text-slate-300">{d.connection}</td><td><StatusBadge status={d.status} /></td><td className="pr-3 text-slate-400">{d.note}</td></tr>)}</tbody></table></Glass>
 
       <Glass className="mt-3 p-4">

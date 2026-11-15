@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-11-15T00:05:15.122Z",
+  "source": "scripts/build-domains.mjs",
+  "note": "Domain-organized data layer. Each file carries its own provenance block; panels read these files instead of hard-coded numbers.",
+  "domains": [
+    {
+      "id": "agri",
+      "file": "agri.json",
+      "title": "Agri Intelligence",
+      "honesty": "live",
+      "series": 2,
+      "imagery": 1
+    },
+    {
+      "id": "ocean",
+      "file": "ocean.json",
+      "title": "Ocean Intelligence",
+      "honesty": "live",
+      "series": 2,
+      "imagery": 1
+    }
+  ]
+}

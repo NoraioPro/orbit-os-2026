@@ -9,6 +9,7 @@ import { EarthPulse } from '../modules/EarthPulse';
 import { AcademyWidget, AgriWidget, AutonomyWidget, DisasterWidget, ExplorerWidget, HumanWidget, InfraWidget, OceanWidget } from '../modules/widgets';
 const GnssGuardian = lazy(() => import('../modules/GnssGuardian').then((m) => ({ default: m.GnssGuardian })));
 const SarObservatory = lazy(() => import('../modules/SarObservatory').then((m) => ({ default: m.SarObservatory })));
+const InfrastructureOslo = lazy(() => import('../modules/InfrastructureOslo').then((m) => ({ default: m.InfrastructureOslo })));
 import { QuickInvestigation } from '../components/QuickInvestigation';
 import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
@@ -59,8 +60,19 @@ const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanWidget 
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;
 const HumanSuite: ComponentType = () => <div className="space-y-3"><AstronautTwin /><HumanLab /><FlameLab /></div>;
 
+
+/** Infrastructure: the Oslo SAR/InSAR situation board leads, the existing exposure widget follows. */
+function InfraSuite() {
+  return (
+    <div className="space-y-3">
+      <InfrastructureOslo />
+      <InfraWidget />
+    </div>
+  );
+}
+
 const WIDGET: Record<string, ComponentType> = {
-  earth: EarthSuite, disaster: DisasterSuite, agri: CropWatch, ocean: OceanSuite, infrastructure: InfraWidget, gnss: GnssGuardian,
+  earth: EarthSuite, disaster: DisasterSuite, agri: CropWatch, ocean: OceanSuite, infrastructure: InfraSuite, gnss: GnssGuardian,
   sar: SarSuite, autonomy: MartianRoutes, explorer: ExplorerSuite, academy: MissionAcademyPro, human: HumanSuite, ignis: FlameLab, defense: SituationRoom,
 };
 export default function ModulePage() {

@@ -54,6 +54,7 @@ export const STORIES: Record<string, ModuleStory> = {
   infrastructure: {
     intro: 'Cities rest on ground that can move.',
     beats: [
+      { id: 'oslo', lat: 59.91, lng: 10.75, title: 'Ground stability · Oslo', text: 'SAR/InSAR screening over bridges, dams, roads and industry. The Oslo board below is a fixed-seed sample field — real InSAR is not connected.', status: 'sample', source: 'ORBIT sample grid', next: 'NISAR L2 InSAR via ASF' },
       { id: 'tokyo', lat: 35.68, lng: 139.69, title: 'Seismic exposure · Tokyo', text: 'Earthquakes within 300 km, max magnitude from the 30-day USGS window.', status: 'live', source: 'USGS FDSN', next: 'NISAR/Sentinel-1 InSAR' },
       { id: 'jakarta', lat: -6.2, lng: 106.85, title: 'Subsidence · Jakarta', text: 'A synthetic displacement grid illustrates the change-detection method. Real InSAR is not connected.', status: 'sample', source: 'ORBIT sample grid', next: 'NISAR / Sentinel-1 SAR' },
       { id: 'la', lat: 34.05, lng: -118.24, title: 'Seismic exposure · Los Angeles', text: 'Fault-adjacent exposure from the same USGS feed. Screening tool, not structural certification.', status: 'live', source: 'USGS FDSN', next: 'asset registry import' },

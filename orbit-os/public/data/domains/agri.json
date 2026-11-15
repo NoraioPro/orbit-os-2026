@@ -1,0 +1,120 @@
+{
+  "domain": "agri",
+  "title": "Agri Intelligence",
+  "subtitle": "Satellite insights for agriculture",
+  "aoi": {
+    "id": "agri-sahel",
+    "name": "Sahel · Niger",
+    "lat": 13.51,
+    "lon": 2.11,
+    "community": "AG"
+  },
+  "generated_at": "2026-11-15T00:05:15.122Z",
+  "provenance": {
+    "provider": "NASA POWER (monthly point API, community=AG)",
+    "url": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=GWETROOT,T2M,PRECTOTCORR,WS2M,CLOUD_AMT&community=AG&longitude=2.11&latitude=13.51&start=2025&end=2026&format=JSON",
+    "access": "keyless",
+    "honesty": "live",
+    "note": "Soil moisture is POWER GWETROOT (root-zone soil wetness, 0–1). Panels label it as such; it is not a MODIS/SMAP retrieval."
+  },
+  "imagery": [
+    {
+      "id": "crop-health",
+      "title": "Vegetation Index (rolling 8-Day, MODIS, Terra)",
+      "label": "NDVI · MODIS Terra 8-day",
+      "status": "live",
+      "note": "Rendered from NASA GIBS tiles for the AOI window; no local pixel values are computed.",
+      "gibs": "MODIS_Terra_NDVI_8Day",
+      "theme": "ndvi",
+      "maxLevel": 9
+    },
+    {
+      "id": "soil-moisture-map",
+      "title": "Soil moisture",
+      "label": "GWETROOT · POWER point",
+      "status": "live",
+      "note": "Point value for the AOI centre, not a spatial map."
+    }
+  ],
+  "series": [
+    {
+      "id": "gwetroot",
+      "label": "Soil moisture (root zone)",
+      "unit": "fraction 0–1",
+      "months": [
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep"
+      ],
+      "values": [
+        0.2,
+        0.21,
+        0.26,
+        0.33,
+        0.38,
+        0.36
+      ],
+      "latest": 0.36,
+      "mean": 0.29,
+      "note": "POWER GWETROOT monthly mean at the AOI point."
+    },
+    {
+      "id": "prectotcorr",
+      "label": "Precipitation",
+      "unit": "mm/day",
+      "months": [
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep"
+      ],
+      "values": [
+        0.61,
+        0.3,
+        5.43,
+        3.91,
+        5.56,
+        2.45
+      ],
+      "latest": 2.45,
+      "mean": 3.043,
+      "note": "POWER PRECTOTCORR monthly mean."
+    }
+  ],
+  "weather": [
+    {
+      "id": "precip",
+      "label": "Precipitation",
+      "unit": "mm/day",
+      "value": 2.45
+    },
+    {
+      "id": "temp",
+      "label": "Temperature",
+      "unit": "°C",
+      "value": 29.3
+    },
+    {
+      "id": "wind",
+      "label": "Wind",
+      "unit": "m/s",
+      "value": 1.91
+    },
+    {
+      "id": "clouds",
+      "label": "Clouds",
+      "unit": "%",
+      "value": null
+    }
+  ],
+  "coverage": {
+    "start": "2025-01",
+    "end": "2026-09",
+    "window": "Apr–Sep 2026"
+  }
+}

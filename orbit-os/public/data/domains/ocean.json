@@ -1,0 +1,120 @@
+{
+  "domain": "ocean",
+  "title": "Ocean Intelligence",
+  "subtitle": "Ocean conditions and ecosystem insights",
+  "aoi": {
+    "id": "ocean-gulfstream",
+    "name": "Gulf Stream · 38N 50W",
+    "lat": 38,
+    "lon": -50,
+    "community": "RE"
+  },
+  "generated_at": "2026-11-15T00:05:15.122Z",
+  "provenance": {
+    "provider": "NASA POWER (monthly point API over ocean, community=RE) + NASA GIBS",
+    "url": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=GWETROOT,T2M,PRECTOTCORR,WS2M,CLOUD_AMT&community=RE&longitude=-50&latitude=38&start=2025&end=2026&format=JSON",
+    "access": "keyless",
+    "honesty": "live",
+    "note": "POWER over ocean is marine AIR temperature (T2M), not sea-surface temperature. SST comes from the GHRSST MUR layer via GIBS imagery only. Chlorophyll (PACE/MODIS ocean colour) is NOT connected — no values are shown."
+  },
+  "imagery": [
+    {
+      "id": "sst",
+      "title": "Sea Surface Temperature (L4, MUR, GHRSST)",
+      "label": "GHRSST MUR L4",
+      "status": "live",
+      "note": "GIBS raster for the AOI window; the app does not read pixel values.",
+      "gibs": "GHRSST_L4_MUR_Sea_Surface_Temperature",
+      "theme": "sea-surface-temperature",
+      "maxLevel": 7
+    },
+    {
+      "id": "chlorophyll",
+      "title": "Chlorophyll",
+      "label": "Ocean colour · not connected",
+      "status": "not connected",
+      "note": "PACE/MODIS ocean-colour is a planned connector. No values or imagery are shown rather than a placeholder that could be mistaken for data."
+    }
+  ],
+  "series": [
+    {
+      "id": "t2m",
+      "label": "Marine air temperature",
+      "unit": "°C",
+      "months": [
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep"
+      ],
+      "values": [
+        16.95,
+        18.09,
+        21,
+        23.54,
+        25.7,
+        25.2
+      ],
+      "latest": 25.2,
+      "mean": 21.747,
+      "note": "POWER T2M over the ocean AOI — air temperature, NOT SST."
+    },
+    {
+      "id": "ws2m",
+      "label": "Wind speed at 2 m",
+      "unit": "m/s",
+      "months": [
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep"
+      ],
+      "values": [
+        6.89,
+        6.83,
+        5.52,
+        5.17,
+        5.27,
+        6.1
+      ],
+      "latest": 6.1,
+      "mean": 5.963,
+      "note": "POWER WS2M monthly mean over the AOI."
+    }
+  ],
+  "weather": [
+    {
+      "id": "precip",
+      "label": "Precipitation",
+      "unit": "mm/day",
+      "value": 7.36
+    },
+    {
+      "id": "temp",
+      "label": "Temperature",
+      "unit": "°C",
+      "value": 25.2
+    },
+    {
+      "id": "wind",
+      "label": "Wind",
+      "unit": "m/s",
+      "value": 6.1
+    },
+    {
+      "id": "clouds",
+      "label": "Clouds",
+      "unit": "%",
+      "value": null
+    }
+  ],
+  "coverage": {
+    "start": "2025-01",
+    "end": "2026-09",
+    "window": "Apr–Sep 2026"
+  }
+}

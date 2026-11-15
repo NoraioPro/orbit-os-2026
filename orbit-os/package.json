@@ -13,7 +13,8 @@
     "test": "node scripts/kernel-selftest.mjs",
     "data:live": "node scripts/build-live.mjs",
     "assets": "node scripts/sync-assets.mjs",
-    "data:all": "node scripts/build-events.mjs && node scripts/build-live.mjs"
+    "data:all": "node scripts/build-events.mjs && node scripts/build-live.mjs",
+    "data:domains": "node scripts/build-domains.mjs"
   },
   "engines": {
     "node": ">=20"
