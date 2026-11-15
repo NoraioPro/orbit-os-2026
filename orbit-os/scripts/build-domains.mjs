@@ -185,6 +185,61 @@ async function fetchUsgsEvent(eventId) {
   };
 }
 
+
+/** Generic ASF query -> normalised granule records (real metadata only). */
+async function asfQuery(params) {
+  const url =
+    'https://api.daac.asf.alaska.edu/services/search/param?' +
+    new URLSearchParams({ output: 'json', ...params }).toString();
+  const res = await fetch(url, { headers: { 'User-Agent': 'ORBIT-OS/0.1 (NASA Space Apps)' } });
+  if (!res.ok) return { url, status: `HTTP ${res.status}`, granules: [] };
+  const json = await res.json();
+  const rows = json?.[0] ?? [];
+  const granules = rows.map((g) => ({
+    granule: g.granuleName ?? null,
+    platform: g.platform ?? null,
+    startTime: g.startTime ?? null,
+    stopTime: g.stopTime ?? null,
+    flightDirection: g.flightDirection ?? null,
+    relativeOrbit: g.relativeOrbit ?? null,
+    frame: g.frameNumber ?? null,
+    beamMode: g.beamModeType ?? null,
+    polarization: g.polarization ?? null,
+    processingLevel: g.processingLevel ?? null,
+    subswath: g.subswath ?? null,
+    offNadirAngle: g.offNadirAngle ?? null,
+    centerLat: g.centerLat ?? null,
+    centerLon: g.centerLon ?? null,
+    sizeMB: g.sizeMB ?? null,
+    insarGrouping: g.insarGrouping ?? null,
+    insarStackSize: g.insarStackSize ?? null,
+    footprint: g.stringFootprint ?? null,
+    thumbnail: g.thumbnailUrl ?? (Array.isArray(g.browse) ? g.browse[0] : null) ?? null,
+    downloadUrl: g.downloadUrl ?? null,
+  }));
+  return { url, status: 'live', granules };
+}
+
+/** East Anatolian Fault: a genuine same-track Sentinel-1 pair around the 6 Feb 2023 M7.8. */
+async function fetchFaultPair() {
+  const point = { intersectsWith: 'POINT(36.9 37.6)' };
+  const before = await asfQuery({ platform: 'SENTINEL-1', flightDirection: 'ASCENDING', processingLevel: 'SLC', start: '2023-01-01', end: '2023-02-05', maxResults: '8', ...point });
+  const after = await asfQuery({ platform: 'SENTINEL-1', flightDirection: 'ASCENDING', processingLevel: 'SLC', start: '2023-02-08', end: '2023-03-25', maxResults: '8', ...point });
+  const nisar = await asfQuery({ platform: 'NISAR', maxResults: '6', ...point });
+
+  // InSAR needs the SAME relative orbit + frame: pick the latest pre-event scene and
+  // the earliest post-event scene that share them.
+  const byTime = (a, b) => new Date(a.startTime) - new Date(b.startTime);
+  const eventTime = new Date('2023-02-06T01:17:34Z');
+  // latest scene BEFORE the event, earliest scene AFTER it, on the same track
+  const pre = [...before.granules].filter((g) => g.startTime && new Date(g.startTime) < eventTime && g.relativeOrbit && g.frame).sort(byTime).pop() ?? before.granules[0] ?? null;
+  const post =
+    (pre && [...after.granules].filter((g) => g.startTime && new Date(g.startTime) > eventTime && g.relativeOrbit === pre.relativeOrbit && g.frame === pre.frame).sort(byTime)[0]) ??
+    after.granules[after.granules.length - 1] ??
+    null;
+  return { before: pre, after: post, nisar: nisar.granules[0] ?? null, queries: { before: before.url, after: after.url, nisar: nisar.url } };
+}
+
 async function main() {
   await mkdir(OUT, { recursive: true });
   const gibsRaw = JSON.parse(await readFile(join(ROOT, 'public', 'data', 'live', 'gibs-layers.json'), 'utf8'));
@@ -346,6 +401,7 @@ async function main() {
       { id: 'agri-ostfold', file: 'agri-ostfold.json', title: 'Agri Intelligence · Østfold', honesty: 'live', series: nordic.series.length, imagery: nordic.imagery.filter((i) => i.gibs).length },
       { id: 'sar', file: 'sar.json', title: 'SAR acquisitions (ASF · Oslo + Svalbard)', honesty: 'live', series: null, imagery: 0 },
       { id: 'events', file: 'events-turkiye.json', title: 'USGS event · Kahramanmaras M7.8', honesty: 'live', series: null, imagery: 0 },
+      { id: 'sar-fault', file: 'sar-fault.json', title: 'East Anatolian Fault · Sentinel-1 pair', honesty: 'live', series: null, imagery: 0 },
     ],
   };
 
@@ -394,6 +450,32 @@ async function main() {
     console.log(` usgs: ${ev.title} · ${ev.timeUtc} · ${ev.depthKm} km`);
   } catch (e) {
     console.log(' usgs event fetch failed:', e.message);
+  }
+
+  // East Anatolian Fault pair (real Sentinel-1 acquisitions around the 2023 M7.8)
+  try {
+    const fault = await fetchFaultPair();
+    const faultFile = {
+      domain: 'sar-fault',
+      title: 'East Anatolian Fault · Sentinel-1 pair',
+      generated_at: generatedAt,
+      aoi: { lat: 37.6, lon: 36.9, name: 'East Anatolian Fault, Turkiye / Syria' },
+      event: { id: 'us6000jllz', label: 'M7.8 Kahramanmaras sequence', timeUtc: '2023-02-06T01:17:34Z' },
+      provenance: {
+        provider: 'NASA ASF Search API',
+        url: 'https://api.daac.asf.alaska.edu/services/search/param',
+        access: 'keyless metadata (product download needs an Earthdata login)',
+        honesty: 'live',
+        note: 'Both scenes are real ASF records on the same relative orbit and frame, so they form an interferometric pair. No interferogram has been processed in this build; amplitude/fringe imagery in the UI is labelled sample.',
+      },
+      pair: { before: fault.before, after: fault.after },
+      nisarCurrent: fault.nisar,
+      queries: fault.queries,
+    };
+    await writeFile(join(OUT, 'sar-fault.json'), JSON.stringify(faultFile, null, 2));
+    console.log(` fault pair: ${fault.before?.startTime ?? '?'} -> ${fault.after?.startTime ?? '?'} (frame ${fault.before?.frame ?? '?'}, orbit ${fault.before?.relativeOrbit ?? '?'})`);
+  } catch (e) {
+    console.log(' fault pair fetch failed:', e.message);
   }
 
   await writeFile(join(OUT, 'index.json'), JSON.stringify(index, null, 2));

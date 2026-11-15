@@ -1,7 +1,7 @@
 {
   "domain": "events",
   "title": "Kahramanmaras M7.8 · 6 Feb 2023",
-  "generated_at": "2026-11-15T09:19:25.983Z",
+  "generated_at": "2026-11-15T09:26:15.424Z",
   "provenance": {
     "provider": "USGS Earthquake Catalog (FDSN event service)",
     "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventid=us6000jllz",

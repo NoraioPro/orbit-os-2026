@@ -2,7 +2,7 @@
   "domain": "sar",
   "title": "SAR acquisitions",
   "subtitle": "ASF Search API harvest (Oslo + Svalbard)",
-  "generated_at": "2026-11-15T09:19:25.983Z",
+  "generated_at": "2026-11-15T09:26:15.424Z",
   "provenance": {
     "provider": "NASA ASF Search API (Alaska Satellite Facility)",
     "url": "https://api.daac.asf.alaska.edu/services/search/param",

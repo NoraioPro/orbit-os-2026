@@ -1,0 +1,95 @@
+{
+  "domain": "sar-fault",
+  "title": "East Anatolian Fault · Sentinel-1 pair",
+  "generated_at": "2026-11-15T09:26:15.424Z",
+  "aoi": {
+    "lat": 37.6,
+    "lon": 36.9,
+    "name": "East Anatolian Fault, Turkiye / Syria"
+  },
+  "event": {
+    "id": "us6000jllz",
+    "label": "M7.8 Kahramanmaras sequence",
+    "timeUtc": "2023-02-06T01:17:34Z"
+  },
+  "provenance": {
+    "provider": "NASA ASF Search API",
+    "url": "https://api.daac.asf.alaska.edu/services/search/param",
+    "access": "keyless metadata (product download needs an Earthdata login)",
+    "honesty": "live",
+    "note": "Both scenes are real ASF records on the same relative orbit and frame, so they form an interferometric pair. No interferogram has been processed in this build; amplitude/fringe imagery in the UI is labelled sample."
+  },
+  "pair": {
+    "before": {
+      "granule": "S1A_IW_SLC__1SDV_20230204T152607_20230204T152635_047088_05A621_4129",
+      "platform": "Sentinel-1A",
+      "startTime": "2023-02-04T15:26:07Z",
+      "stopTime": "2023-02-04T15:26:35Z",
+      "flightDirection": "ASCENDING",
+      "relativeOrbit": 116,
+      "frame": 119,
+      "beamMode": "IW",
+      "polarization": "VV+VH",
+      "processingLevel": "SLC",
+      "subswath": null,
+      "offNadirAngle": null,
+      "centerLat": "37.7319",
+      "centerLon": "38.0737",
+      "sizeMB": 4442.601754188538,
+      "insarGrouping": null,
+      "insarStackSize": null,
+      "footprint": "POLYGON ((36.442276 38.363029, 36.852558 36.683792, 39.677963 37.083942, 39.335003 38.761757, 36.442276 38.363029))",
+      "thumbnail": null,
+      "downloadUrl": "https://datapool.asf.alaska.edu/SLC/SA/S1A_IW_SLC__1SDV_20230204T152607_20230204T152635_047088_05A621_4129.zip"
+    },
+    "after": {
+      "granule": "S1A_IW_SLC__1SDV_20230228T152607_20230228T152635_047438_05B1F8_D724",
+      "platform": "Sentinel-1A",
+      "startTime": "2023-02-28T15:26:07Z",
+      "stopTime": "2023-02-28T15:26:35Z",
+      "flightDirection": "ASCENDING",
+      "relativeOrbit": 116,
+      "frame": 119,
+      "beamMode": "IW",
+      "polarization": "VV+VH",
+      "processingLevel": "SLC",
+      "subswath": null,
+      "offNadirAngle": null,
+      "centerLat": "37.732",
+      "centerLon": "38.0724",
+      "sizeMB": 4431.620403289795,
+      "insarGrouping": null,
+      "insarStackSize": null,
+      "footprint": "POLYGON ((36.44109 38.362858, 36.851334 36.68399, 39.676689 37.084209, 39.333744 38.76165, 36.44109 38.362858))",
+      "thumbnail": null,
+      "downloadUrl": "https://datapool.asf.alaska.edu/SLC/SA/S1A_IW_SLC__1SDV_20230228T152607_20230228T152635_047438_05B1F8_D724.zip"
+    }
+  },
+  "nisarCurrent": {
+    "granule": "NISAR_L2_PR_GSLC_034_151_D_070_2005_DHDH_A_20261103T162403_20261103T162437_P05036_N_F_J_001",
+    "platform": "NISAR",
+    "startTime": "2026-11-03T16:24:03Z",
+    "stopTime": "2026-11-03T16:24:37Z",
+    "flightDirection": "DESCENDING",
+    "relativeOrbit": 151,
+    "frame": 70,
+    "beamMode": null,
+    "polarization": null,
+    "processingLevel": "GSLC",
+    "subswath": null,
+    "offNadirAngle": null,
+    "centerLat": null,
+    "centerLon": null,
+    "sizeMB": null,
+    "insarGrouping": null,
+    "insarStackSize": null,
+    "footprint": "POLYGON ((36.10898 38.06056, 35.32332 36.0141, 37.99609 35.33869, 38.8241 37.37227, 36.10898 38.06056))",
+    "thumbnail": "https://nisar.asf.earthdatacloud.nasa.gov/BROWSE/NISAR_L2_GSLC_V1/NISAR_L2_PR_GSLC_034_151_D_070_2005_DHDH_A_20261103T162403_20261103T162437_P05036_N_F_J_001/NISAR_L2_PR_GSLC_034_151_D_070_2005_DHDH_A_20261103T162403_20261103T162437_P05036_N_F_J_001_LATLON.png",
+    "downloadUrl": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GSLC_V1/NISAR_L2_PR_GSLC_034_151_D_070_2005_DHDH_A_20261103T162403_20261103T162437_P05036_N_F_J_001/NISAR_L2_PR_GSLC_034_151_D_070_2005_DHDH_A_20261103T162403_20261103T162437_P05036_N_F_J_001.h5"
+  },
+  "queries": {
+    "before": "https://api.daac.asf.alaska.edu/services/search/param?output=json&platform=SENTINEL-1&flightDirection=ASCENDING&processingLevel=SLC&start=2023-01-01&end=2023-02-05&maxResults=8&intersectsWith=POINT%2836.9+37.6%29",
+    "after": "https://api.daac.asf.alaska.edu/services/search/param?output=json&platform=SENTINEL-1&flightDirection=ASCENDING&processingLevel=SLC&start=2023-02-08&end=2023-03-25&maxResults=8&intersectsWith=POINT%2836.9+37.6%29",
+    "nisar": "https://api.daac.asf.alaska.edu/services/search/param?output=json&platform=NISAR&maxResults=6&intersectsWith=POINT%2836.9+37.6%29"
+  }
+}

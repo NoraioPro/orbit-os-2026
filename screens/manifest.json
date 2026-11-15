@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T09:24:38.665Z",
+  "generated_at": "2026-11-15T09:29:08.617Z",
   "app": "ORBIT OS · Space Intelligence Platform",
   "base_url": "http://localhost:5173/",
   "capture": {
@@ -230,8 +230,8 @@
       "title": "SAR Earth Observatory",
       "route": "/module/sar",
       "file": "pages/module-sar.jpg",
-      "bytes": 282308,
-      "captured_at": "2026-11-15T09:01:02.139Z"
+      "bytes": 308102,
+      "captured_at": "2026-11-15T09:29:08.216Z"
     },
     {
       "slug": "module-defense",

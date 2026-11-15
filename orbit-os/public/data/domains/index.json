@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T09:19:25.983Z",
+  "generated_at": "2026-11-15T09:26:15.424Z",
   "source": "scripts/build-domains.mjs",
   "note": "Domain-organized data layer. Each file carries its own provenance block; panels read these files instead of hard-coded numbers.",
   "domains": [
@@ -39,6 +39,14 @@
       "id": "events",
       "file": "events-turkiye.json",
       "title": "USGS event · Kahramanmaras M7.8",
+      "honesty": "live",
+      "series": null,
+      "imagery": 0
+    },
+    {
+      "id": "sar-fault",
+      "file": "sar-fault.json",
+      "title": "East Anatolian Fault · Sentinel-1 pair",
       "honesty": "live",
       "series": null,
       "imagery": 0
