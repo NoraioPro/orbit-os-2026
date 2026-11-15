@@ -13,6 +13,7 @@ const InfrastructureOslo = lazy(() => import('../modules/InfrastructureOslo').th
 const AgriBoard = lazy(() => import('../modules/AgriBoard').then((m) => ({ default: m.AgriBoard })));
 const OceanBoard = lazy(() => import('../modules/OceanBoard').then((m) => ({ default: m.OceanBoard })));
 const DisasterEventBoard = lazy(() => import('../modules/DisasterEventBoard').then((m) => ({ default: m.DisasterEventBoard })));
+const TurkiyeBoard = lazy(() => import('../modules/TurkiyeBoard').then((m) => ({ default: m.TurkiyeBoard })));
 import { QuickInvestigation } from '../components/QuickInvestigation';
 import { HarvestPulse, SpaceWeather } from '../modules/harvestWidgets';
 import { useAssets } from '../data/assets';
@@ -57,7 +58,7 @@ const EarthSuite: ComponentType = () => (
     <EarthJukebox />
   </div>
 );
-const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterEventBoard /><DisasterWidget /><FireCalendar /></div>;
+const DisasterSuite: ComponentType = () => <div className="space-y-3"><DisasterEventBoard /><TurkiyeBoard /><DisasterWidget /><FireCalendar /></div>;
 const SarSuite: ComponentType = () => <div className="space-y-3"><SarFaultLab /><SarGlobe /><SarChampion /></div>;
 const OceanSuite: ComponentType = () => <div className="space-y-3"><OceanBoard /><OceanWidget /><SolarFish /></div>;
 const ExplorerSuite: ComponentType = () => <div className="space-y-3"><SpaceWeather /><SpaceExplorerPro /><SkyChangeViewer /></div>;

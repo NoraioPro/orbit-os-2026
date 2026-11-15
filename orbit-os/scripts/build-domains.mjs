@@ -100,18 +100,22 @@ function gibsPick(layers, ids) {
 }
 
 
-/** Real ASF Search API harvest (keyless metadata): NISAR + Sentinel-1 over the Oslo AOI. */
-async function fetchAsf() {
-  const aoi = 'POINT(10.75 59.91)';
-  const q = (platform) =>
-    'https://api.daac.asf.alaska.edu/services/search/param?' +
-    new URLSearchParams({ platform, intersectsWith: aoi, maxResults: '8', output: 'json' }).toString();
-  const out = [];
+/** Real ASF Search API harvest (keyless metadata) for several AOIs. */
+const ASF_AOIS = [
+  { id: 'oslo', name: 'Oslo, Norway', lat: 59.91, lon: 10.75 },
+  { id: 'svalbard', name: 'Svalbard, Norway', lat: 78.22, lon: 15.65 },
+];
+
+async function fetchAsfAoi(aoi) {
+  const point = `POINT(${aoi.lon} ${aoi.lat})`;
+  const queries = [];
   for (const platform of ['NISAR', 'SENTINEL-1']) {
-    const url = q(platform);
+    const url =
+      'https://api.daac.asf.alaska.edu/services/search/param?' +
+      new URLSearchParams({ platform, intersectsWith: point, maxResults: '8', output: 'json' }).toString();
     try {
       const res = await fetch(url, { headers: { 'User-Agent': 'ORBIT-OS/0.1 (NASA Space Apps)' } });
-      if (!res.ok) { out.push({ platform, url, status: `HTTP ${res.status}`, granules: [] }); continue; }
+      if (!res.ok) { queries.push({ platform, url, status: `HTTP ${res.status}`, granules: [] }); continue; }
       const json = await res.json();
       const granules = (json?.[0] ?? []).map((g) => ({
         granule: g.granuleName ?? null,
@@ -126,12 +130,42 @@ async function fetchAsf() {
         orbit: g.absoluteOrbit ?? null,
         browse: Array.isArray(g.browse) ? g.browse.find((b) => /_LATLON\.png$/i.test(b)) ?? g.browse[0] ?? null : null,
       }));
-      out.push({ platform, url, status: 'live', granules });
+      queries.push({ platform, url, status: 'live', granules });
     } catch (e) {
-      out.push({ platform, url, status: String(e.message ?? e), granules: [] });
+      queries.push({ platform, url, status: String(e.message ?? e), granules: [] });
     }
   }
-  return out;
+  return { ...aoi, queries, granules: queries.flatMap((q) => q.granules.map((g) => ({ ...g, platformQuery: q.platform }))) };
+}
+
+/** One real USGS event by id — the 6 Feb 2023 Kahramanmaras M7.8. */
+async function fetchUsgsEvent(eventId) {
+  const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventid=${eventId}`;
+  const res = await fetch(url, { headers: { 'User-Agent': 'ORBIT-OS/0.1 (NASA Space Apps)' } });
+  if (!res.ok) throw new Error(`USGS ${res.status}`);
+  const f = await res.json();
+  const p = f.properties ?? {};
+  const [lon, lat, depth] = f.geometry?.coordinates ?? [null, null, null];
+  const iso = p.time ? new Date(p.time).toISOString() : null;
+  return {
+    eventId,
+    url: p.url ?? url,
+    title: p.title ?? null,
+    place: p.place ?? null,
+    magnitude: p.mag ?? null,
+    magType: p.magType ?? null,
+    timeUtc: iso,
+    depthKm: depth,
+    lat,
+    lon,
+    mmi: p.mmi ?? null,
+    alert: p.alert ?? null,
+    significance: p.sig ?? null,
+    felt: p.felt ?? null,
+    reviewStatus: p.status ?? null,
+    network: p.net ?? null,
+    queryUrl: url,
+  };
 }
 
 async function main() {
@@ -283,18 +317,20 @@ async function main() {
       { id: 'agri', file: 'agri.json', title: agri.title, honesty: 'live', series: agri.series.length, imagery: agri.imagery.filter((i) => i.gibs).length },
       { id: 'ocean', file: 'ocean.json', title: ocean.title, honesty: 'live', series: ocean.series.length, imagery: ocean.imagery.filter((i) => i.gibs).length },
       { id: 'agri-ostfold', file: 'agri-ostfold.json', title: 'Agri Intelligence · Østfold', honesty: 'live', series: nordic.series.length, imagery: nordic.imagery.filter((i) => i.gibs).length },
-      { id: 'sar', file: 'sar.json', title: 'SAR acquisitions (ASF)', honesty: 'live', series: null, imagery: 0 },
+      { id: 'sar', file: 'sar.json', title: 'SAR acquisitions (ASF · Oslo + Svalbard)', honesty: 'live', series: null, imagery: 0 },
+      { id: 'events', file: 'events-turkiye.json', title: 'USGS event · Kahramanmaras M7.8', honesty: 'live', series: null, imagery: 0 },
     ],
   };
 
   await writeFile(join(OUT, 'agri.json'), JSON.stringify(agri, null, 2));
   await writeFile(join(OUT, 'ocean.json'), JSON.stringify(ocean, null, 2));
-  const asf = await fetchAsf();
+  const asfAois = [];
+  for (const aoi of ASF_AOIS) asfAois.push(await fetchAsfAoi(aoi));
+  const asf = { generated_at: generatedAt, aois: asfAois, granules: asfAois.flatMap((a) => a.granules) };
   const sar = {
     domain: 'sar',
     title: 'SAR acquisitions',
-    subtitle: 'ASF Search API harvest over the Oslo AOI',
-    aoi: { name: 'Oslo, Norway', lat: 59.91, lon: 10.75 },
+    subtitle: 'ASF Search API harvest (Oslo + Svalbard)',
     generated_at: generatedAt,
     provenance: {
       provider: 'NASA ASF Search API (Alaska Satellite Facility)',
@@ -303,12 +339,36 @@ async function main() {
       honesty: 'live',
       note: 'Granule metadata is real and returned by ASF. Downloading the products and running InSAR are NOT connected in this build.',
     },
-    queries: asf,
-    granules: asf.flatMap((q) => q.granules.map((g) => ({ ...g, platformQuery: q.platform }))),
+    aois: asfAois.map((a) => ({ id: a.id, name: a.name, lat: a.lat, lon: a.lon, queries: a.queries.map((q) => ({ platform: q.platform, status: q.status, count: q.granules.length })) })),
+    queries: asfAois.flatMap((a) => a.queries.map((q) => ({ ...q, aoi: a.id }))),
+    granules: asf.granules,
   };
   await writeFile(join(OUT, 'sar.json'), JSON.stringify(sar, null, 2));
   const sarEntry = index.domains.find((d) => d.id === 'sar');
   if (sarEntry) sarEntry.series = sar.granules.length;
+
+  // Real historical event (published USGS catalog record) — the 2023 Kahramanmaras M7.8
+  try {
+    const ev = await fetchUsgsEvent('us6000jllz');
+    const eventsFile = {
+      domain: 'events',
+      title: 'Kahramanmaras M7.8 · 6 Feb 2023',
+      generated_at: generatedAt,
+      provenance: {
+        provider: 'USGS Earthquake Catalog (FDSN event service)',
+        url: ev.queryUrl,
+        access: 'keyless',
+        honesty: 'live',
+        note: 'Magnitude, place, time, depth and coordinates are the reviewed USGS record. The InSAR deformation field shown in the app is NOT derived from this record and is labelled sample there.',
+      },
+      event: ev,
+    };
+    await writeFile(join(OUT, 'events-turkiye.json'), JSON.stringify(eventsFile, null, 2));
+    console.log(` usgs: ${ev.title} · ${ev.timeUtc} · ${ev.depthKm} km`);
+  } catch (e) {
+    console.log(' usgs event fetch failed:', e.message);
+  }
+
   await writeFile(join(OUT, 'index.json'), JSON.stringify(index, null, 2));
   console.log('wrote', OUT);
   for (const d of [agri, ocean]) {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T00:28:49.566Z",
+  "generated_at": "2026-11-15T00:32:05.700Z",
   "source": "scripts/build-domains.mjs",
   "note": "Domain-organized data layer. Each file carries its own provenance block; panels read these files instead of hard-coded numbers.",
   "domains": [
@@ -30,9 +30,17 @@
     {
       "id": "sar",
       "file": "sar.json",
-      "title": "SAR acquisitions (ASF)",
+      "title": "SAR acquisitions (ASF · Oslo + Svalbard)",
       "honesty": "live",
-      "series": 16,
+      "series": 24,
+      "imagery": 0
+    },
+    {
+      "id": "events",
+      "file": "events-turkiye.json",
+      "title": "USGS event · Kahramanmaras M7.8",
+      "honesty": "live",
+      "series": null,
       "imagery": 0
     }
   ]

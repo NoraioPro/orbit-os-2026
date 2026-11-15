@@ -1,0 +1,31 @@
+{
+  "domain": "events",
+  "title": "Kahramanmaras M7.8 · 6 Feb 2023",
+  "generated_at": "2026-11-15T00:32:05.700Z",
+  "provenance": {
+    "provider": "USGS Earthquake Catalog (FDSN event service)",
+    "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventid=us6000jllz",
+    "access": "keyless",
+    "honesty": "live",
+    "note": "Magnitude, place, time, depth and coordinates are the reviewed USGS record. The InSAR deformation field shown in the app is NOT derived from this record and is labelled sample there."
+  },
+  "event": {
+    "eventId": "us6000jllz",
+    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000jllz",
+    "title": "M 7.8 - Pazarcik earthquake, Kahramanmaras earthquake sequence",
+    "place": "Pazarcik earthquake, Kahramanmaras earthquake sequence",
+    "magnitude": 7.8,
+    "magType": "mww",
+    "timeUtc": "2023-02-06T01:17:34.342Z",
+    "depthKm": 10,
+    "lat": 37.2256,
+    "lon": 37.0143,
+    "mmi": 9.537,
+    "alert": "red",
+    "significance": 2910,
+    "felt": 3182,
+    "reviewStatus": "reviewed",
+    "network": "us",
+    "queryUrl": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventid=us6000jllz"
+  }
+}

@@ -1,13 +1,8 @@
 {
   "domain": "sar",
   "title": "SAR acquisitions",
-  "subtitle": "ASF Search API harvest over the Oslo AOI",
-  "aoi": {
-    "name": "Oslo, Norway",
-    "lat": 59.91,
-    "lon": 10.75
-  },
-  "generated_at": "2026-11-15T00:28:49.566Z",
+  "subtitle": "ASF Search API harvest (Oslo + Svalbard)",
+  "generated_at": "2026-11-15T00:32:05.700Z",
   "provenance": {
     "provider": "NASA ASF Search API (Alaska Satellite Facility)",
     "url": "https://api.daac.asf.alaska.edu/services/search/param",
@@ -15,6 +10,44 @@
     "honesty": "live",
     "note": "Granule metadata is real and returned by ASF. Downloading the products and running InSAR are NOT connected in this build."
   },
+  "aois": [
+    {
+      "id": "oslo",
+      "name": "Oslo, Norway",
+      "lat": 59.91,
+      "lon": 10.75,
+      "queries": [
+        {
+          "platform": "NISAR",
+          "status": "live",
+          "count": 8
+        },
+        {
+          "platform": "SENTINEL-1",
+          "status": "live",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "svalbard",
+      "name": "Svalbard, Norway",
+      "lat": 78.22,
+      "lon": 15.65,
+      "queries": [
+        {
+          "platform": "NISAR",
+          "status": "live",
+          "count": 0
+        },
+        {
+          "platform": "SENTINEL-1",
+          "status": "live",
+          "count": 8
+        }
+      ]
+    }
+  ],
   "queries": [
     {
       "platform": "NISAR",
@@ -125,7 +158,8 @@
           "orbit": 6139,
           "browse": "https://nisar.asf.earthdatacloud.nasa.gov/BROWSE/NISAR_L1_RIFG_PROVISIONAL_V1/NISAR_L1_PR_RIFG_031_158_A_032_032_2000_SH_20260929T034127_20260929T034203_20261011T034127_20261011T034203_P05023_N_F_J_001/NISAR_L1_PR_RIFG_031_158_A_032_032_2000_SH_20260929T034127_20260929T034203_20261011T034127_20261011T034203_P05023_N_F_J_001_LATLON.png"
         }
-      ]
+      ],
+      "aoi": "oslo"
     },
     {
       "platform": "SENTINEL-1",
@@ -239,7 +273,127 @@
           "orbit": 5437,
           "browse": null
         }
-      ]
+      ],
+      "aoi": "oslo"
+    },
+    {
+      "platform": "NISAR",
+      "url": "https://api.daac.asf.alaska.edu/services/search/param?platform=NISAR&intersectsWith=POINT%2815.65+78.22%29&maxResults=8&output=json",
+      "status": "live",
+      "granules": [],
+      "aoi": "svalbard"
+    },
+    {
+      "platform": "SENTINEL-1",
+      "url": "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&intersectsWith=POINT%2815.65+78.22%29&maxResults=8&output=json",
+      "status": "live",
+      "granules": [
+        {
+          "granule": "S1D_IW_RAW__0SDH_20261113T061514_20261113T061547_005445_00A659_6AEF",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:15:14Z",
+          "product": "RAW",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 332,
+          "orbit": 5445,
+          "browse": null
+        },
+        {
+          "granule": "S1D_IW_RAW__0SDH_20261113T061514_20261113T061547_005445_00A659_6AEF",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:15:14Z",
+          "product": "METADATA_RAW",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 332,
+          "orbit": 5445,
+          "browse": null
+        },
+        {
+          "granule": "S1D_IW_RAW__0SDH_20261113T061449_20261113T061522_005445_00A659_1FBF",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:14:49Z",
+          "product": "RAW",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 327,
+          "orbit": 5445,
+          "browse": null
+        },
+        {
+          "granule": "S1D_IW_RAW__0SDH_20261113T061449_20261113T061522_005445_00A659_1FBF",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:14:49Z",
+          "product": "METADATA_RAW",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 327,
+          "orbit": 5445,
+          "browse": null
+        },
+        {
+          "granule": "S1D_IW_SLC__1SDH_20261113T061452_20261113T061519_005445_00A659_9E10",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:14:52Z",
+          "product": "SLC",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 328,
+          "orbit": 5445,
+          "browse": null
+        },
+        {
+          "granule": "S1D_IW_SLC__1SDH_20261113T061452_20261113T061519_005445_00A659_9E10",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:14:52Z",
+          "product": "METADATA_SLC",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 328,
+          "orbit": 5445,
+          "browse": null
+        },
+        {
+          "granule": "S1D_IW_GRDH_1SDH_20261113T061453_20261113T061518_005445_00A659_F75E",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:14:53Z",
+          "product": "METADATA_GRD_HD",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 328,
+          "orbit": 5445,
+          "browse": null
+        },
+        {
+          "granule": "S1D_IW_GRDH_1SDH_20261113T061453_20261113T061518_005445_00A659_F75E",
+          "platform": "Sentinel-1D",
+          "startTime": "2026-11-13T06:14:53Z",
+          "product": "GRD_HD",
+          "beamMode": "IW",
+          "polarization": "HH+HV",
+          "fileSizeBytes": null,
+          "path": null,
+          "frame": 328,
+          "orbit": 5445,
+          "browse": null
+        }
+      ],
+      "aoi": "svalbard"
     }
   ],
   "granules": [
@@ -467,6 +621,118 @@
       "path": null,
       "frame": 193,
       "orbit": 5437,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_RAW__0SDH_20261113T061514_20261113T061547_005445_00A659_6AEF",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:15:14Z",
+      "product": "RAW",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 332,
+      "orbit": 5445,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_RAW__0SDH_20261113T061514_20261113T061547_005445_00A659_6AEF",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:15:14Z",
+      "product": "METADATA_RAW",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 332,
+      "orbit": 5445,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_RAW__0SDH_20261113T061449_20261113T061522_005445_00A659_1FBF",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:14:49Z",
+      "product": "RAW",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 327,
+      "orbit": 5445,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_RAW__0SDH_20261113T061449_20261113T061522_005445_00A659_1FBF",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:14:49Z",
+      "product": "METADATA_RAW",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 327,
+      "orbit": 5445,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_SLC__1SDH_20261113T061452_20261113T061519_005445_00A659_9E10",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:14:52Z",
+      "product": "SLC",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 328,
+      "orbit": 5445,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_SLC__1SDH_20261113T061452_20261113T061519_005445_00A659_9E10",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:14:52Z",
+      "product": "METADATA_SLC",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 328,
+      "orbit": 5445,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_GRDH_1SDH_20261113T061453_20261113T061518_005445_00A659_F75E",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:14:53Z",
+      "product": "METADATA_GRD_HD",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 328,
+      "orbit": 5445,
+      "browse": null,
+      "platformQuery": "SENTINEL-1"
+    },
+    {
+      "granule": "S1D_IW_GRDH_1SDH_20261113T061453_20261113T061518_005445_00A659_F75E",
+      "platform": "Sentinel-1D",
+      "startTime": "2026-11-13T06:14:53Z",
+      "product": "GRD_HD",
+      "beamMode": "IW",
+      "polarization": "HH+HV",
+      "fileSizeBytes": null,
+      "path": null,
+      "frame": 328,
+      "orbit": 5445,
       "browse": null,
       "platformQuery": "SENTINEL-1"
     }

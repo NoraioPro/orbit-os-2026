@@ -9,7 +9,7 @@
     "lon": 2.11,
     "community": "AG"
   },
-  "generated_at": "2026-11-15T00:28:49.566Z",
+  "generated_at": "2026-11-15T00:32:05.700Z",
   "provenance": {
     "provider": "NASA POWER (monthly point API, community=AG)",
     "url": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=GWETROOT,T2M,PRECTOTCORR,WS2M,CLOUD_AMT&community=AG&longitude=2.11&latitude=13.51&start=2025&end=2026&format=JSON",
